@@ -16,7 +16,7 @@ function User() {
       <Route path={ROUTES.ABOUT} element={<AboutUs />} />
       <Route path={ROUTES.CONTACT} element={<Contact />} />
       <Route path={ROUTES.PRODUCTS} element={<Products />} />
-      <Route path={ROUTES.PRODUCT_DETAILS} element={<ProductDetails />} />
+      <Route path={`${ROUTES.PRODUCT_DETAILS}/:id`} element={<ProductDetails userPage={true} />} />
     </Routes>
   </main>
   )

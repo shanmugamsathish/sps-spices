@@ -267,16 +267,63 @@ function AdminAddProduct() {
     }
   }, [formData.title]);
 
+  const isFormValid = useCallback(() => {
+    if (!formData.title?.trim() || 
+        !formData.vendor?.trim() || 
+        !formData.product_type?.trim() ||
+        !formData.status?.trim() || 
+        !formData.body_html?.trim()) {
+      return false;
+    }
+
+    if (options.length === 0 || 
+        options.some(option => !option.name?.trim() || 
+        !option.values || 
+        option.values.length === 0 || 
+        option.values.every(v => !v?.trim()))) {
+      return false;
+    }
+
+    if (variants.length === 0) {
+      return false;
+    }
+
+    const hasInvalidVariant = variants.some(variant => 
+      !variant.title?.trim() || 
+      !variant.price?.trim() || 
+      !variant.sku?.trim() || 
+      variant.inventory_quantity === "" || 
+      variant.inventory_quantity === null ||
+      variant.inventory_quantity === undefined ||
+      !variant.weight?.trim() || 
+      !variant.weight_unit?.trim()
+    );
+
+    if (hasInvalidVariant) {
+      return false;
+    }
+
+    const hasImage = images.some(image => image instanceof File);
+    if (!hasImage) {
+      return false;
+    }
+
+    return true;
+  }, [formData.title, formData.vendor, formData.product_type, formData.status, formData.body_html, options, variants, images]);
+
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
 
+      if (!isFormValid()) {
+        toast.error("Please fill in all required fields");
+        return;
+      }
+
       dispatch(setLoading(true));
 
-      // Create FormData for multipart/form-data
       const formDataToSend = new FormData();
 
-      // Add product data as JSON string
       const productData = {
         title: formData.title,
         body_html: formData.body_html,
@@ -395,14 +442,21 @@ function AdminAddProduct() {
               Cancel
             </button>
             <button
-              type="submit"
-              className="px-6 py-3 rounded-md text-white font-medium transition-colors cursor-pointer"
-              style={{ backgroundColor: theme.colors.accent.primary }}
+               type="submit"
+               disabled={!isFormValid()}
+               className="px-6 py-3 rounded-md text-white font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+               style={{
+                 backgroundColor: theme.colors.accent.primary,
+               }}
               onMouseEnter={(e) => {
-                e.target.style.backgroundColor = theme.colors.accent.hover;
+                if (!e.target.disabled) {
+                  e.target.style.backgroundColor = theme.colors.accent.hover;
+                }
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor = theme.colors.accent.primary;
+                if (!e.target.disabled) {
+                  e.target.style.backgroundColor = theme.colors.accent.primary;
+                }
               }}
             >
               Add Product

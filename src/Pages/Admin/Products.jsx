@@ -36,7 +36,7 @@ function Products() {
       setLoadingText(false);
       dispatch(setLoading(false));
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     fetchProducts();
@@ -145,7 +145,7 @@ function Products() {
           Products
         </h1>
         <button
-          onClick={() => navigate(ROUTES.ADMIN_ADD_PRODUCT)}
+          onClick={() => {navigate(ROUTES.ADMIN_ADD_PRODUCT); window.scrollTo(0, 0)}}
           className="flex items-center gap-2 px-4 py-2 rounded-md text-white text-sm font-medium transition-colors cursor-pointer"
           style={{ backgroundColor: theme.colors.accent.primary }}
           onMouseEnter={(e) => {
@@ -280,8 +280,9 @@ function Products() {
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className="font-medium"
+                          className="font-medium cursor-pointer"
                           style={{ color: theme.colors.text.primary }}
+                          onClick={() => {navigate(`${ROUTES.ADMIN_PRODUCT_DETAILS}/${product.id}`); window.scrollTo(0, 0)}}
                         >
                           {product.title || 'N/A'}
                         </span>

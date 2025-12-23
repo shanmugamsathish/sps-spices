@@ -63,3 +63,27 @@ export const deleteProduct = async (id) => {
         throw error;
     }
 }
+
+// Autosearch products
+export const autoSearchProducts = async (query) => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/products/autocomplete`, {
+            params: { q: query },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error autosearching products:', error);
+        throw error;
+    }
+}
+
+// Get available product categories
+export const getProductCategories = async () => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/products/categories/list`);
+        return response.data?.categories || [];
+    } catch (error) {
+        console.error('Error fetching product categories:', error);
+        throw error;
+    }
+}
