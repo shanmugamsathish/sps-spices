@@ -126,17 +126,15 @@ function ProductCard({ productsList }) {
 
   // Determine if we should show shimmer (loading state or no products)
   const showShimmer = isLoadingState || !productsData || productsData.length === 0;
-  const shimmerCount = isHome ? 4 : 8;
+  const shimmerCount = isHome ? 4 : productsData.length;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 pt-4 container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {showShimmer ? (
-          // Show shimmer skeletons during loading
           Array.from({ length: shimmerCount }).map((_, index) => (
             <ProductCardShimmer key={`shimmer-${index}`} />
           ))
         ) : (
-          // Show actual product cards
           productsData?.map((product) => {
             const variant = getFirstVariant(product);
           const available = isAvailable(product);

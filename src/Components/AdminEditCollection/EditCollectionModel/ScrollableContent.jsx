@@ -38,7 +38,8 @@ function ScrollableContent({ loadingText, formData, handleInputChange, generateH
           handleRuleChange={handleRuleChange} 
           removeRule={removeRule} 
           selectProductFromSearch={selectProductFromSearch} 
-          getProductImage={getProductImage} 
+          getProductImage={getProductImage}
+          isEditMode={true}
         />
 
         {/* Collection Image */}

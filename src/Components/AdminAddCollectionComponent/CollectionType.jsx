@@ -2,7 +2,7 @@ import React from 'react'
 import theme from '../../lib/theme';
 import { Search, Plus, X, Trash2 } from 'lucide-react';
 
-function CollectionType({ formData, handleInputChange, handleSearchChange, searchQuery, showAutocomplete, autocompleteResults, autocompleteRef, searchRef, openBrowseModal, selectedProducts, removeProduct, addRule, rules, handleRuleChange, removeRule, selectProductFromSearch, getProductImage }) {
+function CollectionType({ formData, handleInputChange, handleSearchChange, searchQuery, showAutocomplete, autocompleteResults, autocompleteRef, searchRef, openBrowseModal, selectedProducts, removeProduct, addRule, rules, handleRuleChange, removeRule, selectProductFromSearch, getProductImage, isEditMode = false }) {
   return (
     <div
     className="p-4 sm:p-6 rounded-lg shadow-sm"
@@ -17,36 +17,52 @@ function CollectionType({ formData, handleInputChange, handleSearchChange, searc
     >
       Collection Type
     </h2>
-    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-      <label className="flex items-center gap-2 cursor-pointer">
-        <input
-          type="radio"
-          name="collection_type"
-          value="custom_collection"
-          checked={formData.collection_type === "custom_collection"}
-          onChange={handleInputChange}
-          className="w-4 h-4"
-          style={{ accentColor: theme.colors.accent.primary }}
-        />
-        <span style={{ color: theme.colors.text.primary }}>
-          Manual Collection
-        </span>
-      </label>
-      <label className="flex items-center gap-2 cursor-pointer">
-        <input
-          type="radio"
-          name="collection_type"
-          value="smart_collection"
-          checked={formData.collection_type === "smart_collection"}
-          onChange={handleInputChange}
-          className="w-4 h-4"
-          style={{ accentColor: theme.colors.accent.primary }}
-        />
-        <span style={{ color: theme.colors.text.primary }}>
-          Smart Collection
-        </span>
-      </label>
-    </div>
+    {isEditMode ? (
+      // In edit mode, show only the current collection type as read-only
+      <div className="flex items-center gap-2">
+        <div
+          className="px-4 py-2 rounded-md font-medium text-white"
+          style={{
+            backgroundColor: theme.colors.accent.primary,
+            border: `1px solid ${theme.colors.border.light}`,
+          }}
+        >
+          {formData.collection_type === "smart_collection" ? "Smart Collection" : "Manual Collection"}
+        </div>
+      </div>
+    ) : (
+      // In add mode, show radio buttons to select type
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="radio"
+            name="collection_type"
+            value="custom_collection"
+            checked={formData.collection_type === "custom_collection"}
+            onChange={handleInputChange}
+            className="w-4 h-4"
+            style={{ accentColor: theme.colors.accent.primary }}
+          />
+          <span style={{ color: theme.colors.text.primary }}>
+            Manual Collection
+          </span>
+        </label>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="radio"
+            name="collection_type"
+            value="smart_collection"
+            checked={formData.collection_type === "smart_collection"}
+            onChange={handleInputChange}
+            className="w-4 h-4"
+            style={{ accentColor: theme.colors.accent.primary }}
+          />
+          <span style={{ color: theme.colors.text.primary }}>
+            Smart Collection
+          </span>
+        </label>
+      </div>
+    )}
 
     {/* Product Selection for Manual Collection */}
     {formData.collection_type === "custom_collection" && (

@@ -14,12 +14,10 @@ function Home() {
     try {
       dispatch(setLoading(true));
       const products = await getAllProducts();
-      console.log('products in Home Page', products);
       dispatch(setProducts(products));
       toast.success('Products fetched successfully');
     } catch (error) {
-      console.error('Error fetching products:', error);
-      toast.error('Error fetching products');
+      toast.error(`${error.message || 'Error fetching products'}`);
     } finally {
       dispatch(setLoading(false));
     }
@@ -39,7 +37,6 @@ function Home() {
   };
 
   const productTypes = getUniqueProductTypes();
-  console.log('productTypes in Home Page', productTypes);
 
   return (
     <div>

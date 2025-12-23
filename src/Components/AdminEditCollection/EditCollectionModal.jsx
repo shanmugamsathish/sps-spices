@@ -53,10 +53,18 @@ function EditCollectionModal({ collectionId, isOpen, onClose, onUpdate, tableWid
       const collectionType = response?.collection_type || 
                             (collection.rules !== undefined ? 'smart_collection' : 'custom_collection');
       
-      // Set initialData with collection_type included
+      
+      const normalizedInitialRules = collectionType === 'smart_collection' && collection.rules
+        ? collection.rules.map(rule => ({
+            ...rule,
+            column: rule.column === 'type' ? 'product_type' : rule.column
+          }))
+        : collection.rules;
+      
       setInitialData({
         ...collection,
         collection_type: collectionType,
+        rules: normalizedInitialRules,
       });
       
       setFormData({
@@ -69,20 +77,24 @@ function EditCollectionModal({ collectionId, isOpen, onClose, onUpdate, tableWid
         disjunctive: collection.disjunctive || false,
       });
 
-      // Set image - can be File or URL string
       if (collection.image?.src) {
         setImage(collection.image.src);
       } else {
         setImage(null);
       }
 
-      // Set rules for smart collections
       if (collectionType === 'smart_collection' && collection.rules) {
-        setRules(collection.rules.length > 0 ? collection.rules : [{
-          column: "product_type",
-          relation: "equals",
-          condition: "",
-        }]);
+        const normalizedRules = collection.rules.length > 0 
+          ? collection.rules.map(rule => ({
+              ...rule,
+              column: rule.column === 'type' ? 'product_type' : rule.column
+            }))
+          : [{
+              column: "product_type",
+              relation: "equals",
+              condition: "",
+            }];
+        setRules(normalizedRules);
       } else {
         setRules([{
           column: "product_type",
@@ -97,7 +109,6 @@ function EditCollectionModal({ collectionId, isOpen, onClose, onUpdate, tableWid
           const allProductsData = await getAllProducts();
           const productsList = Array.isArray(allProductsData) ? allProductsData : [];
           
-          // Map product IDs from collects to actual product objects
           const productIds = collection.collects.map(collect => String(collect.product_id));
           const matchedProducts = productsList.filter(product => 
             productIds.includes(String(product.id))
@@ -138,8 +149,22 @@ function EditCollectionModal({ collectionId, isOpen, onClose, onUpdate, tableWid
       formData.collection_type !== initialCollectionType ||
       formData.disjunctive !== (initialData.disjunctive || false);
 
-    const rulesChanged = formData.collection_type === 'smart_collection' &&
-      JSON.stringify(rules) !== JSON.stringify(initialData.rules || []);
+    let rulesChanged = false;
+    if (formData.collection_type === 'smart_collection') {
+      const normalizedCurrentRules = rules.map(rule => ({
+        column: rule.column === 'type' ? 'product_type' : rule.column,
+        relation: rule.relation,
+        condition: rule.condition ? rule.condition.trim() : rule.condition
+      }));
+      
+      const normalizedInitialRules = (initialData.rules || []).map(rule => ({
+        column: rule.column === 'type' ? 'product_type' : rule.column,
+        relation: rule.relation,
+        condition: rule.condition ? rule.condition.trim() : rule.condition
+      }));
+      
+      rulesChanged = JSON.stringify(normalizedCurrentRules) !== JSON.stringify(normalizedInitialRules);
+    }
 
     const productsChanged = formData.collection_type === 'custom_collection' &&
       JSON.stringify(selectedProducts.map(p => p.id).sort()) !== 
@@ -190,6 +215,11 @@ function EditCollectionModal({ collectionId, isOpen, onClose, onUpdate, tableWid
 
   const handleInputChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
+    
+    if (name === "collection_type") {
+      return;
+    }
+    
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -481,4 +511,3 @@ function EditCollectionModal({ collectionId, isOpen, onClose, onUpdate, tableWid
 }
 
 export default EditCollectionModal;
-

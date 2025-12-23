@@ -37,10 +37,10 @@ function Collections() {
         const isSmartCollection = collection.rules !== undefined;
         
         if (isSmartCollection) {
-          // For smart collections, we can't easily get count without fetching products
-          counts[collection.id] = 'Smart';
+          counts[collection.id] = collection.product_count !== undefined 
+            ? collection.product_count 
+            : collection.products_count || 0;
         } else {
-          // For manual collections, get count from collects array (now included in response)
           const collects = collection?.collects || [];
           counts[collection.id] = collects.length || 0;
         }
