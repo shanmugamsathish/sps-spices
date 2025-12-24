@@ -11,6 +11,7 @@ import Collections from '../Pages/Admin/Collections';
 import Products from '../Pages/Admin/Products';
 import AdminAddCollection from '../Pages/Admin/AdminAddCollection';
 import ProductDetails from '../Pages/User/ProductDetails';
+import AdminAddCustomer from '../Pages/Admin/AdminAddCustomer';
 
 function Admin() {
     const { isCollapsed } = UseAdminSidebar();
@@ -28,6 +29,7 @@ function Admin() {
               <Route path={ROUTES.ADMIN_ADD_PRODUCT} element={<AdminAddProduct />} />
               <Route path={ROUTES.ADMIN_PRODUCTS} element={<Products />} />
               <Route path={ROUTES.ADMIN_CUSTOMERS} element={<Customers />} />
+              <Route path={ROUTES.ADMIN_ADD_CUSTOMER} element={<AdminAddCustomer />} />
               <Route path={ROUTES.ADMIN_ORDERS} element={<Orders />} />
               <Route path={ROUTES.ADMIN_COLLECTIONS} element={<Collections />} />
               <Route path={ROUTES.ADMIN_ADD_COLLECTION} element={<AdminAddCollection />} />

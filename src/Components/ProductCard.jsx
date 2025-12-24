@@ -6,15 +6,26 @@ import { ROUTES } from "../lib/constant";
 import { useSelector } from "react-redux";
 import ProductCardShimmer from "./ProductCardShimmer";
 
-function ProductCard({ productsList }) {
+function ProductCard() {
   const location = useLocation();
   const navigate = useNavigate();
+  const productsList = useSelector((state) => state.products.products);
+  const isSearching = useSelector((state) => state.products.isSearching);
+  const searchQuery = useSelector((state) => state.products.searchQuery);
   const isHome = location.pathname === "/";
   const isLoadingState = useSelector((state) => state.loader.isLoading);
   
   // Ensure productsList is an array before using slice
   const productsListArray = Array.isArray(productsList) ? productsList : [];
+  console.log(productsList);
   const productsData = isHome ? productsListArray.slice(0, 4) : productsListArray;
+  
+  // Check if we're in search mode with no results
+  const isSearchMode = searchQuery && searchQuery.trim() !== "";
+  const hasNoSearchResults = productsListArray.length === 0;
+  
+  // Show shimmer when loading, searching, or when no products found (0 products) - shimmer stays visible always
+  const shouldShowShimmer = isLoadingState || isSearching || (isSearchMode && productsListArray.length === 0) || (!isSearchMode && productsListArray.length === 0);
   
   // Helper function to format price
   const formatPrice = (price) => {
@@ -80,7 +91,7 @@ function ProductCard({ productsList }) {
 
     return (
       <div
-        className="relative w-full h-48 sm:h-56 md:h-56 lg:h-56 overflow-hidden rounded-md cursor-pointer group"
+        className="relative w-full h-48 sm:h-56 md:h-56 lg:h-56 overflow-hidden rounded-md cursor-pointer group "
         style={{ borderBottom: `1px solid ${theme.colors.border.light}` }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -102,7 +113,7 @@ function ProductCard({ productsList }) {
           />
         ))}
         {hasMultipleImages && (
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1.5 z-20">
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1.5 z-20 ">
             {productImages.map((_, index) => (
               <div
                 key={index}
@@ -124,13 +135,14 @@ function ProductCard({ productsList }) {
     return product?.status === 'active' && (getFirstVariant(product)?.inventory_quantity || 0) > 0;
   };
 
-  // Determine if we should show shimmer (loading state or no products)
-  const showShimmer = isLoadingState || !productsData || productsData.length === 0;
-  const shimmerCount = isHome ? 4 : productsData.length;
+  // Determine shimmer count
+  const shimmerCount = isHome ? 4 : (productsData.length > 0 ? productsData.length : 4);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 pt-4 container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        {showShimmer ? (
+    <div className="relative">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 pt-4 container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        {shouldShowShimmer ? (
+          // Show shimmer during loading/searching or when no products found (shimmer stays visible)
           Array.from({ length: shimmerCount }).map((_, index) => (
             <ProductCardShimmer key={`shimmer-${index}`} />
           ))
@@ -145,7 +157,7 @@ function ProductCard({ productsList }) {
           return (
             <div
               key={product.id}
-              className="flex flex-col gap-2 sm:gap-3 rounded-md p-3 sm:p-4 lg:p-5 hover:shadow-lg transition-shadow duration-300"
+              className="flex flex-col gap-2 sm:gap-3 rounded-md p-3 sm:p-4 lg:p-5 transition-shadow duration-300 shadow-lg"
               style={{
                 backgroundColor: theme.colors.background.main,
                 border: `1px solid ${theme.colors.border.light}`,
@@ -205,6 +217,23 @@ function ProductCard({ productsList }) {
             );
           })
         )}
+        {hasNoSearchResults && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center py-8 sm:py-12 pointer-events-none" style={{ zIndex: 10 }}>
+            <div className="p-4 sm:p-6 rounded-lg text-center pointer-events-auto" style={{
+              backgroundColor: theme.colors.background.main,
+              border: `1px solid ${theme.colors.border.light}`,
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            }}>
+              <p className="text-base sm:text-lg md:text-xl font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
+                No Products Found
+              </p>
+              <p className="text-sm sm:text-base" style={{ color: theme.colors.text.secondary }}>
+                No products found for "{searchQuery}". Try a different search term.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

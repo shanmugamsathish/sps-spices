@@ -23,6 +23,18 @@ export const getProductById = async (id) => {
     }
 }
 
+// Get product by title
+export const getProductByTitle = async (title) => {
+    console.log(title);
+    try {
+        const response = await axiosInstance.get(`${API_URL}/products/title/${title}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching product by title:', error);
+        throw error;
+    }
+}
+
 // Create a new product
 export const createProduct = async (formData) => {
     try {
