@@ -54,7 +54,7 @@ function Products() {
   const productTypes = getUniqueProductTypes();
 
   return (
-    <div>
+    <div >
       {productTypes.map((productType) => (
         <ProductCategory
           key={productType}

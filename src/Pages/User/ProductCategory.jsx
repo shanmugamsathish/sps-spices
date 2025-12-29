@@ -7,6 +7,7 @@ import theme from "../../lib/theme";
 import { useSelector } from "react-redux";
 
 function ProductCategory({ categoryName, productType, sectionId }) {
+  console.log(categoryName, productType, sectionId);
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -34,7 +35,7 @@ function ProductCategory({ categoryName, productType, sectionId }) {
 
   return (
     <section id={finalSectionId}>
-      <div className="flex justify-between items-center container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="flex justify-between items-center container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-6">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase">
           <span
             className="border-b-4 pb-1"

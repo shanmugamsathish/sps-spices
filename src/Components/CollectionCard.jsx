@@ -29,7 +29,7 @@ function CollectionCard({ collectionsList }) {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 pt-4 container mx-auto px-4 sm:px-6 lg:px-8 ">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  lg:gap-8 py-4 sm:py-4 lg:py-4 container mx-auto px-4 sm:px-6 lg:px-8 ">
       {collectionsListArray.map((collection) => {
         const collectionImage = getCollectionImage(collection);
         const productCount = getProductCount(collection);

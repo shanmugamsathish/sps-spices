@@ -175,7 +175,7 @@ function ProductCard({ productsList, horizontal = false }) {
   return (
     <div className="relative">
       {horizontal ? (
-        <div className="relative no-scrollbar container mx-auto px-4 sm:px-6  py-4 sm:py-6 lg:py-5">
+        <div className="relative no-scrollbar container mx-auto px-4 sm:px-6  py-2 sm:py-2 lg:py-2">
           {/* Left control */}
           <button
             onClick={scrollLeft}
