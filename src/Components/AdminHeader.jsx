@@ -41,6 +41,7 @@ function AdminHeader() {
       path: ROUTES.ADMIN_LOGOUT,
       label: "Logout",
       icon: LogOut,
+      
     },
   ];
 

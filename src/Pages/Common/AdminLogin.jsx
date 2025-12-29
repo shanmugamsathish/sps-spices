@@ -3,32 +3,34 @@ import { useNavigate } from "react-router-dom";
 import theme from "../../lib/theme";
 import login from "../../assets/login.png";
 import logo from "../../assets/LOGO sps bg.png";
-import { loginUser } from "../../apiCalls/users";
+import { loginAdmin } from "../../apiCalls/users";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { setLoading } from "../../redux/loaderSlice";
 
-const Login = () => {
+const AdminLogin = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("testcustomers@example.com");
-  const [password, setPassword] = useState("password123");
-  const [loading, _setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const [email, setEmail] = useState("josesamimmanuel@gmail.com");
+  const [password, setPassword] = useState("jose@123");
   const [error, _setError] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await loginUser({ email, password });
+      dispatch(setLoading(true));
+      const response = await loginAdmin({ email, password });
       if (response) {
-        navigate("/");
+        navigate("/admin/products");
         toast.success(response.message);
         sessionStorage.setItem("token", response.token);
-        if (response.shopifyAccessToken) {
-          sessionStorage.setItem("shopifyAccessToken", response.shopifyAccessToken);
-        }
       } else {
         toast.error(response.message || "Invalid email or password");
       }
     } catch (error) {
       toast.error(error.response.data.message || "Invalid email or password");
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
@@ -56,10 +58,10 @@ const Login = () => {
             className="text-3xl font-bold mb-2"
             style={{ color: theme.colors.text.primary }}
           >
-            Welcome Back 👋
+            Welcome to Admin Login 👋
           </h2>
 
-          <p className="text-gray-500 mb-6">Please login to your account</p>
+          <p className="text-gray-500 mb-6">Please login to your admin account</p>
 
           {error && (
             <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
@@ -94,32 +96,21 @@ const Login = () => {
 
             <button
               type="submit"
-              disabled={loading}
               className="w-full py-3 rounded-xl font-semibold text-white transition"
               style={{ backgroundColor: theme.colors.accent.primary }}
             >
-              {loading ? "Logging in..." : "Login"}
+              Login
             </button>
           </form>
 
-          <p className="mt-6 text-sm text-center text-gray-600">
-            Don’t have an account?{" "}
-            <span
-              className="cursor-pointer font-semibold hover:underline"
-              style={{ color: theme.colors.accent.primary }}
-              onClick={() => navigate("/register")}
-            >
-              Sign up
-            </span>
-          </p>
           <div className="flex justify-center items-center">
           <p className="mt-6 text-sm text-center text-gray-600">
             <span
               className="cursor-pointer font-semibold hover:underline"
               style={{ color: theme.colors.accent.primary }}
-              onClick={() => navigate("/admin/login")}
+              onClick={() => navigate("/login")}
             >
-              Login as Admin <span className="text-gray-500 mx-2"> | </span>
+              Login as a User <span className="text-gray-500 mx-2"> | </span>
             </span> 
 
           </p>
@@ -140,4 +131,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default AdminLogin;

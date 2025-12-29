@@ -1,12 +1,15 @@
 export const ROUTES = {
     LOGIN: '/login',
     REGISTER: '/register',
+    ADMIN_LOGIN: '/admin/login',
 
     HOME: '/',
     ABOUT: '/about',
     CONTACT: '/contact',
     PRODUCTS: '/products',
     PRODUCT_DETAILS: '/product-details',
+    COLLECTIONS: '/collections',
+    COLLECTION_PRODUCTS: '/collection-products',
 
     ADMIN_PRODUCTS: '/admin/products',
     ADMIN_ADD_PRODUCT: '/admin/add-product',

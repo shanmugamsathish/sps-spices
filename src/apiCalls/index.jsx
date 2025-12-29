@@ -5,8 +5,8 @@ export const axiosInstance = axios.create({
     baseURL: API_URL,
     withCredentials: true,
     headers: {
-        "Content-Type": "application/json;multipart/form-data",
-        "Accept": "application/json;multipart/form-data"
+        "Content-Type": "application/json",
+        "Accept": "application/json"
     },
 });
 
@@ -16,6 +16,10 @@ axiosInstance.interceptors.request.use(
         const token = sessionStorage.getItem("token");
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+        }
+        const shopifyToken = sessionStorage.getItem("shopifyAccessToken");
+        if (shopifyToken) {
+            config.headers['x-shopify-token'] = shopifyToken;
         }
         return config;
     },

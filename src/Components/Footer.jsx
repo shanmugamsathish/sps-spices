@@ -2,6 +2,7 @@ import React from "react";
 import { Instagram } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import theme from "../lib/theme";
+import { Link } from "react-router-dom";
 
 function Footer() {
   return (
@@ -18,14 +19,14 @@ function Footer() {
         style={{ borderColor: theme.colors.border.light }}
       >
         <div className=" hidden lg:block">
-          <span>Follow SPS – Spices & Dry Fruits on social networks:</span>
+          <span>Follow SPS SPICES AND DRY FRUITS on social networks:</span>
         </div>
 
         {/* Social Icons */}
         <div className="flex gap-4">
           {/* Instagram */}
           <a
-            href="https://www.instagram.com/spsspices"
+            href="https://www.instagram.com/sps_spices/"
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: theme.colors.text.primary }}
@@ -35,7 +36,7 @@ function Footer() {
 
           {/* WhatsApp */}
           <a
-            href="https://wa.me/919XXXXXXXXX"
+            href="https://wa.me/917092597277"
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: theme.colors.text.primary }}
@@ -47,39 +48,38 @@ function Footer() {
 
       {/* Main Footer Content */}
       <div className="px-25 py-4 text-center md:text-left">
-        <div className="grid-1 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-
+        <div className="grid-1 grid gap-16 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
             <h6 className="mb-4 flex items-center justify-center font-semibold uppercase md:justify-start">
-              SPS – Spices & Dry Fruits
+              SPS SPICES AND DRY FRUITS
             </h6>
             <p>
-              Authentic spices and premium dry fruits crafted with purity and
-              tradition. Bringing the true taste of heritage to your kitchen.
+              Pure, aromatic spices and nutrient-rich dry fruits. Sourced with
+              quality, packed with freshness.
             </p>
           </div>
 
-          {/* Products */}
-          <div>
-            <h6 className="mb-4 flex justify-center font-semibold uppercase md:justify-start">
-              Our Products
-            </h6>
-            <p className="mb-4">Whole Spices</p>
-            <p className="mb-4">Powdered Spices</p>
-            <p className="mb-4">Dry Fruits & Nuts</p>
-            <p>Combo & Gift Packs</p>
-          </div>
-
           {/* Useful Links */}
-          <div>
+          <div >
             <h6 className="mb-4 flex justify-center font-semibold uppercase md:justify-start">
               Useful Links
             </h6>
-            <p className="mb-4">Shop Online</p>
-            <p className="mb-4">About Us</p>
-            <p className="mb-4">Quality Promise</p>
-            <p>Bulk Orders</p>
+            <p className="mb-2">
+              <Link to="/">Home</Link>
+            </p>
+            <p className="mb-2">
+              <Link to="/about">About Us</Link>
+            </p>
+            <p className="mb-2">
+              <Link to="/products">Products</Link>
+            </p>
+            <p className="mb-2">
+              <Link to="/collections">Collections</Link>
+            </p>
+            <p className="mb-2">
+              <Link to="/contact">Contact Us</Link>
+            </p>
           </div>
 
           {/* Contact */}
@@ -88,26 +88,33 @@ function Footer() {
               Contact
             </h6>
             <p className="mb-4 flex items-center justify-center md:justify-start">
-              Chennai, Tamil Nadu, India
+              C2 NAAZYAS ARCADE 4th Main Road Maharaja Nagar Palayamkottai -
+              627011
             </p>
             <p className="mb-4 flex items-center justify-center md:justify-start">
-              support@spsspices.com
+              spsspices@zohomail.in
             </p>
             <p className="mb-4 flex items-center justify-center md:justify-start">
-              +91 9XXXXXXXXX (WhatsApp)
+              +91 7092597277 (WhatsApp)
             </p>
-            <p className="flex items-center justify-center md:justify-start">
+            {/* <p className="flex items-center justify-center md:justify-start">
               Wholesale & Retail Enquiries
-            </p>
+            </p> */}
           </div>
 
-          {/* Copyright */}
-          <div className="flex">
-            <span>© 2025&nbsp;</span>
-            <span className="font-semibold">
-              SPS – Spices & Dry Fruits
-            </span>
+          {/* Policies */}
+          <div>
+            <h6 className="mb-4 flex justify-center font-semibold uppercase md:justify-start">
+              Policies
+            </h6>
+            <p className="mb-2">Privacy Policy </p>
+            <p className="mb-2">Terms & Conditions</p>
           </div>
+        </div>
+        {/* Copyright */}
+        <div className="text-center mt-4">
+          <span>© 2025&nbsp;</span>
+          <span className="font-semibold">spsspices. All Rights Reserved.</span>
         </div>
       </div>
 
@@ -120,7 +127,8 @@ function Footer() {
         }}
       >
         <span>
-          Use Code <strong>"012546"</strong> – Free shipping on orders above ₹1500
+          Use Code <strong>"012546"</strong> – Free shipping on orders above
+          ₹1500
         </span>
       </div>
     </footer>

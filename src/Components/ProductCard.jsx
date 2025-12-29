@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { ShoppingCart } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import theme from "../lib/theme";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../lib/constant";
 import { useSelector } from "react-redux";
 import ProductCardShimmer from "./ProductCardShimmer";
 
-function ProductCard() {
+function ProductCard({ productsList, horizontal = false }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const productsList = useSelector((state) => state.products.products);
+  // const productsList = useSelector((state) => state.products.products);
   const isSearching = useSelector((state) => state.products.isSearching);
   const searchQuery = useSelector((state) => state.products.searchQuery);
   const isHome = location.pathname === "/";
@@ -17,8 +17,8 @@ function ProductCard() {
   
   // Ensure productsList is an array before using slice
   const productsListArray = Array.isArray(productsList) ? productsList : [];
-  console.log(productsList);
-  const productsData = isHome ? productsListArray.slice(0, 4) : productsListArray;
+
+  const productsData = horizontal ? productsListArray : isHome ? productsListArray.slice(0, 4) : productsListArray;
   
   // Check if we're in search mode with no results
   const isSearchMode = searchQuery && searchQuery.trim() !== "";
@@ -137,103 +137,240 @@ function ProductCard() {
 
   // Determine shimmer count
   const shimmerCount = isHome ? 4 : (productsData.length > 0 ? productsData.length : 4);
+  // Refs and scroll helpers for horizontal mode
+  const scrollRef = useRef(null);
+  const scrollStep = useCallback(() => {
+    if (!scrollRef.current) return 300;
+    const container = scrollRef.current;
+
+    // Prefer stepping by one card width + gap for predictable card-by-card scrolling
+    const firstChild = container.querySelector(":scope > *");
+    if (firstChild) {
+      const childWidth = firstChild.offsetWidth || firstChild.clientWidth || 0;
+      const style = window.getComputedStyle(container);
+      const gapValue = style.gap || style.columnGap || style.rowGap || "0px";
+      const gap = parseFloat(gapValue) || 0;
+      return Math.max(50, Math.floor(childWidth + gap));
+    }
+
+    // Fallback: portion of container width
+    return Math.max(100, Math.floor(container.clientWidth * 0.8));
+  }, []);
+
+  const scrollLeft = () => {
+    if (!scrollRef.current) return;
+    const step = scrollStep();
+    const target = Math.max(0, scrollRef.current.scrollLeft - step);
+    scrollRef.current.scrollTo({ left: target, behavior: "smooth" });
+  };
+
+  const scrollRight = () => {
+    if (!scrollRef.current) return;
+    const step = scrollStep();
+    const maxLeft = scrollRef.current.scrollWidth - scrollRef.current.clientWidth;
+    const target = Math.min(maxLeft, scrollRef.current.scrollLeft + step);
+    scrollRef.current.scrollTo({ left: target, behavior: "smooth" });
+  };
 
   return (
     <div className="relative">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 pt-4 container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        {shouldShowShimmer ? (
-          // Show shimmer during loading/searching or when no products found (shimmer stays visible)
-          Array.from({ length: shimmerCount }).map((_, index) => (
-            <ProductCardShimmer key={`shimmer-${index}`} />
-          ))
-        ) : (
-          productsData?.map((product) => {
-            const variant = getFirstVariant(product);
-          const available = isAvailable(product);
-          const stockQuantity = variant?.inventory_quantity || 0;
-          const comparePrice = variant?.compare_at_price || variant?.price;
-          const currentPrice = variant?.price;
+      {horizontal ? (
+        <div className="relative no-scrollbar container mx-auto px-4 sm:px-6  py-4 sm:py-6 lg:py-5">
+          {/* Left control */}
+          <button
+            onClick={scrollLeft}
+            aria-label="Scroll left"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 rounded-full p-2 shadow-md"
+            style={{ backgroundColor: theme.colors.accent.primary, color: 'white' }}
+          >
+            <ChevronLeft className="w-5 h-5"  />
+          </button>
 
-          return (
-            <div
-              key={product.id}
-              className="flex flex-col gap-2 sm:gap-3 rounded-md p-3 sm:p-4 lg:p-5 transition-shadow duration-300 shadow-lg"
-              style={{
-                backgroundColor: theme.colors.background.main,
-                border: `1px solid ${theme.colors.border.light}`,
-                color: theme.colors.text.primary,
-              }}
-            >
-              <ProductImageCarousel
-                product={product}
-                onClick={() => {
-                  navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`);
-                  window.scrollTo(0, 0);
-                }}
-              />
-              <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-center cursor-pointer h-14" onClick={() => {navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`); window.scrollTo(0, 0)}}>
-                {product.title}
-              </h2>
-              <div className="flex justify-between ">
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between gap-2">
-                    <span className="text-sm sm:text-base lg:text-sm font-bold ">
-                      MRP:{" "}
-                      {comparePrice && comparePrice !== currentPrice && (
-                        <span className="text-sm sm:text-base lg:text-xs line-through">
-                          ₹ {formatPrice(comparePrice)}
+          {/* Scrollable row */}
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto no-scrollbar pt-4 pb-6 px-4"
+            style={{ scrollBehavior: "smooth" }}
+          >
+            {shouldShowShimmer
+              ? Array.from({ length: shimmerCount }).map((_, index) => (
+                  <div key={`shimmer-${index}`} className="flex-none w-72">
+                    <ProductCardShimmer />
+                  </div>
+                ))
+              : productsData?.map((product) => {
+                  const variant = getFirstVariant(product);
+                  const available = isAvailable(product);
+                  const stockQuantity = variant?.inventory_quantity || 0;
+                  const comparePrice = variant?.compare_at_price || variant?.price;
+                  const currentPrice = variant?.price;
+
+                  return (
+                    <div
+                      key={product.id}
+                      className="flex-none w-72 flex flex-col gap-2 sm:gap-3 rounded-md p-3 sm:p-4 lg:p-5 transition-shadow duration-300 shadow-lg"
+                      style={{
+                        backgroundColor: theme.colors.background.main,
+                        border: `1px solid ${theme.colors.border.light}`,
+                        color: theme.colors.text.primary,
+                      }}
+                    >
+                      <ProductImageCarousel
+                        product={product}
+                        onClick={() => {
+                          navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`);
+                          window.scrollTo(0, 0);
+                        }}
+                      />
+                      <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-center cursor-pointer h-14" onClick={() => {navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`); window.scrollTo(0, 0)}}>
+                        {product.title}
+                      </h2>
+                      <div className="flex justify-between ">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex justify-between gap-2">
+                            <span className="text-sm sm:text-base lg:text-sm font-bold ">
+                              MRP:{" "}
+                              {comparePrice && comparePrice !== currentPrice && (
+                                <span className="text-sm sm:text-base lg:text-xs line-through">
+                                  ₹ {formatPrice(comparePrice)}
+                                </span>
+                              )}
+                            </span>
+                            <span className="text-sm sm:text-base lg:text-sm font-bold">
+                              ₹ {formatPrice(currentPrice)}
+                            </span>
+                          </div>
+                          <span className="text-xs sm:text-sm lg:text-md opacity-80">
+                            Stock: {stockQuantity} left
+                          </span>
+                        </div>
+                        <span
+                          className={`text-xs sm:text-sm lg:text-md font-medium ${
+                            available ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {available ? "Available" : "Out of Stock"}
                         </span>
-                      )}
-                    </span>
-                    <span className="text-sm sm:text-base lg:text-sm font-bold">
-                      ₹ {formatPrice(currentPrice)}
+                      </div>
+                      <button
+                        className="glow-button px-4 py-2 rounded-md flex justify-center items-center gap-2 hover:opacity-90 transition-opacity relative z-10"
+                        style={{
+                          backgroundColor: theme.colors.accent.primary,
+                          color: theme.colors.background.main,
+                        }}
+                      >
+                        <ShoppingCart className="w-4 h-4 font-bold relative z-10" />
+                        <span className="relative z-10">Add to Cart</span>
+                      </button>
+                    </div>
+                  );
+                })}
+          </div>
+
+          {/* Right control */}
+          <button
+            onClick={scrollRight}
+            aria-label="Scroll right"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 rounded-full p-2 shadow-md"
+            style={{ backgroundColor: theme.colors.accent.primary, color: 'white' }}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 pt-4 container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+          {shouldShowShimmer ? (
+            // Show shimmer during loading/searching or when no products found (shimmer stays visible)
+            Array.from({ length: shimmerCount }).map((_, index) => (
+              <ProductCardShimmer key={`shimmer-${index}`} />
+            ))
+          ) : (
+            productsData?.map((product) => {
+              const variant = getFirstVariant(product);
+              const available = isAvailable(product);
+              const stockQuantity = variant?.inventory_quantity || 0;
+              const comparePrice = variant?.compare_at_price || variant?.price;
+              const currentPrice = variant?.price;
+
+              return (
+                <div
+                  key={product.id}
+                  className="flex flex-col gap-2 sm:gap-3 rounded-md p-3 sm:p-4 lg:p-5 transition-shadow duration-300 shadow-lg"
+                  style={{
+                    backgroundColor: theme.colors.background.main,
+                    border: `1px solid ${theme.colors.border.light}`,
+                    color: theme.colors.text.primary,
+                  }}
+                >
+                  <ProductImageCarousel
+                    product={product}
+                    onClick={() => {
+                      navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`);
+                      window.scrollTo(0, 0);
+                    }}
+                  />
+                  <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-center cursor-pointer h-14" onClick={() => {navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`); window.scrollTo(0, 0)}}>
+                    {product.title}
+                  </h2>
+                  <div className="flex justify-between ">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex justify-between gap-2">
+                        <span className="text-sm sm:text-base lg:text-sm font-bold ">
+                          MRP:{" "}
+                          {comparePrice && comparePrice !== currentPrice && (
+                            <span className="text-sm sm:text-base lg:text-xs line-through">
+                              ₹ {formatPrice(comparePrice)}
+                            </span>
+                          )}
+                        </span>
+                        <span className="text-sm sm:text-base lg:text-sm font-bold">
+                          ₹ {formatPrice(currentPrice)}
+                        </span>
+                      </div>
+                      <span className="text-xs sm:text-sm lg:text-md opacity-80">
+                        Stock: {stockQuantity} left
+                      </span>
+                    </div>
+                    <span
+                      className={`text-xs sm:text-sm lg:text-md font-medium ${
+                        available ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      {available ? "Available" : "Out of Stock"}
                     </span>
                   </div>
-                  <span className="text-xs sm:text-sm lg:text-md opacity-80">
-                    Stock: {stockQuantity} left
-                  </span>
+                  <button
+                    className="glow-button px-4 py-2 rounded-md flex justify-center items-center gap-2 hover:opacity-90 transition-opacity relative z-10"
+                    style={{
+                      backgroundColor: theme.colors.accent.primary,
+                      color: theme.colors.background.main,
+                    }}
+                  >
+                    <ShoppingCart className="w-4 h-4 font-bold relative z-10" />
+                    <span className="relative z-10">Add to Cart</span>
+                  </button>
                 </div>
-                <span
-                  className={`text-xs sm:text-sm lg:text-md font-medium ${
-                    available
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {available ? "Available" : "Out of Stock"}
-                </span>
+              );
+            })
+          )}
+          {hasNoSearchResults && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center py-8 sm:py-12 pointer-events-none" style={{ zIndex: 10 }}>
+              <div className="p-4 sm:p-6 rounded-lg text-center pointer-events-auto" style={{
+                backgroundColor: theme.colors.background.main,
+                border: `1px solid ${theme.colors.border.light}`,
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              }}>
+                <p className="text-base sm:text-lg md:text-xl font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
+                  No Products Found
+                </p>
+                <p className="text-sm sm:text-base" style={{ color: theme.colors.text.secondary }}>
+                  No products found for "{searchQuery}". Try a different search term.
+                </p>
               </div>
-              <button
-                className="glow-button px-4 py-2 rounded-md flex justify-center items-center gap-2 hover:opacity-90 transition-opacity relative z-10"
-                style={{
-                  backgroundColor: theme.colors.accent.primary,
-                  color: theme.colors.background.main,
-                }}
-              >
-                <ShoppingCart className="w-4 h-4 font-bold relative z-10" />
-                <span className="relative z-10">Add to Cart</span>
-              </button>
             </div>
-            );
-          })
-        )}
-        {hasNoSearchResults && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center py-8 sm:py-12 pointer-events-none" style={{ zIndex: 10 }}>
-            <div className="p-4 sm:p-6 rounded-lg text-center pointer-events-auto" style={{
-              backgroundColor: theme.colors.background.main,
-              border: `1px solid ${theme.colors.border.light}`,
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            }}>
-              <p className="text-base sm:text-lg md:text-xl font-semibold mb-2" style={{ color: theme.colors.text.primary }}>
-                No Products Found
-              </p>
-              <p className="text-sm sm:text-base" style={{ color: theme.colors.text.secondary }}>
-                No products found for "{searchQuery}". Try a different search term.
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

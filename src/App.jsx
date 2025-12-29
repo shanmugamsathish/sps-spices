@@ -10,10 +10,12 @@ import Admin from "./Routes/Admin";
 import User from "./Routes/User";
 import { Toaster } from "react-hot-toast";
 import Loader from "./Components/Loader";
+import Common from "./Routes/Common";
 
 function AppContent() {
   const location = useLocation();
   const isAdmin = location.pathname.includes("/admin");
+  const isCommon = location.pathname.includes("/login") || location.pathname.includes("/register");
   const isLoading = useSelector((state) => state.loader.isLoading);
 
   return (
@@ -26,11 +28,18 @@ function AppContent() {
       }}
     >
       {isLoading && <Loader />}
-      {isAdmin ? (
+      {isAdmin && (
         <AdminSidebarProvider>
           <Admin />
         </AdminSidebarProvider>
-      ) : (
+      )}
+      {isCommon && (
+        <>
+        <Common />
+        <Footer />
+        </>
+      )}
+      {!isAdmin && !isCommon && (
         <>
           <Header />
           <User />

@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import DialogBox from '../../Components/DialogBox';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../../redux/loaderSlice';
+import EditCustomerModal from '../../Components/AdminEditCustomer/EditCustomerModel';
 
 function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -13,6 +14,8 @@ function Customers() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [selectedCustomerName, setSelectedCustomerName] = useState(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [_selectedCustomer, setSelectedCustomer] = useState(null);
   const dispatch = useDispatch();
 
   const fetchCustomers = useCallback(async () => {
@@ -50,11 +53,20 @@ function Customers() {
     return `₹${numAmount.toFixed(2)}`;
   };
 
-  // Handle edit customer (placeholder - can be expanded later)
-  // eslint-disable-next-line no-unused-vars
-  const handleEdit = (customerId) => {
-    toast.info('Edit functionality coming soon');
-    // TODO: Implement edit modal similar to EditProductModal
+  // Refresh list and close modal after an update from child modal
+  const handleCustomerUpdate = useCallback(() => {
+        fetchCustomers();
+        setEditModalOpen(false);
+    setSelectedCustomer(null);
+    setSelectedCustomerId(null);
+    setSelectedCustomerName(null);
+  }, [fetchCustomers]);
+
+  const handleCloseModal = () => {
+    setEditModalOpen(false);
+    setSelectedCustomer(null);
+    setSelectedCustomerId(null);
+    setSelectedCustomerName(null);
   };
 
   // Handle delete dialog
@@ -201,7 +213,12 @@ function Customers() {
                       <td className="px-4 py-3">
                         <div className="flex justify-center items-center gap-2">
                           <button
-                            onClick={() => handleEdit(customer.id)}
+                            onClick={() => {
+                              setSelectedCustomerId(customer.id);
+                              setSelectedCustomer(customer);
+                              setSelectedCustomerName(customerName);
+                              setEditModalOpen(true);
+                            }}
                             className="p-2 rounded-md transition-colors cursor-pointer"
                             style={{
                               backgroundColor: theme.colors.accent.primary,
@@ -235,6 +252,13 @@ function Customers() {
         </div>
       )}
 
+      {/* Edit Customer Modal */}
+      <EditCustomerModal
+        customerId={selectedCustomerId}
+        isOpen={editModalOpen}
+        onClose={handleCloseModal}
+        onUpdate={handleCustomerUpdate}
+      />
       <DialogBox
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
