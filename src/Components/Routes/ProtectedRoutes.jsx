@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { getUserProfile, getAdminProfile } from '../../apiCalls/users';
 import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/userSlice';
 
 const PUBLIC_ROUTES = [
   '/login',
@@ -20,7 +22,7 @@ function ProtectedRoutes() {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
-
+  const dispatch = useDispatch();
   // Helper — decode JWT payload
   const decodeToken = (token) => {
     try {
@@ -87,6 +89,8 @@ function ProtectedRoutes() {
           setLoading(false);
           return;
         }
+        console.log("response", response);
+        dispatch(setUser(response.customer));
       } catch (err) {
         toast.error(err.response?.data?.message || "Unauthorized");
         navigate("/login");

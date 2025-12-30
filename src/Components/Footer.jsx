@@ -1,6 +1,9 @@
 import React from "react";
 import { Instagram } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
+import { FaYoutube } from "react-icons/fa";
+import { FaFacebook } from "react-icons/fa";
+import { FaTwitter } from "react-icons/fa";
 import theme from "../lib/theme";
 import { Link } from "react-router-dom";
 
@@ -43,6 +46,37 @@ function Footer() {
           >
             <FaWhatsapp className="w-6 h-6" />
           </a>
+
+          {/* Youtube */}
+          <a
+            href="https://www.youtube.com/@spsspices"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: theme.colors.text.primary }}
+          >
+            <FaYoutube className="w-6 h-6" />
+          </a>
+
+          {/* Facebook */}
+          <a
+            href="https://www.facebook.com/spsspices"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: theme.colors.text.primary }}
+          >
+            <FaFacebook className="w-6 h-6" />
+          </a>
+
+          {/* Twitter */}
+          <a
+            href="https://www.twitter.com/spsspices"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: theme.colors.text.primary }}
+          >
+            <FaTwitter className="w-6 h-6" />
+          </a>
+
         </div>
       </div>
 

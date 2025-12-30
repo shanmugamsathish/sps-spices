@@ -5,17 +5,20 @@ import login from "../../assets/login.png";
 import logo from "../../assets/LOGO sps bg.png";
 import { loginUser } from "../../apiCalls/users";
 import toast from "react-hot-toast";
+import { setLoading } from "../../redux/loaderSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("testcustomers@example.com");
   const [password, setPassword] = useState("password123");
-  const [loading, _setLoading] = useState(false);
   const [error, _setError] = useState("");
-
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.loader.loading);
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      dispatch(setLoading(true));
       const response = await loginUser({ email, password });
       if (response) {
         navigate("/");
@@ -29,6 +32,8 @@ const Login = () => {
       }
     } catch (error) {
       toast.error(error.response.data.message || "Invalid email or password");
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 

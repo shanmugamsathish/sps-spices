@@ -258,6 +258,7 @@ function Customers() {
         isOpen={editModalOpen}
         onClose={handleCloseModal}
         onUpdate={handleCustomerUpdate}
+        title="Edit Customer"
       />
       <DialogBox
         isOpen={isDialogOpen}

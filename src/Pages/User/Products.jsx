@@ -17,7 +17,6 @@ function Products() {
       dispatch(setLoading(true));
       const products = await getAllProducts();
       dispatch(setProducts(products));
-      toast.success('Products fetched successfully');
     } catch (error) {
       console.error('Error fetching products:', error);
       toast.error('Error fetching products');

@@ -6,7 +6,7 @@ import { setLoading } from "../../redux/loaderSlice";
 import ScrollableContent from "./EditCustomerModel/ScrollableContent";
 import Header from "./EditCustomerModel/Header";
 
-function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, tablePosition }) {
+function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, tablePosition, title }) {
     const dispatch = useDispatch();
     const modalRef = useRef(null);
     const [hasChanges, setHasChanges] = useState(false);
@@ -289,7 +289,7 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <Header onClose={onClose} hasChanges={hasChanges} loading={loadingText} handleSubmit={handleSubmit} />
+        <Header onClose={onClose} hasChanges={hasChanges} loading={loadingText} handleSubmit={handleSubmit} title={title} />
 
         {/* Scrollable Content */}
         <ScrollableContent formData={formData} addresses={addresses} addAddress={addAddress} removeAddress={removeAddress} handleAddressChange={handleAddressChange} handleInputChange={handleInputChange} handleSubmit={handleSubmit} loading={loadingText} />

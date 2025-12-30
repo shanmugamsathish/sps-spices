@@ -2,7 +2,7 @@ import React from "react";
 import theme from "../../../lib/theme";
 import { X, Save } from "lucide-react";
 
-function Header({ onClose, hasChanges, loading, handleSubmit }) {
+function Header({ onClose, hasChanges, loading, handleSubmit, title }) {
   return (
     <div
       className="flex items-center justify-between p-4 border-b sticky top-0 z-10"
@@ -22,7 +22,7 @@ function Header({ onClose, hasChanges, loading, handleSubmit }) {
         className="text-xl font-semibold flex-1 text-center"
         style={{ color: theme.colors.text.primary }}
       >
-        Edit Customer
+        {title}
       </h2>
       <button
         onClick={handleSubmit}

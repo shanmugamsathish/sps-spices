@@ -20,7 +20,6 @@ function Home() {
       dispatch(setLoading(true));
       const products = await getAllProducts();
       dispatch(setProducts(products));
-      toast.success("Products fetched successfully");
     } catch (error) {
       toast.error(`${error.message || "Error fetching products"}`);
     } finally {

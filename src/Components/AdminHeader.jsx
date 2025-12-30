@@ -6,15 +6,37 @@ import logo from "../assets/LOGO sps.jpg";
 import theme from "../lib/theme";
 import { ROUTES } from "../lib/constant";
 import { UseAdminSidebar } from "../contexts/AdminSidebarContext";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/userSlice";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import DialogBox from "./DialogBox";
 
 function AdminHeader() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isCollapsed, toggleCollapse } = UseAdminSidebar();
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isActive = (path) => location.pathname === path;
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+  const handleLogout = () => {
+    try {
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("shopifyAccessToken");
+      navigate("/admin/login");
+      dispatch(setUser(null));
+      toast.success("Logged out successfully");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast.error("Error logging out");
+  }
+    finally {
+      setIsMobileMenuOpen(false);
+    }
+  }
 
   const menuItems = [
     {
@@ -41,7 +63,7 @@ function AdminHeader() {
       path: ROUTES.ADMIN_LOGOUT,
       label: "Logout",
       icon: LogOut,
-      
+      onClick: handleLogout,
     },
   ];
 
@@ -81,7 +103,49 @@ function AdminHeader() {
             {menuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
-              
+
+              // If item provides an onClick handler (like Logout), render a button so navigation is controlled.
+              if (typeof item.onClick === "function") {
+                return (
+                  <button
+                    key={item.path}
+                    type="button"
+                    className={`flex items-center gap-3 px-4 py-3 w-full rounded-lg transition-all duration-200 ${
+                      active ? "shadow-md" : "hover:shadow-sm"
+                    }`}
+                    style={
+                      active
+                        ? {
+                            backgroundColor: theme.colors.accent.primary,
+                            color: "#FFFFFF",
+                          }
+                        : {
+                            backgroundColor: "transparent",
+                            color: theme.colors.text.primary,
+                          }
+                    }
+                    onMouseEnter={(e) => {
+                      if (!active) {
+                        e.currentTarget.style.backgroundColor = theme.colors.background.main;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!active) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }
+                    }}
+                    onClick={() => setIsDialogOpen(true)}
+                  >
+                    <Icon className="w-5 h-5 shrink-0" />
+                    {!isCollapsed && (
+                      <span className="font-medium text-sm whitespace-nowrap">
+                        {item.label}
+                      </span>
+                    )}
+                  </button>
+                );
+              }
+
               return (
                 <Link
                   key={item.path}
@@ -167,7 +231,47 @@ function AdminHeader() {
             {menuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
-              
+
+              if (typeof item.onClick === "function") {
+                return (
+                  <button
+                    key={item.path}
+                    type="button"
+                    className={`flex items-center gap-3 py-3 px-4 w-full rounded-lg transition-all duration-200 ${
+                      active ? "shadow-md" : ""
+                    }`}
+                    style={
+                      active
+                        ? {
+                            backgroundColor: theme.colors.accent.primary,
+                            color: "#FFFFFF",
+                          }
+                        : {
+                            backgroundColor: "transparent",
+                            color: theme.colors.text.primary,
+                          }
+                    }
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsDialogOpen(true);
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!active) {
+                        e.currentTarget.style.backgroundColor = theme.colors.background.main;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!active) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }
+                    }}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="font-medium">{item.label}</span>
+                  </button>
+                );
+              }
+
               return (
                 <Link
                   key={item.path}
@@ -186,7 +290,6 @@ function AdminHeader() {
                           color: theme.colors.text.primary,
                         }
                   }
-                  onClick={() => setIsMobileMenuOpen(false)}
                   onMouseEnter={(e) => {
                     if (!active) {
                       e.currentTarget.style.backgroundColor = theme.colors.background.main;
@@ -206,6 +309,7 @@ function AdminHeader() {
           </div>
         </nav>
       </header>
+      <DialogBox isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} title="Logout" description="Are you sure you want to logout?" onConfirm={handleLogout} />
     </>
   );
 }
