@@ -197,7 +197,7 @@ function Header() {
         {/* Icons Section - Fixed Width (Responsive) with Permanent Search Input */}
         {/* Show Icons when not isHeader or isHeader and token and shopifyAccessToken are present */}
         {(!isHeader || (isHeader && token && shopifyAccessToken)) && (
-          <IconsSections isSearchOpen={isSearchOpen} setSearchQuery={setSearchQuery} handleSearch={handleSearch} setIsSearchOpen={setIsSearchOpen} searchQuery={searchQuery} dispatch={dispatch} setProducts={setProducts} getAllProducts={getAllProducts} navigate={navigate} ROUTES={ROUTES} cartItemsCount={cartItemsCount} user={user} setShowUserMenu={setShowUserMenu} userMenuRef={userMenuRef} setIsEditCustomerModalOpen={setIsEditCustomerModalOpen} setIsDialogOpen={setIsDialogOpen} toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} showUserMenu={showUserMenu} />
+          <IconsSections isSearchOpen={isSearchOpen} setSearchQuery={setSearchQuery} handleSearch={handleSearch} setIsSearchOpen={setIsSearchOpen} searchQuery={searchQuery} dispatch={dispatch} setProducts={setProducts} getAllProducts={getAllProducts} navigate={navigate} ROUTES={ROUTES} cartItemsCount={cartItemsCount} user={user} setShowUserMenu={setShowUserMenu} userMenuRef={userMenuRef} setIsEditCustomerModalOpen={setIsEditCustomerModalOpen} setIsDialogOpen={setIsDialogOpen} toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} showUserMenu={showUserMenu} isHeader={isHeader} token={token} shopifyAccessToken={shopifyAccessToken} />
         )}
         {/* Show Login button when isHeader and token and shopifyAccessToken are not present */}
         {isHeader && !token && !shopifyAccessToken && (

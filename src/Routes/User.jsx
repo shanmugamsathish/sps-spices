@@ -21,17 +21,15 @@ function User() {
   return (
     <main className="grow">
     <Routes>
-      <Route path={ROUTES.HOME} element={<ProtectedRoutes />}>
-        <Route index element={<Home />} />
-      </Route>
+      {/* Remove Protected Routes from home page */}
+      <Route path={ROUTES.HOME} element={<Home />} />
       <Route path={ROUTES.ABOUT} element={<ProtectedRoutes />}>
         <Route index element={<AboutUs />} />
       </Route>
       <Route path={ROUTES.CONTACT} element={<ProtectedRoutes />}>
         <Route index element={<Contact />} />
       </Route>
-      <Route path={ROUTES.PRODUCTS} element={<ProtectedRoutes />}>
-        <Route index element={<Products />} />
+      <Route path={ROUTES.PRODUCTS} element={<Products />}>
       </Route>
       <Route path={`${ROUTES.PRODUCT_DETAILS}/:id`} element={<ProtectedRoutes />}>
         <Route index element={<ProductDetails userPage={true} />} />

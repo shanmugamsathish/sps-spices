@@ -8,6 +8,8 @@ import { setUser } from '../../redux/userSlice';
 const PUBLIC_ROUTES = [
   '/login',
   '/register',
+  '/',
+  '/products',
   '/forgot-password',
   '/reset-password',
   '/verify-email',
