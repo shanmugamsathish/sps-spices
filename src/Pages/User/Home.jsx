@@ -10,6 +10,7 @@ import WhyChooseUs from "./WhyChooseUs";
 import { setLoading } from "../../redux/loaderSlice";
 import toast from "react-hot-toast";
 import theme from "../../lib/theme";
+import HeroSection from "./HeroSection";
 
 function Home() {
   const dispatch = useDispatch();
@@ -46,6 +47,7 @@ function Home() {
 
   return (
     <div>
+      <HeroSection />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase">
           <span
@@ -91,8 +93,9 @@ function Home() {
             className="border-b-4 pb-1"
             style={{ borderColor: theme.colors.accent.primary }}
           >
-            Recent Products
+            Recent 
           </span>
+          {" "}Products
         </h2>
         <p className=" mt-10 text-lg font-medium " style={{ color: theme.colors.text.primary }}>
         A signature collection of premium spice blends, crafted with precision and tradition. Each blend delivers depth, aroma, and balance — created for kitchens that demand nothing but the finest.

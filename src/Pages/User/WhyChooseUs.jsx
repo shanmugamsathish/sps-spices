@@ -1,6 +1,6 @@
 import React from "react";
 import theme from "../../lib/theme";
-import logo from "../../assets/LOGO sps bg.png";
+import { LOGO } from "../../lib/constant";
 
 function WhyChooseUs() {
   return (
@@ -28,7 +28,7 @@ function WhyChooseUs() {
 
           <div className="flex justify-center">
             <img
-              src={logo}
+              src={LOGO.LOGO_WHITE}
               alt="SPS Logo"
               className="w-52 sm:w-60 lg:w-72"
             />

@@ -8,6 +8,9 @@ import Products from '../Pages/User/Products';
 import ProductDetails from '../Pages/User/ProductDetails';
 import Collections from '../Pages/User/Collections';
 import CollectionProducts from '../Pages/User/CollectionProducts';
+import AddToWishlist from '../Pages/User/AddToWishlist';
+import Cart from '../Pages/User/Cart';
+import MyOrders from '../Pages/User/MyOrders';
 import Loader from '../Components/Loader';
 import Login from '../Pages/Common/Login';
 import Register from '../Pages/Common/Register';
@@ -38,6 +41,15 @@ function User() {
       </Route>
       <Route path={`${ROUTES.COLLECTION_PRODUCTS}/:id`} element={<ProtectedRoutes />}>
         <Route index element={<CollectionProducts />} />
+      </Route>
+      <Route path={ROUTES.ADD_TO_WISHLIST} element={<ProtectedRoutes />}>
+        <Route index element={<AddToWishlist />} />
+      </Route>
+      <Route path={ROUTES.CART} element={<ProtectedRoutes />}>
+        <Route index element={<Cart />} />
+      </Route>
+      <Route path={ROUTES.MY_ORDERS} element={<ProtectedRoutes />}>
+        <Route index element={<MyOrders />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

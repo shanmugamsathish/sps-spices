@@ -1,93 +1,31 @@
 import React from "react";
-import { Instagram } from "lucide-react";
+import { FaInstagram } from "react-icons/fa";
 import { FaWhatsapp } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
 import { FaTwitter } from "react-icons/fa";
 import theme from "../lib/theme";
 import { Link } from "react-router-dom";
+import { ROUTES } from "../lib/constant";
 
 function Footer() {
   return (
     <footer
       className="text-center lg:text-left"
       style={{
-        backgroundColor: theme.colors.background.main,
-        color: theme.colors.text.primary,
+        backgroundColor: theme.colors.accent.primary,
+        color: theme.colors.background.main,
       }}
     >
-      {/* Top Social Bar */}
-      <div
-        className="flex gap-4 items-center justify-start border-b-2 px-25 py-4"
-        style={{ borderColor: theme.colors.border.light }}
-      >
-        <div className=" hidden lg:block">
-          <span>Follow SPS SPICES AND DRY FRUITS on social networks:</span>
-        </div>
-
-        {/* Social Icons */}
-        <div className="flex gap-4">
-          {/* Instagram */}
-          <a
-            href="https://www.instagram.com/sps_spices/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: theme.colors.text.primary }}
-          >
-            <Instagram className="w-6 h-6" />
-          </a>
-
-          {/* WhatsApp */}
-          <a
-            href="https://wa.me/917092597277"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: theme.colors.text.primary }}
-          >
-            <FaWhatsapp className="w-6 h-6" />
-          </a>
-
-          {/* Youtube */}
-          <a
-            href="https://www.youtube.com/@spsspices"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: theme.colors.text.primary }}
-          >
-            <FaYoutube className="w-6 h-6" />
-          </a>
-
-          {/* Facebook */}
-          <a
-            href="https://www.facebook.com/spsspices"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: theme.colors.text.primary }}
-          >
-            <FaFacebook className="w-6 h-6" />
-          </a>
-
-          {/* Twitter */}
-          <a
-            href="https://www.twitter.com/spsspices"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: theme.colors.text.primary }}
-          >
-            <FaTwitter className="w-6 h-6" />
-          </a>
-
-        </div>
-      </div>
 
       {/* Main Footer Content */}
       <div className="px-25 py-4 text-center md:text-left">
         <div className="grid-1 grid gap-16 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
-            <h6 className="mb-4 flex items-center justify-center font-semibold uppercase md:justify-start">
+            <span className="mb-4 inline-block font-semibold uppercase md:justify-start border-b border-white pb-2">
               SPS SPICES AND DRY FRUITS
-            </h6>
+            </span>
             <p>
               Pure, aromatic spices and nutrient-rich dry fruits. Sourced with
               quality, packed with freshness.
@@ -96,9 +34,9 @@ function Footer() {
 
           {/* Useful Links */}
           <div >
-            <h6 className="mb-4 flex justify-center font-semibold uppercase md:justify-start">
+            <span className="mb-4 inline-block font-semibold uppercase md:justify-start border-b border-white pb-2">
               Useful Links
-            </h6>
+            </span>
             <p className="mb-2">
               <Link to="/">Home</Link>
             </p>
@@ -118,9 +56,9 @@ function Footer() {
 
           {/* Contact */}
           <div>
-            <h6 className="mb-4 flex justify-center font-semibold uppercase md:justify-start">
+            <span className="mb-4 inline-block font-semibold uppercase md:justify-start border-b border-white pb-2">
               Contact
-            </h6>
+            </span>
             <p className="mb-4 flex items-center justify-center md:justify-start">
               C2 NAAZYAS ARCADE 4th Main Road Maharaja Nagar Palayamkottai -
               627011
@@ -138,33 +76,50 @@ function Footer() {
 
           {/* Policies */}
           <div>
-            <h6 className="mb-4 flex justify-center font-semibold uppercase md:justify-start">
+            <span className="mb-4 inline-block font-semibold uppercase md:justify-start border-b border-white pb-2">
               Policies
-            </h6>
-            <p className="mb-2">Privacy Policy </p>
-            <p className="mb-2">Terms & Conditions</p>
+            </span>
+            <p className="mb-2 cursor-pointer"><Link to={ROUTES.PRIVACY_POLICY} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Privacy Policy</Link></p>
+            <p className="mb-2 cursor-pointer"><Link to={ROUTES.TERMS_AND_CONDITION} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Terms & Conditions</Link></p>
+            <div className="flex flex-col gap-2 justify-center md:justify-start my-6">
+              <span>Follow <span className="font-semibold">SPS SPICES AND DRY FRUITS</span> on social networks:</span>
+              <div className="flex gap-4">
+              <a href="https://www.instagram.com/sps_spices/" target="_blank" rel="noopener noreferrer">
+                <FaInstagram className="w-6 h-6" />
+              </a>
+              <a href="https://www.youtube.com/@spsspices" target="_blank" rel="noopener noreferrer">
+                <FaYoutube className="w-6 h-6" />
+              </a>
+              <a href="https://www.facebook.com/spsspices" target="_blank" rel="noopener noreferrer">
+                <FaFacebook className="w-6 h-6" />
+              </a>
+              <a href="https://www.twitter.com/spsspices" target="_blank" rel="noopener noreferrer">
+                <FaTwitter className="w-6 h-6" />
+              </a>
+            </div>
+            </div>
+
           </div>
         </div>
         {/* Copyright */}
-        <div className="text-center mt-4">
+        <div className="text-center mt-4 flex flex-col gap-2 justify-center md:justify-start">
+          <div className="flex items-center justify-center ">
           <span>© 2025&nbsp;</span>
-          <span className="font-semibold">spsspices. All Rights Reserved.</span>
+          <span className="font-semibold">spsspicesanddryfruits. All Rights Reserved</span>
+          </div>
+          <span className="font-semibold">Designed and Developed by <a href="https://pragantechnologies.com" target="_blank" rel="noopener noreferrer">Pragan Tech Solutions</a></span>
         </div>
       </div>
 
       {/* Offer Banner */}
-      <div
+      {/* <div
         className="p-6 text-center"
-        style={{
-          backgroundColor: theme.colors.accent.primary,
-          color: theme.colors.background.main,
-        }}
       >
         <span>
           Use Code <strong>"012546"</strong> – Free shipping on orders above
           ₹1500
         </span>
-      </div>
+      </div> */}
     </footer>
   );
 }

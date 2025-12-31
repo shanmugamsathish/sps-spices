@@ -1,20 +1,74 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { getProductById } from '../../apiCalls/products'
 import { ShoppingCart } from 'lucide-react'
 import theme from '../../lib/theme'
 import { setLoading } from '../../redux/loaderSlice'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { createCart, addItemsToCart, updateItemQuantity, getCartDetails } from '../../apiCalls/cart'
+import { updateInventoryFromCart, setCart, selectCart } from '../../redux/productSlice'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router-dom'
 
-function ProductDetails({ userPage }) {
-  console.log('userPage in ProductDetails', userPage);
+function ProductDetails() {
+  const navigate = useNavigate()
   const { id } = useParams()
   const [product, setProduct] = useState(null)
   const [selectedVariant, setSelectedVariant] = useState(null)
   const [quantity, setQuantity] = useState(1)
   const [loadingText, setLoadingText] = useState(true)
+  const [cartId, setCartId] = useState(null)
+  const [isUpdatingCart, setIsUpdatingCart] = useState(false)
   const dispatch = useDispatch()
+  const cart = useSelector(selectCart)
   
+  // Cart initialization
+  useEffect(() => {
+    const initializeCart = async () => {
+      try {
+        const storedCartId = localStorage.getItem("cartId");
+        
+        if (storedCartId) {
+          if (!storedCartId.includes('?key=')) {
+            const response = await createCart();
+            if (response?.success && response?.cart?.id) {
+              const fullCartId = response.cart.id;
+              localStorage.setItem("cartId", fullCartId);
+              setCartId(fullCartId);
+            }
+          } else {
+            try {
+              const cartResponse = await getCartDetails(storedCartId);
+              if (cartResponse?.success && cartResponse.cart) {
+                dispatch(updateInventoryFromCart(cartResponse.cart));
+                dispatch(setCart(cartResponse.cart));
+              }
+              setCartId(storedCartId);
+            } catch (error) {
+              toast.error(error.message);
+              const response = await createCart();
+              if (response?.success && response?.cart?.id) {
+                const fullCartId = response.cart.id;
+                localStorage.setItem("cartId", fullCartId);
+                setCartId(fullCartId);
+              }
+            }
+          }
+        } else {
+          const response = await createCart();
+          if (response?.success && response?.cart?.id) {
+            const fullCartId = response.cart.id;
+            localStorage.setItem("cartId", fullCartId);
+            setCartId(fullCartId);
+          }
+        }
+      } catch (error) {
+        toast.error("Error initializing cart: " + error.message);
+      }
+    };
+    initializeCart();
+  }, [dispatch]);
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -37,15 +91,252 @@ function ProductDetails({ userPage }) {
     fetchProduct()
   }, [id, dispatch])
 
+  // Helper function to convert variant ID to GraphQL global ID format
+  const getVariantGraphQLId = useCallback((variant) => {
+    if (variant?.admin_graphql_api_id) {
+      return variant.admin_graphql_api_id;
+    }
+    
+    if (variant?.id && typeof variant.id === 'string' && variant.id.startsWith('gid://')) {
+      return variant.id;
+    }
+    
+    if (variant?.id) {
+      const numericId = typeof variant.id === 'string' ? variant.id : String(variant.id);
+      return `gid://shopify/ProductVariant/${numericId}`;
+    }
+    
+    return null;
+  }, []);
+
+  // Update quantity in local state when variant changes or cart updates
+  useEffect(() => {
+    if (selectedVariant && cart) {
+      const variantGraphQLId = getVariantGraphQLId(selectedVariant);
+      if (variantGraphQLId && cart.lines?.edges) {
+        const cartLine = cart.lines.edges.find(
+          edge => edge.node.merchandise?.id === variantGraphQLId
+        );
+        if (cartLine) {
+          setQuantity(cartLine.node.quantity);
+        } else {
+          setQuantity(1);
+        }
+      } else {
+        setQuantity(1);
+      }
+    }
+  }, [selectedVariant, cart, getVariantGraphQLId])
+
+  // Helper to find cart line ID for a variant
+  const findCartLineId = useCallback((variantGraphQLId) => {
+    if (!cart || !cart.lines?.edges || !variantGraphQLId) return null;
+    
+    const cartLine = cart.lines.edges.find(
+      edge => edge.node.merchandise?.id === variantGraphQLId
+    );
+    
+    return cartLine ? cartLine.node.id : null;
+  }, [cart]);
+
   const handleVariantSelect = (variant) => {
     setSelectedVariant(variant)
-    setQuantity(1) // Reset quantity when variant changes
   }
 
-  const handleQuantityChange = (change) => {
-    const newQuantity = quantity + change
-    if (newQuantity >= 1 && newQuantity <= (selectedVariant?.inventory_quantity || 10)) {
-      setQuantity(newQuantity)
+  const handleQuantityChange = async (change) => {
+    if (!cartId || !selectedVariant || isUpdatingCart) return;
+
+    const newQuantity = quantity + change;
+    if (newQuantity < 1) {
+      toast.error("Quantity cannot be less than 1");
+      return;
+    }
+
+    const stockQuantity = selectedVariant?.inventory_quantity || 0;
+    if (newQuantity > stockQuantity) {
+      toast.error(`Only ${stockQuantity} items available in stock`);
+      return;
+    }
+
+    try {
+      setIsUpdatingCart(true);
+      const variantGraphQLId = getVariantGraphQLId(selectedVariant);
+      if (!variantGraphQLId) {
+        toast.error("Product variant ID not found");
+        return;
+      }
+
+      let currentCartId = cartId;
+      if (!currentCartId || !currentCartId.includes('?key=')) {
+        const storedCartId = localStorage.getItem("cartId");
+        if (storedCartId && storedCartId.includes('?key=')) {
+          setCartId(storedCartId);
+          currentCartId = storedCartId;
+        } else {
+          toast.error("No valid cartId found. Please refresh the page.");
+          return;
+        }
+      }
+
+      // Check if item already exists in cart
+      const existingLineId = findCartLineId(variantGraphQLId);
+
+      if (existingLineId) {
+        // Item exists in cart - use updateItemQuantity
+        const response = await updateItemQuantity({
+          cartId: currentCartId,
+          lines: [
+            {
+              id: existingLineId,
+              quantity: newQuantity,
+            },
+          ],
+        });
+
+        if (response?.success && response.cart) {
+          dispatch(setCart(response.cart));
+          dispatch(updateInventoryFromCart(response.cart));
+          setQuantity(newQuantity);
+        } else {
+          toast.error(response?.errors?.[0]?.message || "Failed to update quantity");
+        }
+      } else {
+        // Item doesn't exist - add it first
+        const addResponse = await addItemsToCart({
+          cartId: currentCartId,
+          lines: [
+            {
+              merchandiseId: variantGraphQLId,
+              quantity: newQuantity,
+            },
+          ],
+        });
+
+        if (addResponse?.success) {
+          if (addResponse?.cart?.id && addResponse.cart.id !== cartId) {
+            const newCartId = addResponse.cart.id;
+            localStorage.setItem("cartId", newCartId);
+            setCartId(newCartId);
+          }
+          
+          const updatedCartId = addResponse?.cart?.id || currentCartId;
+          const cartResponse = await getCartDetails(updatedCartId);
+          if (cartResponse?.success && cartResponse.cart) {
+            dispatch(updateInventoryFromCart(cartResponse.cart));
+            dispatch(setCart(cartResponse.cart));
+            setQuantity(newQuantity);
+          }
+        } else {
+          toast.error("Failed to add item to cart: " + (addResponse?.errors || addResponse?.message));
+        }
+      }
+    } catch (error) {
+      console.error("Error updating cart:", error);
+      toast.error("Error updating cart: " + (error.response?.data?.message || error.message));
+    } finally {
+      setIsUpdatingCart(false);
+    }
+  }
+
+  // Handle add to cart button
+  const handleAddToCart = async (navigateToCart = false) => {
+    if (navigateToCart) {
+      navigate('/cart')
+      return
+    }
+    if (!cartId || !selectedVariant || isUpdatingCart) {
+      if (!cartId) {
+        toast.error("Cart not initialized yet. Please try again.");
+      }
+      return;
+    }
+
+    const variantGraphQLId = getVariantGraphQLId(selectedVariant);
+    if (!variantGraphQLId) {
+      toast.error("Product variant ID not found or invalid");
+      return;
+    }
+
+    const available = product?.status === 'active' && (selectedVariant?.inventory_quantity || 0) > 0;
+    if (!available) {
+      toast.error("Product is not available");
+      return;
+    }
+
+    try {
+      setIsUpdatingCart(true);
+      let currentCartId = cartId;
+      if (!currentCartId || !currentCartId.includes('?key=')) {
+        const storedCartId = localStorage.getItem("cartId");
+        if (storedCartId && storedCartId.includes('?key=')) {
+          setCartId(storedCartId);
+          currentCartId = storedCartId;
+        } else {
+          toast.error("No valid cartId found. Please refresh the page.");
+          return;
+        }
+      }
+
+      // Check if item already exists in cart
+      const existingLineId = findCartLineId(variantGraphQLId);
+      const currentCartQuantity = existingLineId 
+        ? cart.lines.edges.find(edge => edge.node.id === existingLineId)?.node.quantity || 0
+        : 0;
+      const newQuantity = currentCartQuantity + quantity;
+
+      if (existingLineId) {
+        // Item exists - update quantity
+        const response = await updateItemQuantity({
+          cartId: currentCartId,
+          lines: [
+            {
+              id: existingLineId,
+              quantity: newQuantity,
+            },
+          ],
+        });
+
+        if (response?.success && response.cart) {
+          dispatch(setCart(response.cart));
+          dispatch(updateInventoryFromCart(response.cart));
+          setQuantity(newQuantity);
+        } else {
+          toast.error(response?.errors?.[0]?.message || "Failed to update cart");
+        }
+      } else {
+        // Item doesn't exist - add it
+        const addResponse = await addItemsToCart({
+          cartId: currentCartId,
+          lines: [
+            {
+              merchandiseId: variantGraphQLId,
+              quantity: quantity,
+            },
+          ],
+        });
+
+        if (addResponse?.success) {
+          if (addResponse?.cart?.id && addResponse.cart.id !== cartId) {
+            const newCartId = addResponse.cart.id;
+            localStorage.setItem("cartId", newCartId);
+            setCartId(newCartId);
+          }
+          
+          const updatedCartId = addResponse?.cart?.id || currentCartId;
+          const cartResponse = await getCartDetails(updatedCartId);
+          if (cartResponse?.success && cartResponse.cart) {
+            dispatch(updateInventoryFromCart(cartResponse.cart));
+            dispatch(setCart(cartResponse.cart));
+          }
+        } else {
+          toast.error("Failed to add item to cart: " + (addResponse?.errors || addResponse?.message));
+        }
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Error adding to cart: " + (error.response?.data?.message || error.message));
+    } finally {
+      setIsUpdatingCart(false);
     }
   }
 
@@ -163,7 +454,8 @@ function ProductDetails({ userPage }) {
               <div className="flex items-center border-2 rounded-md overflow-hidden" style={{ borderColor: theme.colors.border.light }}>
                 <button
                   onClick={() => handleQuantityChange(-1)}
-                  className="px-3 py-2 font-bold text-lg hover:opacity-70 transition-opacity"
+                  disabled={isUpdatingCart || quantity <= 1}
+                  className="px-3 py-2 font-bold text-lg hover:opacity-70 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ 
                     color: theme.colors.text.primary,
                     backgroundColor: theme.colors.background.main
@@ -181,7 +473,8 @@ function ProductDetails({ userPage }) {
                 </span>
                 <button
                   onClick={() => handleQuantityChange(1)}
-                  className="px-3 py-2 font-bold text-lg hover:opacity-70 transition-opacity"
+                  disabled={isUpdatingCart || quantity >= (selectedVariant?.inventory_quantity || 0)}
+                  className="px-3 py-2 font-bold text-lg hover:opacity-70 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ 
                     color: theme.colors.text.primary,
                     backgroundColor: theme.colors.background.main
@@ -194,14 +487,18 @@ function ProductDetails({ userPage }) {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                className="flex items-center justify-center gap-2 px-6 py-3 rounded-md font-semibold hover:opacity-90 transition-opacity flex-1 sm:flex-none"
+                onClick={() => {
+                  handleAddToCart(true)
+                }}
+                disabled={!cartId || isUpdatingCart || !selectedVariant || (selectedVariant?.inventory_quantity || 0) <= 0}
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded-md font-semibold hover:opacity-90 transition-opacity flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   backgroundColor: theme.colors.accent.primary,
                   color: theme.colors.background.main,
                 }}
               >
                 <ShoppingCart className="w-5 h-5" />
-                Add to cart
+                {isUpdatingCart ? "Adding..." : "Add to cart"}
               </button>
               <button
                 className="px-6 py-3 rounded-md font-semibold hover:opacity-90 transition-opacity flex-1 sm:flex-none"

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import theme from "../../lib/theme";
-import register from "../../assets/register.png";
-import logo from "../../assets/LOGO sps bg.png";
+import { LOGO } from "../../lib/constant";
 import { registerUser } from "../../apiCalls/users";
 import toast from "react-hot-toast";
 
@@ -37,12 +36,12 @@ const Register = () => {
         {/* LEFT – Illustration */}
         <div className="hidden md:block relative bg-indigo-50">
           <img
-            src={register}
+            src={LOGO.REGISTER}
             alt="Login Illustration"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <img
-            src={logo}
+            src={LOGO.LOGO_WHITE}
             alt="Logo"
             className="absolute top-4 right-10 w-22 h-22 object-cover"
           />

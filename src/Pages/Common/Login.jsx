@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import theme from "../../lib/theme";
-import login from "../../assets/login.png";
-import logo from "../../assets/LOGO sps bg.png";
+import { LOGO } from "../../lib/constant";
 import { loginUser } from "../../apiCalls/users";
 import toast from "react-hot-toast";
 import { setLoading } from "../../redux/loaderSlice";
@@ -44,12 +43,12 @@ const Login = () => {
         {/* LEFT – Illustration */}
         <div className="hidden md:block relative bg-indigo-50">
           <img
-            src={login}
+            src={LOGO.LOGIN}
             alt="Login Illustration"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <img
-            src={logo}
+            src={LOGO.LOGO_WHITE}
             alt="Logo"
             className="absolute top-4 right-10 w-22 h-22 object-cover"
           />

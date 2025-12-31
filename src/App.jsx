@@ -11,11 +11,13 @@ import User from "./Routes/User";
 import { Toaster } from "react-hot-toast";
 import Loader from "./Components/Loader";
 import Common from "./Routes/Common";
+import { ROUTES } from "./lib/constant";
 
 function AppContent() {
   const location = useLocation();
   const isAdmin = location.pathname.includes("/admin");
-  const isCommon = location.pathname.includes("/login") || location.pathname.includes("/register");
+  const isCommon = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.TERMS_AND_CONDITION, ROUTES.PRIVACY_POLICY].includes(location.pathname);
+  const isHeader = [ROUTES.TERMS_AND_CONDITION, ROUTES.PRIVACY_POLICY].includes(location.pathname);
   const isLoading = useSelector((state) => state.loader.isLoading);
 
   return (
@@ -35,6 +37,7 @@ function AppContent() {
       )}
       {isCommon && (
         <>
+        {isHeader && <Header />}
         <Common />
         <Footer />
         </>

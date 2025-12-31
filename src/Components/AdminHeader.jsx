@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, ShoppingBag, LogOut, Users, Folder, ListOrdered } from "lucide-react";
 import { useLocation } from "react-router-dom";
-import logo from "../assets/LOGO sps.jpg";
 import theme from "../lib/theme";
-import { ROUTES } from "../lib/constant";
+import { ROUTES, LOGO } from "../lib/constant";
 import { UseAdminSidebar } from "../contexts/AdminSidebarContext";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/userSlice";
@@ -83,7 +82,7 @@ function AdminHeader() {
         <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: theme.colors.border.light }}>
           {!isCollapsed && (
             <img
-              src={logo}
+              src={LOGO.LOGO}
               alt="logo"
               className="h-12 w-auto object-contain"
             />
@@ -198,7 +197,7 @@ function AdminHeader() {
       >
         <div className="flex items-center justify-between px-4 py-3">
           <img
-            src={logo}
+            src={LOGO.LOGO}
             alt="logo"
             className="h-10 w-auto object-contain"
           />

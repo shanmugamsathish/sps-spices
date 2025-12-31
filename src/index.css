@@ -358,3 +358,62 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.hero-section {
+  width: 100%;
+  height: 50vh; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hero-track {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: max-content;
+  gap: 12px;
+  transform: translate3d(0,0,0);
+  animation: hero-scroll linear infinite;
+  animation-duration: var(--hero-scroll-duration, var(--hero-scroll-duration));
+  will-change: transform;
+}
+
+.hero-viewport:hover .hero-track,
+.hero-track:focus-within {
+  animation-play-state: paused;
+}
+
+.hero-slide {
+  flex: 0 0 auto;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-slide img {
+  height: 100%;
+  width: auto;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+@keyframes hero-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
