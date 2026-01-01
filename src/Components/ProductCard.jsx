@@ -8,6 +8,7 @@ import ProductCardShimmer from "./ProductCardShimmer";
 import { createCart, addItemsToCart, getCartDetails } from "../apiCalls/cart";
 import toast from "react-hot-toast";
 import { updateInventoryFromCart, setCart } from "../redux/productSlice";
+import EditLoginModal from "./EditLoginModal";
 
 function ProductCard({ productsList, horizontal = false }) {
   const location = useLocation();
@@ -18,10 +19,9 @@ function ProductCard({ productsList, horizontal = false }) {
   const isHome = location.pathname === "/";
   const isLoadingState = useSelector((state) => state.loader.isLoading);
   const [cartId, setCartId] = useState(null);
-  
+  const [openEditLoginModal, setOpenEditLoginModal] = useState(false);
   // Ensure productsList is an array before using slice
   const productsListArray = Array.isArray(productsList) ? productsList : [];
-
   const productsData = horizontal ? productsListArray : isHome ? productsListArray.slice(0, 4) : productsListArray;
   
   // Check if we're in search mode with no results
@@ -30,6 +30,9 @@ function ProductCard({ productsList, horizontal = false }) {
   
   // Show shimmer when loading, searching, or when no products found (0 products) - shimmer stays visible always
   const shouldShowShimmer = isLoadingState || isSearching || (isSearchMode && productsListArray.length === 0) || (!isSearchMode && productsListArray.length === 0);
+
+  const token = sessionStorage.getItem("token");
+  const shopifyAccessToken = sessionStorage.getItem("shopifyAccessToken");
   
   // Helper function to format price
   const formatPrice = (price) => {
@@ -213,6 +216,13 @@ function ProductCard({ productsList, horizontal = false }) {
 
   // Handle add to cart
   const handleAddToCart = useCallback(async (product) => {
+
+    if (!token || !shopifyAccessToken) {
+      toast.error("Please login to add items to cart");
+      setOpenEditLoginModal(true);
+      return;
+    }
+
     if (!cartId) {
       toast.error("Cart not initialized yet. Please try again.");
       return;
@@ -530,6 +540,7 @@ function ProductCard({ productsList, horizontal = false }) {
         )}
       </div>
       )}
+      <EditLoginModal open={openEditLoginModal} onClose={() => setOpenEditLoginModal(false)} />
     </div>
   );
 }
