@@ -26,7 +26,8 @@ function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const dispatch = useDispatch();
-  const user = useSelector((state) => state?.user?.user);
+  const user = useSelector((state) => state?.user?.user?.customer?.firstName);
+  console.log(user);
   const isActive = (path) => location.pathname === path;
   const isHeader = [ROUTES.TERMS_AND_CONDITION, ROUTES.PRIVACY_POLICY].includes(location.pathname);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -197,7 +198,7 @@ function Header() {
         {/* Icons Section - Fixed Width (Responsive) with Permanent Search Input */}
         {/* Show Icons when not isHeader or isHeader and token and shopifyAccessToken are present */}
         {(!isHeader || (isHeader && token && shopifyAccessToken)) && (
-          <IconsSections isSearchOpen={isSearchOpen} setSearchQuery={setSearchQuery} handleSearch={handleSearch} setIsSearchOpen={setIsSearchOpen} searchQuery={searchQuery} dispatch={dispatch} setProducts={setProducts} getAllProducts={getAllProducts} navigate={navigate} ROUTES={ROUTES} cartItemsCount={cartItemsCount} user={user} setShowUserMenu={setShowUserMenu} userMenuRef={userMenuRef} setIsEditCustomerModalOpen={setIsEditCustomerModalOpen} setIsDialogOpen={setIsDialogOpen} toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} showUserMenu={showUserMenu} isHeader={isHeader} token={token} shopifyAccessToken={shopifyAccessToken} />
+          <IconsSections isSearchOpen={isSearchOpen} setSearchQuery={setSearchQuery} handleSearch={handleSearch} setIsSearchOpen={setIsSearchOpen} searchQuery={searchQuery} dispatch={dispatch} setProducts={setProducts} getAllProducts={getAllProducts} navigate={navigate} ROUTES={ROUTES} cartItemsCount={cartItemsCount} user={user} setShowUserMenu={setShowUserMenu} userMenuRef={userMenuRef} setIsEditCustomerModalOpen={setIsEditCustomerModalOpen} setIsDialogOpen={setIsDialogOpen} toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} showUserMenu={showUserMenu} token={token} shopifyAccessToken={shopifyAccessToken} />
         )}
         {/* Show Login button when isHeader and token and shopifyAccessToken are not present */}
         {isHeader && !token && !shopifyAccessToken && (

@@ -67,7 +67,7 @@ const EditLoginModal = ({ open, onClose }) => {
         </button>
 
         <p className="text-lg font-bold mb-6">
-          Please login to add items to cart
+          Please login to complete your purchase
         </p>
 
         {error && (
@@ -81,7 +81,7 @@ const EditLoginModal = ({ open, onClose }) => {
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
               type="email"
-              placeholder="you@example.com"
+              placeholder="yourname@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

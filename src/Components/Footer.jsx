@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaInstagram } from "react-icons/fa";
 import { FaWhatsapp } from "react-icons/fa";
 import { FaYoutube } from "react-icons/fa";
@@ -7,8 +7,20 @@ import { FaTwitter } from "react-icons/fa";
 import theme from "../lib/theme";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../lib/constant";
+import { getUserProfile } from "../apiCalls/users";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/userSlice";
+
 
 function Footer() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const userProfile = await getUserProfile();
+      dispatch(setUser(userProfile));
+    };
+    fetchUserProfile();
+  }, [dispatch]);
   return (
     <footer
       className="text-center lg:text-left"

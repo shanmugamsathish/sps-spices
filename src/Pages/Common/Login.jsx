@@ -76,7 +76,7 @@ const Login = () => {
               <label className="block text-sm font-medium mb-1">Email</label>
               <input
                 type="email"
-                placeholder="you@example.com"
+                placeholder="yourname@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -88,7 +88,7 @@ const Login = () => {
               <label className="block text-sm font-medium mb-1">Password</label>
               <input
                 type="password"
-                placeholder="Enter your password"
+                placeholder="Your Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
