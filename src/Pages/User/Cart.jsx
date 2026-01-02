@@ -312,7 +312,7 @@ function Cart() {
           </div>
         </div>
       </div>
-      <div className=" my-4">
+      <div >
         <h2
           className="font-bold mb-4 sm:ml-8 md:ml-12 lg:ml-16 text-xl sm:text-2xl md:text-3xl lg:text-3xl leading-tight"
           style={{ color: theme.colors.text.primary }}

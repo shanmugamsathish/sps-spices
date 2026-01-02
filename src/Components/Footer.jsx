@@ -99,6 +99,9 @@ function Footer() {
               <a href="https://www.instagram.com/sps_spices/" target="_blank" rel="noopener noreferrer">
                 <FaInstagram className="w-6 h-6" />
               </a>
+              <a href="https://wa.me/917092597277" target="_blank" rel="noopener noreferrer">
+                <FaWhatsapp className="w-6 h-6" />
+              </a>
               <a href="https://www.youtube.com/@spsspices" target="_blank" rel="noopener noreferrer">
                 <FaYoutube className="w-6 h-6" />
               </a>

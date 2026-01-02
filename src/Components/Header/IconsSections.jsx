@@ -111,7 +111,7 @@ function IconsSections({
       <HeartPlus
         className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 cursor-pointer hover:opacity-70 transition-opacity hidden sm:block shrink-0"
         style={{ color: theme.colors.text.primary }}
-        onClick={() => navigate(ROUTES.ADD_TO_WISHLIST)}
+        onClick={() => {navigate(ROUTES.ADD_TO_WISHLIST), window.scrollTo(0, 0)}}
       />
       <div className="relative">
         {cartItemsCount > 0 && (

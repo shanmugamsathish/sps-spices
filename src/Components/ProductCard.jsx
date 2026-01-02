@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import { ShoppingCart, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import theme from "../lib/theme";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../lib/constant";
 import { useSelector, useDispatch } from "react-redux";
 import ProductCardShimmer from "./ProductCardShimmer";
 import { createCart, addItemsToCart, getCartDetails } from "../apiCalls/cart";
+import { getFavourites, addFavourite, removeFavourite } from "../apiCalls/favourites";
 import toast from "react-hot-toast";
 import { updateInventoryFromCart, setCart } from "../redux/productSlice";
 import EditLoginModal from "./EditLoginModal";
+import { setLoading } from "../redux/loaderSlice";
 
-function ProductCard({ productsList, horizontal = false }) {
+function ProductCard({ productsList, horizontal = false, onFavoriteChange }) {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -22,7 +24,7 @@ function ProductCard({ productsList, horizontal = false }) {
   const [openEditLoginModal, setOpenEditLoginModal] = useState(false);
   // Ensure productsList is an array before using slice
   const productsListArray = Array.isArray(productsList) ? productsList : [];
-  const productsData = horizontal ? productsListArray : isHome ? productsListArray.slice(0, 4) : productsListArray;
+  const productsData = horizontal ? productsListArray : isHome ? productsListArray.slice(0, 8) : productsListArray;
   
   // Check if we're in search mode with no results
   const isSearchMode = searchQuery && searchQuery.trim() !== "";
@@ -33,6 +35,7 @@ function ProductCard({ productsList, horizontal = false }) {
 
   const token = sessionStorage.getItem("token");
   const shopifyAccessToken = sessionStorage.getItem("shopifyAccessToken");
+  const [favoritesSet, setFavoritesSet] = useState(new Set());
   
   // Helper function to format price
   const formatPrice = (price) => {
@@ -104,6 +107,68 @@ function ProductCard({ productsList, horizontal = false }) {
         onMouseLeave={handleMouseLeave}
         onClick={onClick}
       >
+        {/* Wishlist heart overlay */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            const prodId = product?.id;
+            if (!prodId) return;
+            (async () => {
+              try {
+                const idStr = String(prodId);
+                const isFavorited = favoritesSet.has(idStr);
+                
+                if (isFavorited) {
+                  dispatch(setLoading(true));
+                  await removeFavourite({ favouriteId: idStr });
+                  dispatch(setLoading(false));
+                  setFavoritesSet((prev) => {
+                    const copy = new Set(prev);
+                    copy.delete(idStr);
+                    return copy;
+                  });
+                  // Refresh favorites list if callback provided (e.g., from Wishlist page)
+                  if (onFavoriteChange) {
+                    onFavoriteChange();
+                  } else {
+                    fetchFavorites();
+                  }
+                  toast.success("Removed from favorites");
+                } else {
+                  dispatch(setLoading(true));
+                  await addFavourite({ productId: prodId });
+                  dispatch(setLoading(false));
+                  setFavoritesSet((prev) => new Set(prev).add(idStr));
+                  // Refresh favorites list if callback provided (e.g., from Wishlist page)
+                  if (onFavoriteChange) {
+                    onFavoriteChange();
+                  } else {
+                    fetchFavorites();
+                  }
+                  toast.success("Added to favorites");
+                }
+              } catch (err) {
+                toast.error(err.response?.data?.message || "Failed to update favorites");
+              }
+            })();
+          }}
+          aria-label="Toggle wishlist"
+          className="absolute top-2 right-2 z-30 p-1.5 rounded-full backdrop-blur-sm"
+          style={{
+            backgroundColor: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {favoritesSet.has(String(product?.id)) ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5"  viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          ) : (
+            <Heart className="w-5 h-5" style={{ color: theme.colors.text.primary }} />
+          )}
+        </button>
         {productImages.map((imageSrc, index) => (
           <img
             key={index}
@@ -193,6 +258,30 @@ function ProductCard({ productsList, horizontal = false }) {
     };
     initializeCart();
   }, [dispatch]);
+
+  const fetchFavorites = useCallback(async () => {
+    try {
+      dispatch(setLoading(true));
+      const response = await getFavourites();
+      if (response?.success) {
+        const favs = response.favorites || response.favourites || [];
+        const ids = new Set(favs.map((p) => String(p.id)));
+        setFavoritesSet(ids);
+      }
+    } catch (err) {
+      // ignore - user may be not logged in
+      toast.error("Could not fetch favorites: " + (err?.message || err));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }, [dispatch]);
+
+  // Fetch user's favorites once on mount
+  useEffect(() => {
+    if (token && shopifyAccessToken) {
+      fetchFavorites();
+    }
+  }, [token, shopifyAccessToken, fetchFavorites]);
 
   // Helper function to convert variant ID to GraphQL global ID format
   const getVariantGraphQLId = useCallback((variant) => {
@@ -295,7 +384,7 @@ function ProductCard({ productsList, horizontal = false }) {
     } catch (error) {
       toast.error("Error adding item to cart: " + (error.response?.data?.message || error.message));
     }
-  }, [cartId, getFirstVariant, getVariantGraphQLId, dispatch]);
+  }, [cartId, getFirstVariant, getVariantGraphQLId, dispatch, token, shopifyAccessToken]);
 
   const scrollRef = useRef(null);
   const scrollStep = useCallback(() => {
@@ -340,7 +429,7 @@ function ProductCard({ productsList, horizontal = false }) {
             onClick={scrollLeft}
             aria-label="Scroll left"
             className="absolute left-2 top-1/2 -translate-y-1/2 z-20 rounded-full p-2 shadow-md"
-            style={{ backgroundColor: theme.colors.accent.primary, color: 'white' }}
+            style={{ backgroundColor: 'white', color: theme.colors.accent.primary }}
           >
             <ChevronLeft className="w-5 h-5"  />
           </button>

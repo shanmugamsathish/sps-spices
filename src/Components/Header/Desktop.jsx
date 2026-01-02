@@ -73,6 +73,15 @@ function Desktop({ isActive, isHeader, token, shopifyAccessToken }) {
     >
       PRIVACY POLICY
     </Link>
+    <Link
+      to={ROUTES.CONTACT}
+      onClick={() => {
+        window.scrollTo(0, 0);
+      }}
+      className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm md:text-base font-medium transition-all hover:opacity-80 whitespace-nowrap"
+    >
+      CONTACT
+    </Link>
     </>
     )}
 
