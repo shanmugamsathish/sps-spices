@@ -7,8 +7,11 @@ import { setLoading } from '../../redux/loaderSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { createCart, addItemsToCart, updateItemQuantity, getCartDetails } from '../../apiCalls/cart'
 import { updateInventoryFromCart, setCart, selectCart } from '../../redux/productSlice'
+import { selectUser } from '../../redux/userSlice'
+import { getUserProfile } from '../../apiCalls/users'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
+import ProductReviews from '../../Components/ProductReviews'
 
 function ProductDetails() {
   const navigate = useNavigate()

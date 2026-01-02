@@ -9,15 +9,17 @@ import EmptyCart from "../../Components/Cart/EmptyCart";
 import { getAllProducts } from "../../apiCalls/products";
 import OrderProducts from "../../Components/Cart/OrderProducts";
 import RecentProducts from "../User/RecentProducts";
+import { ROUTES } from "../../lib/constant";
+import { useNavigate } from "react-router-dom";
 
 function Cart() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const cart = useSelector(selectCart);
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [updatingLineId, setUpdatingLineId] = useState(null);
 
-  // Get cartId from localStorage
   const cartId = localStorage.getItem("cartId");
 
   const fetchProducts = useCallback(async () => {
@@ -33,7 +35,6 @@ function Cart() {
     fetchProducts();
   }, [fetchProducts]);
 
-  // Fetch cart if not in Redux
   useEffect(() => {
     const fetchCart = async () => {
       if (!cart && cartId) {
@@ -54,17 +55,14 @@ function Cart() {
     fetchCart();
   }, [cart, cartId, dispatch]);
 
-  // Helper to find product by variant ID
   const findProductByVariantId = useCallback(
     (variantId) => {
       if (!variantId || !allProducts || allProducts.length === 0) return null;
 
-      // Extract numeric ID from GraphQL ID if needed
       const extractNumericId = (id) => {
         if (!id) return null;
         if (typeof id === "number") return id;
         if (typeof id === "string") {
-          // Handle GraphQL ID format: "gid://shopify/ProductVariant/51060196966688"
           const match = id.match(/\/(\d+)$/);
           return match ? parseInt(match[1], 10) : null;
         }
@@ -76,21 +74,17 @@ function Cart() {
       for (const product of allProducts) {
         if (product.variants && Array.isArray(product.variants)) {
           for (const variant of product.variants) {
-            // Try multiple matching strategies
             const variantGraphQLId = variant.admin_graphql_api_id;
             const variantNumericId = variant.id;
 
-            // Match by GraphQL ID
             if (variantGraphQLId === variantId) {
               return { product, variant };
             }
 
-            // Match by numeric ID
             if (targetNumericId && variantNumericId === targetNumericId) {
               return { product, variant };
             }
 
-            // Match by constructed GraphQL ID
             if (variantNumericId) {
               const constructedGraphQLId = `gid://shopify/ProductVariant/${variantNumericId}`;
               if (constructedGraphQLId === variantId) {
@@ -105,7 +99,6 @@ function Cart() {
     [allProducts]
   );
 
-  // Update quantity
   const handleQuantityChange = async (lineId, currentQuantity, change) => {
     if (!cartId || !cart) return;
 
@@ -117,9 +110,8 @@ function Cart() {
 
     try {
       setUpdatingLineId(lineId);
-      // Use full cartId (with key) for API call - Shopify requires it
       const response = await updateItemQuantity({
-        cartId: cartId, // Use full cartId with key
+        cartId: cartId, 
         lines: [
           {
             id: lineId,
@@ -145,15 +137,13 @@ function Cart() {
     }
   };
 
-  // Remove item
   const handleRemoveItem = async (lineId) => {
     if (!cartId || !cart) return;
 
     try {
       setUpdatingLineId(lineId);
-      // Use full cartId (with key) for API call
       const response = await removeItemsFromCart({
-        cartId: cartId, // Use full cartId with key
+        cartId: cartId, 
         lineIds: [lineId],
       });
 
@@ -241,7 +231,6 @@ function Cart() {
           Shopping Cart
         </h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Cart Items - Takes 2 columns on large screens */}
           <OrderProducts
             cart={cart}
             findProductByVariantId={findProductByVariantId}
@@ -250,7 +239,6 @@ function Cart() {
             updatingLineId={updatingLineId}
           />
 
-          {/* Column 3: Order Summary */}
           <div className="lg:col-span-1">
             <div
               className="sticky top-4 p-6 rounded-lg border"
@@ -296,9 +284,8 @@ function Cart() {
 
               <button
                 onClick={() => {
-                  // Navigate to checkout page when implemented
-                  toast.info("Checkout page coming soon!");
-                  // navigate('/checkout');
+                  navigate(ROUTES.PAYMENT);
+                  toast.success("Redirecting to payment page...");
                 }}
                 className="glow-button w-full py-3 rounded-md font-semibold hover:opacity-90 transition-opacity"
                 style={{

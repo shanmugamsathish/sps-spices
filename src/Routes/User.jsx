@@ -11,6 +11,7 @@ import CollectionProducts from '../Pages/User/CollectionProducts';
 import AddToWishlist from '../Pages/User/AddToWishlist';
 import Cart from '../Pages/User/Cart';
 import MyOrders from '../Pages/User/MyOrders';
+import PaymentPage from '../Pages/User/PaymentPage';
 import Loader from '../Components/Loader';
 import Login from '../Pages/Common/Login';
 import Register from '../Pages/Common/Register';
@@ -48,6 +49,9 @@ function User() {
       </Route>
       <Route path={ROUTES.MY_ORDERS} element={<ProtectedRoutes />}>
         <Route index element={<MyOrders />} />
+      </Route>
+      <Route path={ROUTES.PAYMENT} element={<ProtectedRoutes />}>
+        <Route index element={<PaymentPage />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

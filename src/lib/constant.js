@@ -30,6 +30,7 @@ export const ROUTES = {
     ADD_TO_WISHLIST: '/add-to-wishlist',
     CART: '/cart',
     MY_ORDERS: '/my-orders',
+    PAYMENT: '/payment',
 
     ADMIN_PRODUCTS: '/admin/products',
     ADMIN_ADD_PRODUCT: '/admin/add-product',
