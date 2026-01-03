@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import ProductCard from '../../Components/ProductCard'
 import RecentProducts from '../User/RecentProducts'
 import theme from '../../lib/theme'
+import { TITLES } from '../../lib/constant'
 
 function AddToWishlist() {
   const dispatch = useDispatch()
@@ -41,7 +42,7 @@ function AddToWishlist() {
           className="text-2xl sm:text-3xl lg:text-4xl font-bold mx-7"
           style={{ color: theme.colors.text.primary }}
         >
-          My Wishlist
+          {TITLES.WISHLIST.TITLE}
         </h1>
         {favourites.length > 0 && (
           <p 

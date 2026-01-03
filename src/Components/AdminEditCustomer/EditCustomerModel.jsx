@@ -154,7 +154,6 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
                     ? customerObj.addresses
                     : [defaultAddress]
                 );
-                // freshly loaded data = no unsaved changes
                 setHasChanges(false);
             }
         } catch (error) {
@@ -227,7 +226,6 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
 
         try {
           const response = await updateCustomer(customerId, customerPayload);
-          console.log("handleSubmit", response);
           if (response) {
             toast.success(response.message || "Customer updated successfully");
             // Let parent refresh the list if provided

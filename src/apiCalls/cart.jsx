@@ -1,46 +1,31 @@
 import { axiosInstance } from "./index";
 import { API_URL } from "../lib/constant";
 
-/* -------------------------
-   CREATE CART
---------------------------*/
-
+// Create a cart
 export const createCart = async (cartData = {}) => {
     const response = await axiosInstance.post(`${API_URL}/cart/create`, cartData);
     return response.data;
 };
 
-/* -------------------------
-   ADD ITEMS TO CART
---------------------------*/
-
+// Add items to a cart
 export const addItemsToCart = async (cartData) => {
     const response = await axiosInstance.post(`${API_URL}/cart/add`, cartData);
     return response.data;
 };
 
-/* -------------------------
-   UPDATE ITEM QUANTITY
---------------------------*/
-
+// Update item quantity
 export const updateItemQuantity = async (cartData) => {
     const response = await axiosInstance.post(`${API_URL}/cart/update`, cartData);
     return response.data;
 };
 
-/* -------------------------
-   REMOVE ITEMS FROM CART
---------------------------*/
-
+// Remove items from a cart
 export const removeItemsFromCart = async (cartData) => {
     const response = await axiosInstance.post(`${API_URL}/cart/remove`, cartData);
     return response.data;
 };
 
-/* -------------------------
-   GET CART DETAILS
---------------------------*/
-
+// Get cart details
 export const getCartDetails = async (cartId) => {
     if (!cartId) {
       throw new Error("Cart ID is required");

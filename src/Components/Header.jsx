@@ -26,7 +26,7 @@ function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const dispatch = useDispatch();
-  const user = useSelector((state) => state?.user?.user?.customer?.firstName);
+  const user = useSelector((state) => state?.user?.user?.customer);
   console.log(user);
   const isActive = (path) => location.pathname === path;
   const isHeader = [ROUTES.TERMS_AND_CONDITION, ROUTES.PRIVACY_POLICY].includes(location.pathname);
@@ -110,7 +110,6 @@ function Header() {
         const allProducts = await getAllProducts();
         if (allProducts) {
           const productsArray = Array.isArray(allProducts) ? allProducts : [];
-          console.log(productsArray);
           dispatch(setProducts(productsArray));
         } else {
           dispatch(setProducts([]));
@@ -196,9 +195,8 @@ function Header() {
 
         <Desktop isActive={isActive} isHeader={isHeader} token={token} shopifyAccessToken={shopifyAccessToken}/>
         {/* Icons Section - Fixed Width (Responsive) with Permanent Search Input */}
-        {/* Show Icons when not isHeader or isHeader and token and shopifyAccessToken are present */}
         {(!isHeader || (isHeader && token && shopifyAccessToken)) && (
-          <IconsSections isSearchOpen={isSearchOpen} setSearchQuery={setSearchQuery} handleSearch={handleSearch} setIsSearchOpen={setIsSearchOpen} searchQuery={searchQuery} dispatch={dispatch} setProducts={setProducts} getAllProducts={getAllProducts} navigate={navigate} ROUTES={ROUTES} cartItemsCount={cartItemsCount} user={user} setShowUserMenu={setShowUserMenu} userMenuRef={userMenuRef} setIsEditCustomerModalOpen={setIsEditCustomerModalOpen} setIsDialogOpen={setIsDialogOpen} toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} showUserMenu={showUserMenu} token={token} shopifyAccessToken={shopifyAccessToken} />
+          <IconsSections isSearchOpen={isSearchOpen} setSearchQuery={setSearchQuery} handleSearch={handleSearch} setIsSearchOpen={setIsSearchOpen} searchQuery={searchQuery} dispatch={dispatch} setProducts={setProducts} getAllProducts={getAllProducts} navigate={navigate} ROUTES={ROUTES} cartItemsCount={cartItemsCount} user={user?.firstName} setShowUserMenu={setShowUserMenu} userMenuRef={userMenuRef} setIsEditCustomerModalOpen={setIsEditCustomerModalOpen} setIsDialogOpen={setIsDialogOpen} toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} showUserMenu={showUserMenu} token={token} shopifyAccessToken={shopifyAccessToken} />
         )}
         {/* Show Login button when isHeader and token and shopifyAccessToken are not present */}
         {isHeader && !token && !shopifyAccessToken && (

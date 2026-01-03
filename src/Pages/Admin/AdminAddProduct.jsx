@@ -115,7 +115,6 @@ function AdminAddProduct() {
   // Helper function to generate variants from options
   const generateVariantsFromOptions = useCallback(
     (updatedOptions, currentVariants) => {
-      console.log("generateVariantsFromOptions", updatedOptions, currentVariants);
       if (updatedOptions.length > 0 && updatedOptions[0].values) {
         // Get the first option's non-empty values
         const optionValues = updatedOptions[0].values.filter(
@@ -178,7 +177,6 @@ function AdminAddProduct() {
 
   const handleOptionValueChange = useCallback(
     (optionIndex, valueIndex, value) => {
-      console.log("handleOptionValueChange", optionIndex, valueIndex, value);
       const updatedOptions = [...options];
       updatedOptions[optionIndex].values[valueIndex] = value;
       setOptions(updatedOptions);

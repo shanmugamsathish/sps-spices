@@ -10,17 +10,24 @@ import { ROUTES } from "../lib/constant";
 import { getUserProfile } from "../apiCalls/users";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/userSlice";
+import { FOOTER_TEXT } from "../lib/constant";
+import { useLocation } from "react-router-dom";
 
 
 function Footer() {
   const dispatch = useDispatch();
+  const location = useLocation();
+  const auth = [ROUTES.HOME, ROUTES.PRODUCTS].includes(location.pathname);
   useEffect(() => {
     const fetchUserProfile = async () => {
       const userProfile = await getUserProfile();
       dispatch(setUser(userProfile));
     };
-    fetchUserProfile();
-  }, [dispatch]);
+    if (auth) {
+      fetchUserProfile();
+    }
+  }, [dispatch, auth]);
+  
   return (
     <footer
       className="text-center lg:text-left"
@@ -36,50 +43,48 @@ function Footer() {
           {/* Brand */}
           <div>
             <span className="mb-4 inline-block font-semibold uppercase md:justify-start border-b border-white pb-2">
-              SPS SPICES AND DRY FRUITS
+              {FOOTER_TEXT.BRAND_NAME}
             </span>
             <p>
-              Pure, aromatic spices and nutrient-rich dry fruits. Sourced with
-              quality, packed with freshness.
+              {FOOTER_TEXT.DESCRIPTION}
             </p>
           </div>
 
           {/* Useful Links */}
           <div >
             <span className="mb-4 inline-block font-semibold uppercase md:justify-start border-b border-white pb-2">
-              Useful Links
+              {FOOTER_TEXT.USEFUL_LINKS.title}
             </span>
             <p className="mb-2">
-              <Link to="/">Home</Link>
+              <Link to={FOOTER_TEXT.USEFUL_LINKS.links[0].link}>{FOOTER_TEXT.USEFUL_LINKS.links[0].title}</Link>
             </p>
             <p className="mb-2">
-              <Link to="/about">About Us</Link>
+              <Link to={FOOTER_TEXT.USEFUL_LINKS.links[1].link}>{FOOTER_TEXT.USEFUL_LINKS.links[1].title}</Link>
             </p>
             <p className="mb-2">
-              <Link to="/products">Products</Link>
+              <Link to={FOOTER_TEXT.USEFUL_LINKS.links[2].link}>{FOOTER_TEXT.USEFUL_LINKS.links[2].title}</Link>
             </p>
             <p className="mb-2">
-              <Link to="/collections">Collections</Link>
+              <Link to={FOOTER_TEXT.USEFUL_LINKS.links[3].link}>{FOOTER_TEXT.USEFUL_LINKS.links[3].title}</Link>
             </p>
             <p className="mb-2">
-              <Link to="/contact">Contact Us</Link>
+              <Link to={FOOTER_TEXT.USEFUL_LINKS.links[4].link}>{FOOTER_TEXT.USEFUL_LINKS.links[4].title}</Link>
             </p>
           </div>
 
           {/* Contact */}
           <div>
             <span className="mb-4 inline-block font-semibold uppercase md:justify-start border-b border-white pb-2">
-              Contact
+              {FOOTER_TEXT.CONTACT_INFO.TITLE}
             </span>
             <p className="mb-4 flex items-center justify-center md:justify-start">
-              C2 NAAZYAS ARCADE 4th Main Road Maharaja Nagar Palayamkottai -
-              627011
+              {FOOTER_TEXT.CONTACT_INFO.ADDRESS}
             </p>
             <p className="mb-4 flex items-center justify-center md:justify-start">
-              spsspices@zohomail.in
+              {FOOTER_TEXT.CONTACT_INFO.EMAIL}
             </p>
             <p className="mb-4 flex items-center justify-center md:justify-start">
-              +91 7092597277 (WhatsApp)
+              {FOOTER_TEXT.CONTACT_INFO.PHONE}
             </p>
             {/* <p className="flex items-center justify-center md:justify-start">
               Wholesale & Retail Enquiries
@@ -89,26 +94,26 @@ function Footer() {
           {/* Policies */}
           <div>
             <span className="mb-4 inline-block font-semibold uppercase md:justify-start border-b border-white pb-2">
-              Policies
+              {FOOTER_TEXT.POLICIES.TITLE}
             </span>
-            <p className="mb-2 cursor-pointer"><Link to={ROUTES.PRIVACY_POLICY} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Privacy Policy</Link></p>
-            <p className="mb-2 cursor-pointer"><Link to={ROUTES.TERMS_AND_CONDITION} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Terms & Conditions</Link></p>
+            <p className="mb-2 cursor-pointer"><Link to={ROUTES.PRIVACY_POLICY} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>{FOOTER_TEXT.POLICIES.PRIVACY_POLICY.title}</Link></p>
+            <p className="mb-2 cursor-pointer"><Link to={ROUTES.TERMS_AND_CONDITION} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>{FOOTER_TEXT.POLICIES.TERMS_AND_CONDITIONS.title}</Link></p>
             <div className="flex flex-col gap-2 justify-center md:justify-start my-6">
-              <span>Follow <span className="font-semibold">SPS SPICES AND DRY FRUITS</span> on social networks:</span>
+              <span>{FOOTER_TEXT.FOLLOW_US.TEXT.TITLE} <span className="font-semibold">{FOOTER_TEXT.BRAND_NAME}</span> {FOOTER_TEXT.FOLLOW_US.TEXT.TEXT_2}</span>
               <div className="flex gap-4">
-              <a href="https://www.instagram.com/sps_spices/" target="_blank" rel="noopener noreferrer">
+              <a href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.INSTAGRAM} target="_blank" rel="noopener noreferrer">
                 <FaInstagram className="w-6 h-6" />
               </a>
-              <a href="https://wa.me/917092597277" target="_blank" rel="noopener noreferrer">
+              <a href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.WHATSAPP} target="_blank" rel="noopener noreferrer">
                 <FaWhatsapp className="w-6 h-6" />
               </a>
-              <a href="https://www.youtube.com/@spsspices" target="_blank" rel="noopener noreferrer">
+              <a href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.YOUTUBE} target="_blank" rel="noopener noreferrer">
                 <FaYoutube className="w-6 h-6" />
               </a>
-              <a href="https://www.facebook.com/spsspices" target="_blank" rel="noopener noreferrer">
+              <a href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.FACEBOOK} target="_blank" rel="noopener noreferrer">
                 <FaFacebook className="w-6 h-6" />
               </a>
-              <a href="https://www.twitter.com/spsspices" target="_blank" rel="noopener noreferrer">
+              <a href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.TWITTER} target="_blank" rel="noopener noreferrer">
                 <FaTwitter className="w-6 h-6" />
               </a>
             </div>
@@ -119,10 +124,10 @@ function Footer() {
         {/* Copyright */}
         <div className="text-center mt-4 flex flex-col gap-2 justify-center md:justify-start">
           <div className="flex items-center justify-center ">
-          <span>© 2025&nbsp;</span>
-          <span className="font-semibold">spsspicesanddryfruits. All Rights Reserved</span>
+          <span>{FOOTER_TEXT.COPYRIGHT.TEXT.YEAR}&nbsp;</span>
+          <span className="font-semibold">{FOOTER_TEXT.COPYRIGHT.TEXT.BRAND_NAME} All Rights Reserved</span>
           </div>
-          <span className="font-semibold">Designed and Developed by <a href="https://pragantechnologies.com" target="_blank" rel="noopener noreferrer">Pragan Tech Solutions</a></span>
+          <span className="font-semibold">{FOOTER_TEXT.DESIGNED_AND_DEVELOPED_BY.TEXT} <a href={FOOTER_TEXT.DESIGNED_AND_DEVELOPED_BY.LINK} target="_blank" rel="noopener noreferrer">{FOOTER_TEXT.DESIGNED_AND_DEVELOPED_BY.LINK_TEXT}</a></span>
         </div>
       </div>
 

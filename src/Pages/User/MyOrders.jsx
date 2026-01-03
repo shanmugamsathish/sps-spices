@@ -5,13 +5,15 @@ import { setLoading } from "../../redux/loaderSlice";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { Package, MapPin, Calendar, CreditCard, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { TITLES } from "../../lib/constant";
 
 function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedOrders, setExpandedOrders] = useState(new Set());
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const toggleOrderDetails = (orderId) => {
     setExpandedOrders((prev) => {
       const newSet = new Set(prev);
@@ -37,7 +39,6 @@ function MyOrders() {
           setOrders([]);
         }
       } catch (error) {
-        console.error("Error fetching orders:", error);
         toast.error(error.response?.data?.message || "Failed to load orders");
         setOrders([]);
       } finally {
@@ -120,7 +121,7 @@ function MyOrders() {
             className="text-2xl sm:text-3xl lg:text-4xl font-bold"
             style={{ color: theme.colors.text.primary }}
           >
-            My Orders
+            {TITLES.MY_ORDERS.TITLE}
           </h1>
           {orders.length > 0 && (
             <p
@@ -168,6 +169,7 @@ function MyOrders() {
                   backgroundColor: theme.colors.background.main,
                   border: `1px solid ${theme.colors.border.light}`,
                 }}
+                onClick={() => toggleOrderDetails(order.id)}
               >
                 <div
                   className="p-4 sm:p-6 border-b"
@@ -221,16 +223,15 @@ function MyOrders() {
                     </div>
                     <div
                       className="flex items-center mb-4 gap-2 cursor-pointer"
-                      onClick={() => toggleOrderDetails(order.id)}
+                      
                     >
                       <h3
                         className="text-base sm:text-lg font-semibold"
                         style={{
                           color: theme.colors.text.primary,
-                          borderBottom: `2px solid ${theme.colors.accent.primary}`,
                         }}
                       >
-                        Order Items
+                        {TITLES.MY_ORDERS.ORDER_ITEMS}
                       </h3>
                       <ChevronDown
                         className={`w-5 h-5 transition-transform duration-300 ${
@@ -297,8 +298,9 @@ function MyOrders() {
                             {/* Product Details */}
                             <div className="flex-1 min-w-0">
                               <h4
-                                className="text-base sm:text-lg font-semibold mb-1"
+                                className="text-base sm:text-lg font-semibold mb-1 cursor-pointer hover:underline"
                                 style={{ color: theme.colors.text.primary }}
+                                onClick={() => navigate(`/product-details/${item.product_id}`)}
                               >
                                 {item.title}
                               </h4>
@@ -343,7 +345,7 @@ function MyOrders() {
                         className="text-base font-semibold mb-3"
                         style={{ color: theme.colors.text.primary }}
                       >
-                        Order Summary
+                        {TITLES.MY_ORDERS.ORDER_SUMMARY}
                       </h3>
                       <div
                         className="space-y-2 text-sm p-4 rounded-md"
@@ -399,7 +401,7 @@ function MyOrders() {
                           style={{ color: theme.colors.text.primary }}
                         >
                           <MapPin className="w-4 h-4" />
-                          Shipping Address
+                          {TITLES.MY_ORDERS.SHIPPING_ADDRESS}
                         </h3>
                         <div
                           className="text-sm space-y-1 p-4 rounded-md"

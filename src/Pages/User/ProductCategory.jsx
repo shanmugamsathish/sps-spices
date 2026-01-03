@@ -7,7 +7,6 @@ import theme from "../../lib/theme";
 import { useSelector } from "react-redux";
 
 function ProductCategory({ categoryName, productType, sectionId }) {
-  console.log(categoryName, productType, sectionId);
   const navigate = useNavigate();
   const location = useLocation();
   const isHome = location.pathname === "/";

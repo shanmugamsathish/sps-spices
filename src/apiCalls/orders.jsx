@@ -5,7 +5,7 @@ import { API_URL } from "../lib/constant";
 export const getCustomerOrdersWithProductIds = async () => {
     try {
         const response = await axiosInstance.get(`${API_URL}/orders/with-product-ids`);
-        return response.data; // Returns { success: true, orders: [...], totalOrders: number }
+        return response.data;
     } catch (error) {
         console.error('Error fetching customer orders:', error);
         throw error;

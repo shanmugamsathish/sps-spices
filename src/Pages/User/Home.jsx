@@ -11,6 +11,7 @@ import { setLoading } from "../../redux/loaderSlice";
 import toast from "react-hot-toast";
 import theme from "../../lib/theme";
 import HeroSection from "./HeroSection";
+import { TITLES } from "../../lib/constant";
 
 function Home() {
   const dispatch = useDispatch();
@@ -54,12 +55,11 @@ function Home() {
             className="border-b-4 pb-1"
             style={{ borderColor: theme.colors.accent.primary }}
           >
-            Products
+            {TITLES.PRODUCTS.TITLE}
           </span>
         </h2>
         <p className=" mt-10 text-lg font-medium text-center" style={{ color: theme.colors.text.primary }}>
-          Royal Spices. Refined Taste. Pure, carefully sourced spices crafted to
-          elevate everyday cooking into an experience of elegance.
+          {TITLES.PRODUCTS.DESCRIPTION}
         </p>
       </div>
       {productTypes.map((productType) => (
@@ -78,11 +78,11 @@ function Home() {
             className="border-b-4 pb-1"
             style={{ borderColor: theme.colors.accent.primary }}
           >
-            Collections
+            {TITLES.COLLECTIONS.TITLE}
           </span>
         </h2>
         <p className=" mt-10 text-lg font-medium " style={{ color: theme.colors.text.primary }}>
-        A signature collection of premium spice blends, crafted with precision and tradition. Each blend delivers depth, aroma, and balance — created for kitchens that demand nothing but the finest.
+        {TITLES.COLLECTIONS.DESCRIPTION}
         </p>
       </div>
       <Collections />
@@ -93,12 +93,12 @@ function Home() {
             className="border-b-4 pb-1"
             style={{ borderColor: theme.colors.accent.primary }}
           >
-            Recent 
+            {TITLES.RECENT_PRODUCTS.TITLE.TEXT} 
           </span>
-          {" "}Products
+          {" "}{TITLES.RECENT_PRODUCTS.TITLE.TEXT_2}
         </h2>
         <p className=" mt-10 text-lg font-medium " style={{ color: theme.colors.text.primary }}>
-        A signature collection of premium spice blends, crafted with precision and tradition. Each blend delivers depth, aroma, and balance — created for kitchens that demand nothing but the finest.
+        {TITLES.RECENT_PRODUCTS.DESCRIPTION}
         </p>
       </div>
       <RecentProducts />

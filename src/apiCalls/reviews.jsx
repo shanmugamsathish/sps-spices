@@ -25,3 +25,15 @@ export const submitProductReview = async (productId, reviewData) => {
     }
 };
 
+// Delete a review for a product
+export const deleteProductReview = async (productId, reviewId) => {
+    try {
+        const url = `${API_URL}/products/${productId}/reviews/${reviewId}`;
+        const response = await axiosInstance.delete(url);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting review:', error);
+        throw error;
+    }
+};
+

@@ -16,7 +16,6 @@ export const getAllCustomers = async () => {
 export const getCustomerById = async (id) => {
     try {
         const response = await axiosInstance.get(`${API_URL}/customers/${id}`);
-        // Response structure: { message: '...', data: { customer: {...} } }
         return response.data.data?.customer || response.data.data || response.data;
     } catch (error) {
         console.error('Error fetching customer by id:', error);
@@ -32,7 +31,6 @@ export const createCustomer = async (customer) => {
                 'Content-Type': 'application/json',
             },
         });
-        // Response structure: { message: '...', data: {...} }
         return response.data;
     } catch (error) {
         console.error('Error creating customer:', error);
@@ -43,7 +41,6 @@ export const createCustomer = async (customer) => {
 // Update a customer
 export const updateCustomer = async (id, customer) => {
     try {
-        // Send data in format: { customer: {...} }
         const response = await axiosInstance.put(`${API_URL}/customers/update/${id}`, customer, {
             headers: {
                 'Content-Type': 'application/json',

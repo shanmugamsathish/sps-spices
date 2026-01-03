@@ -38,7 +38,6 @@ function ProtectedRoutes() {
   useEffect(() => {
     const verifyAccess = async () => {
       const token = sessionStorage.getItem("token");
-      console.log("token", token);
       const shopifyAccessToken = sessionStorage.getItem("shopifyAccessToken");
       const isAdmin = isAdminRoute(location.pathname);
 
@@ -91,8 +90,7 @@ function ProtectedRoutes() {
           setLoading(false);
           return;
         }
-        console.log("response", response);
-        dispatch(setUser(response.customer));
+        dispatch(setUser(response));
       } catch (err) {
         toast.error(err.response?.data?.message || "Unauthorized");
         navigate("/login");

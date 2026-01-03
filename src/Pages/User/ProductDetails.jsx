@@ -24,6 +24,31 @@ function ProductDetails() {
   const [isUpdatingCart, setIsUpdatingCart] = useState(false)
   const dispatch = useDispatch()
   const cart = useSelector(selectCart)
+  const user = useSelector(selectUser)
+  const [customerId, setCustomerId] = useState(null)
+  const [customerName, setCustomerName] = useState(null)
+
+  useEffect(() => {
+    const fetchCustomerInfo = async () => {
+      try {
+        const response = await getUserProfile()
+        if (response?.success && response?.customer) {
+          const customer = response.customer
+          let shopifyCustomerId = customer.shopifyCustomerId || customer.id
+          if (shopifyCustomerId && typeof shopifyCustomerId === 'string' && shopifyCustomerId.includes('/')) {
+            shopifyCustomerId = shopifyCustomerId.split('/').pop()
+          }
+          setCustomerId(shopifyCustomerId ? String(shopifyCustomerId) : null)
+          setCustomerName(customer.firstName && customer.lastName 
+            ? `${customer.firstName} ${customer.lastName}`
+            : customer.email || customer.firstName || 'Customer')
+        }
+      } catch (error) {
+        console.error('Error fetching customer info:', error)
+      }
+    }
+    fetchCustomerInfo()
+  }, [])
   
   // Cart initialization
   useEffect(() => {
@@ -544,6 +569,17 @@ function ProductDetails() {
           </div>
         </div>
       </div>
+
+      {/* Product Reviews Section */}
+      {product && (
+        <div className="mt-8">
+          <ProductReviews
+            productId={product.id}
+            customerId={customerId}
+            customerName={customerName}
+          />
+        </div>
+      )}
     </div>
   )
 }

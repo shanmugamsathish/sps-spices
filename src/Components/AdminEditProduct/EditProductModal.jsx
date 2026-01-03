@@ -7,7 +7,6 @@ import { useDispatch } from 'react-redux';
 import { setLoading } from '../../redux/loaderSlice';
 
 function EditProductModal({ productId, isOpen, onClose, onUpdate, tableWidth, tablePosition }) {
-  console.log("EditProductModal", productId, isOpen, onClose, onUpdate, tableWidth, tablePosition);
   const [loadingText, setLoadingText] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [initialData, setInitialData] = useState(null);
