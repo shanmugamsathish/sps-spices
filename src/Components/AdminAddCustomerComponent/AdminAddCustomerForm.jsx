@@ -4,25 +4,18 @@ import { ROUTES } from '../../lib/constant'
 import theme from '../../lib/theme'
 import { useNavigate } from 'react-router-dom'
 
-// function AdminAddCustomerForm({ formData, handleInputChange, addresses, addAddress, removeAddress, handleAddressChange, isPaymentPage, handleSubmit, validationErrors }) {
-function AdminAddCustomerForm({formData, handleInputChange, addresses, addAddress, removeAddress, handleAddressChange, handleSubmit}) {
+function AdminAddCustomerForm({ formData, handleInputChange, addresses, addAddress, removeAddress, handleAddressChange, isPaymentPage, handleSubmit, validationErrors }) {
   const navigate = useNavigate();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-    {/* Basic Customer Information */}
-    {/* <BasicInformation formData={formData} handleInputChange={handleInputChange} isPaymentPage={isPaymentPage} validationErrors={validationErrors}/> */}
-    <BasicInformation formData={formData} handleInputChange={handleInputChange}/>
-
-    {/* Addresses */}
-    {/* <Address addresses={addresses} addAddress={addAddress} removeAddress={removeAddress} handleAddressChange={handleAddressChange} isPaymentPage={isPaymentPage} validationErrors={validationErrors}/> */}
-    <Address addresses={addresses} addAddress={addAddress} removeAddress={removeAddress} handleAddressChange={handleAddressChange}/>
-
-    {/* Submit Button */}
-    {/* {isPaymentPage ? ( */}
-      {/* null */}
-    {/* ) : ( */}
-    <div className="flex justify-end gap-4">
+    <BasicInformation formData={formData} handleInputChange={handleInputChange} isPaymentPage={isPaymentPage} validationErrors={validationErrors}/>
+    <Address addresses={addresses} addAddress={addAddress} removeAddress={removeAddress} handleAddressChange={handleAddressChange} isPaymentPage={isPaymentPage} validationErrors={validationErrors}/>
+    {isPaymentPage ? (
+      null
+    ) : (
+      <>
+          <div className="flex justify-end gap-4">
       <button
         type="button"
         onClick={() => navigate(ROUTES.ADMIN_CUSTOMERS)}
@@ -55,7 +48,9 @@ function AdminAddCustomerForm({formData, handleInputChange, addresses, addAddres
         Add Customer
       </button>
     </div>
-    {/* )} */}
+      </>
+    )}
+
   </form>
   )
 }

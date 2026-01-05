@@ -2,15 +2,14 @@ import React from "react";
 import theme from "../../lib/theme";
 import { Plus, Trash2 } from "lucide-react";
 
-function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
-// function Address({
-//   addresses,
-//   addAddress,
-//   removeAddress,
-//   handleAddressChange,
-//   isPaymentPage,
-//   validationErrors = {},
-// }) {
+function Address({
+  addresses,
+  addAddress,
+  removeAddress,
+  handleAddressChange,
+  isPaymentPage,
+  validationErrors = {},
+}) {
   return (
     <div
       className="p-6 rounded-lg shadow-sm"
@@ -20,24 +19,24 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
       }}
     >
       <div className="flex items-center justify-between mb-6">
-        {/* {isPaymentPage ? ( */}
-          {/* <h2
+        {isPaymentPage ? (
+           <h2
             className="text-xl font-semibold"
             style={{ color: theme.colors.text.primary }}
           >
             Shipping Addresses
-          </h2> */}
-        {/* ) : ( */}
+          </h2> 
+        ) : (
           <h2
             className="text-xl font-semibold"
             style={{ color: theme.colors.text.primary }}
           >
             Addresses (Optional)
           </h2>
-        {/* )} */}
-        {/* {isPaymentPage ? ( */}
-          {/* null */}
-        {/* ) : ( */}
+        )}
+         {isPaymentPage ? (
+           null 
+        ) : (
         <button
           type="button"
           onClick={addAddress}
@@ -53,7 +52,7 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
           <Plus className="w-4 h-4" />
           Add Address
         </button>
-        {/* )} */}
+        )}
       </div>
 
       <div className="space-y-6">
@@ -91,8 +90,7 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  First Name 
-                  {/* First Name {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>} */}
+                  First Name {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
@@ -103,17 +101,16 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: theme.colors.border.light,
-                    // borderColor: validationErrors.first_name && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: validationErrors.first_name && index === 0 ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter first name"
                 />
-                {/* {validationErrors.first_name && index === 0 && ( */}
-                  {/* <p className="mt-1 text-sm" style={{ color: "#DC2626" }}> */}
-                    {/* {validationErrors.first_name} */}
-                  {/* </p> */}
-                {/* )} */}
+                {validationErrors.first_name && index === 0 && (
+                  <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+                    {validationErrors.first_name}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -121,8 +118,7 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  Last Name 
-                  {/* Last Name {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>} */}
+                  Last Name {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
@@ -133,17 +129,16 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: theme.colors.border.light,
-                    // borderColor: validationErrors.last_name && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: validationErrors.last_name && index === 0 ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter last name"
                 />
-                {/* {validationErrors.last_name && index === 0 && ( */} 
-                  {/* <p className="mt-1 text-sm" style={{ color: "#DC2626" }}> */}
-                    {/* {validationErrors.last_name} */}
-                  {/* </p> */}
-                {/* )} */}
+                {validationErrors.last_name && index === 0 && ( 
+                  <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+                    {validationErrors.last_name}
+                  </p>
+                )}
               </div>
 
               <div className="md:col-span-2">
@@ -174,8 +169,7 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  Address Line 1 
-                  {/* Address Line 1 {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>} */}
+                  Address Line 1 {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
@@ -186,17 +180,16 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: theme.colors.border.light,
-                    // borderColor: validationErrors.address1 && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: validationErrors.address1 && index === 0 ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Street address"
                 />
-                {/* {validationErrors.address1 && index === 0 && ( */}
-                  {/* <p className="mt-1 text-sm" style={{ color: "#DC2626" }}> */}
-                    {/* {validationErrors.address1} */}
-                  {/* </p> */}
-                {/* )} */}
+                {validationErrors.address1 && index === 0 && ( 
+                  <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+                    {validationErrors.address1}
+                  </p>
+                )}
               </div>
 
               <div className="md:col-span-2">
@@ -227,8 +220,7 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  City 
-                  {/* City {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>} */}
+                  City {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
@@ -239,17 +231,16 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: theme.colors.border.light,
-                    // borderColor: validationErrors.city && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: validationErrors.city && index === 0 ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter city"
                 />
-                {/* {validationErrors.city && index === 0 && ( */}
-                  {/* <p className="mt-1 text-sm" style={{ color: "#DC2626" }}> */}
-                    {/* {validationErrors.city} */}
-                  {/* </p> */}
-                {/* )} */}
+                {validationErrors.city && index === 0 && ( 
+                  <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+                    {validationErrors.city}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -257,8 +248,7 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  State/Province 
-                  {/* State/Province {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>} */}
+                  State/Province {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
@@ -269,17 +259,16 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: theme.colors.border.light,
-                    // borderColor: validationErrors.province && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: validationErrors.province && index === 0 ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter state/province"
                 />
-                {/* {validationErrors.province && index === 0 && ( */}
-                  {/* <p className="mt-1 text-sm" style={{ color: "#DC2626" }}> */}
-                    {/* {validationErrors.province} */}
-                  {/* </p> */}
-                {/* )} */}
+                {validationErrors.province && index === 0 && ( 
+                  <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+                    {validationErrors.province}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -287,8 +276,7 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  Country 
-                  {/* Country {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>} */}
+                  Country {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
@@ -299,17 +287,16 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: theme.colors.border.light,
-                    // borderColor: validationErrors.country && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: validationErrors.country && index === 0 ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter country"
                 />
-                {/* {validationErrors.country && index === 0 && ( */}
-                  {/* <p className="mt-1 text-sm" style={{ color: "#DC2626" }}> */}
-                    {/* {validationErrors.country} */}
-                  {/* </p> */}
-                {/* )} */}
+                {validationErrors.country && index === 0 && ( 
+                  <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+                    {validationErrors.country}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -317,8 +304,7 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  ZIP/Postal Code 
-                  {/* ZIP/Postal Code {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>} */}
+                  ZIP/Postal Code {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
@@ -329,17 +315,16 @@ function Address({addresses, addAddress, removeAddress, handleAddressChange}) {
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: theme.colors.border.light,
-                    // borderColor: validationErrors.zip && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: validationErrors.zip && index === 0 ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter ZIP code"
                 />
-                {/* {validationErrors.zip && index === 0 && ( */}
-                  {/* <p className="mt-1 text-sm" style={{ color: "#DC2626" }}> */}
-                    {/* {validationErrors.zip} */}
-                  {/* </p> */}
-                {/* )} */}
+                {validationErrors.zip && index === 0 && ( 
+                  <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+                    {validationErrors.zip}
+                  </p>
+                )}
               </div>
 
               <div>
