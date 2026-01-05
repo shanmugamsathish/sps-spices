@@ -36,6 +36,7 @@ function IconsSections({
   showUserMenu,
   token,
   shopifyAccessToken,
+  isSearch,
 }) {
   return (
     <div
@@ -52,7 +53,7 @@ function IconsSections({
         className="flex items-center gap-1 sm:gap-3 md:gap-4"
         style={{ width: "100%", maxWidth: "100%" }}
       >
-        {isSearchOpen ? (
+        {isSearchOpen && isSearch ? (
           <div className="flex items-center gap-1 sm:gap-2 w-full">
             <input
               type="text"

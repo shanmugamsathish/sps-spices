@@ -7,12 +7,14 @@ import { setLoading } from "../../redux/loaderSlice";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../lib/constant";
 import { Plus, Trash2 } from "lucide-react";
-import BasicInformation from "../../Components/AdminAddCustomerComponent/BasicInformation";
-import Address from "../../Components/AdminAddCustomerComponent/Address";
+// import { useLocation } from "react-router-dom";
+import AdminAddCustomerForm from "../../Components/AdminAddCustomerComponent/AdminAddCustomerForm";
 
 function AdminAddCustomer() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  // const location = useLocation();
+  // const isPaymentPage = location.pathname === "/payment";
 
   const [formData, setFormData] = useState({
     email: "",
@@ -205,57 +207,23 @@ function AdminAddCustomer() {
   );
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 md:p-8">
-      <div className="max-w-4xl mx-auto">
+    // <div className={` ${isPaymentPage ? "w-full p-0" : "min-h-screen p-4 sm:p-6 md:p-8 w-full"}`}>
+    <div className="min-h-screen p-4 sm:p-6 md:p-8 w-full">
+      {/* <div className={` ${isPaymentPage ? "w-full" : "max-w-4xl mx-auto w-full"}`}> */}
+      <div className="max-w-4xl mx-auto w-full">
+        {/* {isPaymentPage ? ( */}
+          {/* null */}
+        {/* ) : ( */}
         <h1
           className="text-3xl md:text-4xl font-bold mb-8"
           style={{ color: theme.colors.text.primary }}
         >
           Add New Customer
         </h1>
+        {/* )} */}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Basic Customer Information */}
-          <BasicInformation formData={formData} handleInputChange={handleInputChange} />
-
-          {/* Addresses */}
-          <Address addresses={addresses} addAddress={addAddress} removeAddress={removeAddress} handleAddressChange={handleAddressChange} />
-
-          {/* Submit Button */}
-          <div className="flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={() => navigate(ROUTES.ADMIN_CUSTOMERS)}
-              className="px-6 py-3 rounded-md font-medium transition-colors cursor-pointer"
-              style={{
-                backgroundColor: theme.colors.border.light,
-                color: theme.colors.text.primary,
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-            //   disabled={!isFormValid()}
-              className="px-6 py-3 rounded-md text-white font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
-              style={{
-                backgroundColor: theme.colors.accent.primary,
-              }}
-              onMouseEnter={(e) => {
-                if (!e.target.disabled) {
-                  e.target.style.backgroundColor = theme.colors.accent.hover;
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!e.target.disabled) {
-                  e.target.style.backgroundColor = theme.colors.accent.primary;
-                }
-              }}
-            >
-              Add Customer
-            </button>
-          </div>
-        </form>
+        {/* <AdminAddCustomerForm formData={formData} handleInputChange={handleInputChange} addresses={addresses} addAddress={addAddress} removeAddress={removeAddress} handleAddressChange={handleAddressChange} isPaymentPage={isPaymentPage} handleSubmit={handleSubmit} /> */}
+        <AdminAddCustomerForm formData={formData} handleInputChange={handleInputChange} addresses={addresses} addAddress={addAddress} removeAddress={removeAddress} handleAddressChange={handleAddressChange} handleSubmit={handleSubmit} />
       </div>
     </div>
   );

@@ -34,3 +34,13 @@ export const getOrderById = async (orderId) => {
     }
 };
 
+// Get all admin orders
+export const getAdminOrders = async () => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/admin/orders`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching admin orders:', error);
+        throw error;
+    }
+};

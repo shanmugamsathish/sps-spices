@@ -28,17 +28,16 @@ function Contact() {
     async (e) => {
       e.preventDefault();
 
-      // Validation
-      if (
-        !formData.name?.trim() ||
-        !formData.email?.trim() ||
-        !formData.message?.trim()
-      ) {
-        toast.error("Please fill in all required fields");
-        return;
+      // Required fields validation
+      const required = ["name", "email", "phone", "subject", "message"];
+      for (const key of required) {
+        if (!formData[key] || !formData[key].toString().trim()) {
+          toast.error("Please enter that field");
+          return;
+        }
       }
 
-      // Email validation
+      // Email format validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
         toast.error("Please enter a valid email address");
@@ -47,13 +46,12 @@ function Contact() {
 
       setIsSubmitting(true);
 
-      // Simulate API call - replace with actual API call
       try {
-        // TODO: Replace with actual API endpoint
-        // const response = await sendContactMessage(formData);
+        const message = `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nSubject: ${formData.subject}\nMessage: ${formData.message}`;
+        const waNumber = "917092597277"; // business WhatsApp number used in contact info
+        const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
 
-        // Simulate delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        window.open(waUrl, "_blank");
 
         toast.success("Message sent successfully! We'll get back to you soon.");
         setIsSubmitted(true);

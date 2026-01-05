@@ -1,7 +1,8 @@
 import React from 'react'
 import theme from '../../lib/theme'
 
-function BasicInformation({ formData, handleInputChange }) {
+function BasicInformation({formData, handleInputChange}) {
+// function BasicInformation({ formData, handleInputChange, isPaymentPage, validationErrors = {} }) {
   return (
     <div
     className="p-6 rounded-lg shadow-sm"
@@ -22,7 +23,8 @@ function BasicInformation({ formData, handleInputChange }) {
           className="block text-sm font-medium mb-2"
           style={{ color: theme.colors.text.secondary }}
         >
-          First Name
+          First Name 
+          {/* First Name {isPaymentPage && <span style={{ color: "#DC2626" }}>*</span>} */}
         </label>
         <input
           type="text"
@@ -33,10 +35,16 @@ function BasicInformation({ formData, handleInputChange }) {
           style={{
             backgroundColor: theme.colors.background.main,
             borderColor: theme.colors.border.light,
+            // borderColor: validationErrors.first_name ? "#DC2626" : theme.colors.border.light,
             color: theme.colors.text.primary,
           }}
           placeholder="Enter first name"
         />
+        {/* {validationErrors.first_name && (
+          <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+            {validationErrors.first_name}
+          </p>
+        )} */}
       </div>
 
       <div>
@@ -44,7 +52,8 @@ function BasicInformation({ formData, handleInputChange }) {
           className="block text-sm font-medium mb-2"
           style={{ color: theme.colors.text.secondary }}
         >
-          Last Name
+          Last Name 
+          {/* Last Name {isPaymentPage && <span style={{ color: "#DC2626" }}>*</span>} */}
         </label>
         <input
           type="text"
@@ -55,10 +64,16 @@ function BasicInformation({ formData, handleInputChange }) {
           style={{
             backgroundColor: theme.colors.background.main,
             borderColor: theme.colors.border.light,
+            // borderColor: validationErrors.last_name ? "#DC2626" : theme.colors.border.light,
             color: theme.colors.text.primary,
           }}
           placeholder="Enter last name"
         />
+        {/* {validationErrors.last_name && (
+          <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+            {validationErrors.last_name}
+          </p>
+        )} */}
       </div>
 
       <div>
@@ -89,7 +104,8 @@ function BasicInformation({ formData, handleInputChange }) {
           className="block text-sm font-medium mb-2"
           style={{ color: theme.colors.text.secondary }}
         >
-          Phone
+          Phone 
+          {/* Phone {isPaymentPage && <span style={{ color: "#DC2626" }}>*</span>} */}
         </label>
         <input
           type="tel"
@@ -100,12 +116,111 @@ function BasicInformation({ formData, handleInputChange }) {
           style={{
             backgroundColor: theme.colors.background.main,
             borderColor: theme.colors.border.light,
+            // borderColor: validationErrors.phone ? "#DC2626" : theme.colors.border.light,
             color: theme.colors.text.primary,
           }}
           placeholder="+91 1234567890"
         />
+        {/* {validationErrors.phone && (
+          <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+            {validationErrors.phone}
+          </p>
+        )} */}
       </div>
 
+      {/* {isPaymentPage ? (
+        null
+      ) : (
+        <>
+      <div>
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: theme.colors.text.secondary }}
+        >
+          Password *
+        </label>
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleInputChange}
+          required
+          minLength={5}
+          className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
+          style={{
+            backgroundColor: theme.colors.background.main,
+            borderColor: theme.colors.border.light,
+            color: theme.colors.text.primary,
+          }}
+          placeholder="Minimum 5 characters"
+        />
+      </div>
+
+      <div>
+        <label
+          className="block text-sm font-medium mb-2"
+          style={{ color: theme.colors.text.secondary }}
+        >
+          Confirm Password *
+        </label>
+        <input
+          type="password"
+          name="password_confirmation"
+          value={formData.password_confirmation}
+          onChange={handleInputChange}
+          required
+          minLength={5}
+          className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
+          style={{
+            backgroundColor: theme.colors.background.main,
+            borderColor: theme.colors.border.light,
+            color: theme.colors.text.primary,
+          }}
+          placeholder="Re-enter password"
+        />
+      </div>
+
+      <div className="md:col-span-2 flex items-center gap-6">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            name="accepts_marketing"
+            checked={formData.accepts_marketing}
+            onChange={handleInputChange}
+            className="w-4 h-4 rounded"
+            style={{
+              accentColor: theme.colors.accent.primary,
+            }}
+          />
+          <span
+            className="text-sm"
+            style={{ color: theme.colors.text.secondary }}
+          >
+            Accepts Marketing
+          </span>
+        </label>
+
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            name="send_email_welcome"
+            checked={formData.send_email_welcome}
+            onChange={handleInputChange}
+            className="w-4 h-4 rounded"
+            style={{
+              accentColor: theme.colors.accent.primary,
+            }}
+          />
+          <span
+            className="text-sm"
+            style={{ color: theme.colors.text.secondary }}
+          >
+            Send Welcome Email
+          </span>
+        </label>
+      </div>
+      </>
+      )} */}
       <div>
         <label
           className="block text-sm font-medium mb-2"

@@ -12,14 +12,42 @@ import EditCustomerModal from "./AdminEditCustomer/EditCustomerModel";
 import { getUserProfile } from "../apiCalls/users";
 import { ROUTES, LOGO } from "../lib/constant";
 import { getCartDetails } from "../apiCalls/cart";
-import { selectCart, selectCartItemsCount, setCart  } from "../redux/productSlice";
+import {
+  selectCart,
+  selectCartItemsCount,
+  setCart,
+} from "../redux/productSlice";
 import Desktop from "./Header/Desktop";
 import IconsSections from "./Header/IconsSections";
 import Mobile from "./Header/Mobile";
+import { matchPath } from "react-router-dom";
+import { getCollectionById } from "../apiCalls/collections";
 
 function Header() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const match = matchPath(
+    { path: `${ROUTES.COLLECTION_PRODUCTS}/:id`, end: true },
+    location.pathname
+  );
+  const isHeader = [ROUTES.TERMS_AND_CONDITION, ROUTES.PRIVACY_POLICY].includes(
+    location.pathname
+  );
+  const isSearch =
+    [ROUTES.HOME, ROUTES.PRODUCTS].includes(location.pathname) ||
+    !!matchPath(
+      { path: `${ROUTES.COLLECTION_PRODUCTS}/:id`, end: true },
+      location.pathname
+    );
+
+  const isProductSearch = [ROUTES.HOME, ROUTES.PRODUCTS].includes(location.pathname)
+
+  const isCollectionSearch = !!matchPath(
+    { path: `${ROUTES.COLLECTION_PRODUCTS}/:id`, end: true },
+    location.pathname
+  );
+  const id = match?.params?.id;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef(null);
@@ -27,9 +55,9 @@ function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.user?.user?.customer);
-  console.log(user);
   const isActive = (path) => location.pathname === path;
-  const isHeader = [ROUTES.TERMS_AND_CONDITION, ROUTES.PRIVACY_POLICY].includes(location.pathname);
+
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
@@ -39,14 +67,16 @@ function Header() {
 
   const token = sessionStorage.getItem("token");
   const shopifyAccessToken = sessionStorage.getItem("shopifyAccessToken");
-  
+
   // Calculate cart count from Redux cart or fetch if needed
   const [cartItemsCount, setCartItemsCount] = useState(0);
 
   useEffect(() => {
-    // If cart is in Redux, use it
     if (cart && cart.lines && cart.lines.edges) {
-      const total = cart.lines.edges.reduce((sum, edge) => sum + (edge.node.quantity || 0), 0);
+      const total = cart.lines.edges.reduce(
+        (sum, edge) => sum + (edge.node.quantity || 0),
+        0
+      );
       setCartItemsCount(total);
       return;
     }
@@ -59,7 +89,7 @@ function Header() {
           dispatch(setCart(cartResponse.cart));
           if (cartResponse?.success && cartResponse.cart?.lines?.edges) {
             const total = cartResponse.cart.lines.edges.reduce(
-              (sum, edge) => sum + (edge.node.quantity || 0), 
+              (sum, edge) => sum + (edge.node.quantity || 0),
               0
             );
             setCartItemsCount(total);
@@ -102,22 +132,38 @@ function Header() {
     }
   }, [dispatch]);
 
+  useEffect(() => {
+    setSearchQuery("");
+  }, [location.pathname]);
   const handleSearch = async (e) => {
     const query = e.target.value.trim();
 
     if (!query) {
-      try {
-        const allProducts = await getAllProducts();
-        if (allProducts) {
-          const productsArray = Array.isArray(allProducts) ? allProducts : [];
-          dispatch(setProducts(productsArray));
-        } else {
+      if (isProductSearch) {
+        try {
+          const allProducts = await getAllProducts();
+          if (allProducts) {
+            const productsArray = Array.isArray(allProducts) ? allProducts : [];
+            dispatch(setProducts(productsArray));
+          } else {
+            dispatch(setProducts([]));
+          }
+        } catch (error) {
+          console.error("Error fetching all products:", error);
           dispatch(setProducts([]));
         }
-      } catch (error) {
-        console.error("Error fetching all products:", error);
-        dispatch(setProducts([]));
       }
+      if (isCollectionSearch) {
+        try {
+          const response = await getCollectionById(id);
+          const collectionData = response?.collection || response;
+          dispatch(setProducts(collectionData.products));
+        } catch (error) {
+          console.error("Error fetching collection:", error);
+          dispatch(setProducts([]));
+        }
+      }
+
       return;
     }
 
@@ -193,22 +239,63 @@ function Header() {
 
         {/* Desktop Navigation - Fixed Width (Responsive) */}
 
-        <Desktop isActive={isActive} isHeader={isHeader} token={token} shopifyAccessToken={shopifyAccessToken}/>
+        <Desktop
+          isActive={isActive}
+          isHeader={isHeader}
+          token={token}
+          shopifyAccessToken={shopifyAccessToken}
+        />
         {/* Icons Section - Fixed Width (Responsive) with Permanent Search Input */}
         {(!isHeader || (isHeader && token && shopifyAccessToken)) && (
-          <IconsSections isSearchOpen={isSearchOpen} setSearchQuery={setSearchQuery} handleSearch={handleSearch} setIsSearchOpen={setIsSearchOpen} searchQuery={searchQuery} dispatch={dispatch} setProducts={setProducts} getAllProducts={getAllProducts} navigate={navigate} ROUTES={ROUTES} cartItemsCount={cartItemsCount} user={user?.firstName} setShowUserMenu={setShowUserMenu} userMenuRef={userMenuRef} setIsEditCustomerModalOpen={setIsEditCustomerModalOpen} setIsDialogOpen={setIsDialogOpen} toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} showUserMenu={showUserMenu} token={token} shopifyAccessToken={shopifyAccessToken} />
+          <IconsSections
+            isSearchOpen={isSearchOpen}
+            setSearchQuery={setSearchQuery}
+            handleSearch={handleSearch}
+            setIsSearchOpen={setIsSearchOpen}
+            searchQuery={searchQuery}
+            dispatch={dispatch}
+            setProducts={setProducts}
+            getAllProducts={getAllProducts}
+            navigate={navigate}
+            ROUTES={ROUTES}
+            cartItemsCount={cartItemsCount}
+            user={user?.firstName}
+            setShowUserMenu={setShowUserMenu}
+            userMenuRef={userMenuRef}
+            setIsEditCustomerModalOpen={setIsEditCustomerModalOpen}
+            setIsDialogOpen={setIsDialogOpen}
+            toggleMenu={toggleMenu}
+            isMenuOpen={isMenuOpen}
+            showUserMenu={showUserMenu}
+            token={token}
+            shopifyAccessToken={shopifyAccessToken}
+            isSearch={isSearch}
+          />
         )}
         {/* Show Login button when isHeader and token and shopifyAccessToken are not present */}
         {isHeader && !token && !shopifyAccessToken && (
-          <button className=" px-4 py-2 rounded-md" style={{ backgroundColor: theme.colors.accent.primary, color: 'white' }} onClick={() => {
-            navigate(ROUTES.LOGIN);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}>Login</button>
+          <button
+            className=" px-4 py-2 rounded-md"
+            style={{
+              backgroundColor: theme.colors.accent.primary,
+              color: "white",
+            }}
+            onClick={() => {
+              navigate(ROUTES.LOGIN);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          >
+            Login
+          </button>
         )}
       </div>
 
       {/* Mobile Navigation Menu */}
-      <Mobile isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} isActive={isActive} />
+      <Mobile
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
+        isActive={isActive}
+      />
 
       <EditCustomerModal
         customerId={user?.id}
