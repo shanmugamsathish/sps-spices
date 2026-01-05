@@ -20,13 +20,13 @@ const getAuthHeaders = () => {
 };
 
 // Create a payment order
-export const createPaymentOrder = async (amount) => {
+export const createPaymentOrder = async (orderData) => {
   try {
     const response = await fetch(`${API_URL}/payment/create-order`, {
       method: "POST",
       headers: getAuthHeaders(),
       credentials: "include",
-      body: JSON.stringify({ amount }),
+      body: JSON.stringify(orderData),
     });
 
     if (!response.ok) {
