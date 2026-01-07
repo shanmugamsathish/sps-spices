@@ -1,3 +1,7 @@
+
+// API URL
+export const API_URL = 'http://localhost:7777/api';
+
 // Hero Section Images
 import Image1 from '../assets/Image1.png';
 import Image2 from '../assets/Image2.png';
@@ -13,8 +17,16 @@ import login from '../assets/login.png';
 import register from '../assets/register.png';
 import pageNotFound from '../assets/page-not-found.png';
 
-// API URL
-export const API_URL = 'http://localhost:7777/api';
+// About Us Images
+import aboutUsImage from '../assets/AboutUs.png';
+
+// Reviews Images
+import profilepic1 from "../assets/profilepic1.png";
+import profilepic2 from "../assets/profilepic2.png";
+import profilepic3 from "../assets/profilepic3.png";
+import profilepic4 from "../assets/profilepic4.png";
+import profilepic5 from "../assets/profilepic5.png";
+import profilepic6 from "../assets/profilepic6.png";
 
 // Routes
 export const ROUTES = {
@@ -55,6 +67,11 @@ export const HERO_SECTION_IMAGES = [
     Image5,
     Image6,
 ]
+
+// About Us Images
+export const ABOUT_US_IMAGES = {
+    ABOUT_US_IMAGE: aboutUsImage,
+}
 
 // Hero Section Duration
 export const HERO_SECTION_DURATION = 60;
@@ -207,3 +224,56 @@ export const TITLES = {
     DESCRIPTION: "Your orders, carefully crafted with precision and tradition. Each blend delivers depth, aroma, and balance — created for kitchens that demand nothing but the finest.",
   },
 }
+
+// About Us
+export const ABOUT_US = {
+  TITLE: "SPS Spices & Dry Fruits",
+  SUB_TITLE: {
+    TEXT: "Royal Spices",
+    TEXT_2: "Premium Dry Fruits",
+    TEXT_3: "Refined Taste",
+  },
+  DESCRIPTION1: "Pure, carefully sourced spices crafted to elevate everyday cooking into an experience of elegance. Rooted in tradition and refined through modern craftsmanship, every product reflects our commitment to purity, consistency, and timeless taste.",
+  DESCRIPTION2: "From premium-grade spices to hand-selected dry fruits, our collections are curated to serve homes, chefs, and culinary enthusiasts who value authenticity, aroma, and balanced flavor.",
+  TRUST_LINE: "The Trusted Choice for Authentic Spices and Exquisite Dry Fruits.",
+}
+
+// Reviews
+export const REVIEWS = [
+  {
+    profilepic: profilepic3,
+    name: "Rajesh K",
+    title: "Good Quality Spices",
+    text: "I bought black pepper, cloves and cardamom. Spices are fresh and smell very nice. Happy with the purchase.",
+  },
+  {
+    profilepic: profilepic2,
+    name: "Arun Kumar",
+    title: "சுத்தமான பேக்கிங் - புதிய பொருட்கள்",
+    text: "பொருட்கள் சுத்தமாகவும் நன்றாக பேக் செய்யப்பட்டும் உள்ளன. வீட்டில் தயாரிக்கப்பட்ட மசாலாப் பொருட்கள் போல இருக்குது.",
+  },
+  {
+    profilepic: profilepic1,
+    name: "Priya R",
+    title: "Good Dry Fruits for Daily Use",
+    text: "Bought almonds, cashew and raisins. Dry fruits are fresh and crunchy. Worth the money.",
+  },
+  {
+    profilepic: profilepic5,
+    name: "Santhosh M",
+    title: "Good Quality",
+    text: "Purchased dried ginger, garlic and nutmeg. Using it for cooking. Taste is good and quality is nice.",
+  },
+  {
+    profilepic: profilepic4,
+    name: "Nisha K",
+    title: "Kids Liked It",
+    text: "Ordered pista and dried fruits like apricot and mango. Very soft and fresh. My kids liked it a lot.",
+  },
+  {
+    profilepic: profilepic6,
+    name: "Rahul A",
+    title: "Good Kerala Spices",
+    text: "Bought Marayoor jaggery and cardamom. Natural taste and good flavour. Will buy again.",
+  },
+];

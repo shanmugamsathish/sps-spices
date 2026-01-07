@@ -228,7 +228,7 @@ function Header() {
             minWidth: "5rem",
             maxWidth: "10rem",
           }}
-          onClick={() => navigate(ROUTES.HOME)}
+          onClick={() => {navigate(ROUTES.HOME); window.scrollTo({ top: 0, behavior: "smooth" });}}
         >
           <img
             src={LOGO.LOGO}

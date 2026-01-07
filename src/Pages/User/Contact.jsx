@@ -28,7 +28,6 @@ function Contact() {
     async (e) => {
       e.preventDefault();
 
-      // Required fields validation
       const required = ["name", "email", "phone", "subject", "message"];
       for (const key of required) {
         if (!formData[key] || !formData[key].toString().trim()) {
@@ -48,7 +47,7 @@ function Contact() {
 
       try {
         const message = `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nSubject: ${formData.subject}\nMessage: ${formData.message}`;
-        const waNumber = "917092597277"; // business WhatsApp number used in contact info
+        const waNumber = "917092597277"; 
         const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
 
         window.open(waUrl, "_blank");
@@ -111,14 +110,11 @@ function Contact() {
       content: "+91 7092597277",
       link: "https://wa.me/917092597277",
     },
-    {
-      icon: MapPin,
-      title: "Visit Us",
-      content:
-        "C2 NAAZYAS ARCADE 4th Main Road Maharaja Nagar Palayamkottai - 627011",
-      link: "https://maps.app.goo.gl/DwYRXFQjf9hXqsBj9",
-    },
   ];
+
+  const mapAddress = "C2 NAAZYAS ARCADE 4th Main Road Maharaja Nagar Palayamkottai - 627011";
+  const mapLink = "https://maps.app.goo.gl/DwYRXFQjf9hXqsBj9";
+  const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapAddress)}&output=embed`;
 
   return (
     <div
@@ -159,19 +155,20 @@ function Contact() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start"
         >
-          {/* Left Panel - Contact Information */}
-          <motion.div variants={itemVariants} className="space-y-6">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-              className="p-8 rounded-lg shadow-sm"
-              style={{
-                backgroundColor: "#FFFFFF",
-                border: `1px solid ${theme.colors.border.light}`,
-              }}
-            >
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+            className="p-8 rounded-lg shadow-sm flex flex-col"
+            style={{
+              backgroundColor: "#FFFFFF",
+              border: `1px solid ${theme.colors.border.light}`,
+            }}
+          >
+            {/* Contact Information Section */}
+            <div>
               <h2
                 className="text-2xl font-semibold mb-6"
                 style={{ color: theme.colors.text.primary }}
@@ -219,19 +216,73 @@ function Contact() {
                   );
                 })}
               </div>
-            </motion.div>
+            </div>
 
-            {/* Business Hours */}
-            <motion.div
-              variants={itemVariants}
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.2 }}
-              className="p-8 rounded-lg shadow-sm"
-              style={{
-                backgroundColor: "#FFFFFF",
-                border: `1px solid ${theme.colors.border.light}`,
-              }}
-            >
+            {/* Map Section */}
+            <div className="flex flex-col flex-1 mt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className="p-3 rounded-lg shrink-0"
+                  style={{
+                    backgroundColor: theme.colors.accent.primary,
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <h2
+                  className="text-md font-semibold cursor-pointer hover:underline"
+                  style={{ color: theme.colors.text.primary }}
+                  onClick={() => window.open(mapLink, "_blank")}
+                >
+                  Find Us Here
+                </h2>
+              </div>
+              
+              <div className="rounded-lg overflow-hidden border min-h-[300px]" style={{ borderColor: theme.colors.border.light }}>
+                <iframe
+                  src={mapEmbedUrl}
+                  width="100%"
+                  height="100%"
+                  style={{ minHeight: "300px", border: "none" }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Location Map"
+                  className="w-full h-full"
+                />
+              </div>
+
+              <motion.a
+                href={mapLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="glow-button mt-4 w-full py-3 px-6 rounded-lg font-semibold text-white flex items-center justify-center gap-2 transition-colors"
+                style={{
+                  backgroundColor: theme.colors.accent.primary,
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = theme.colors.accent.hover;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = theme.colors.accent.primary;
+                }}
+              >
+                <MapPin className="w-5 h-5" />
+                Open in Google Maps
+              </motion.a>
+            </div>
+
+            {/* Divider */}
+            <div
+              className="my-6"
+              style={{ borderTop: `1px solid ${theme.colors.border.light}` }}
+            />
+
+            {/* Business Hours Section */}
+            <div>
               <h2
                 className="text-2xl font-semibold mb-4"
                 style={{ color: theme.colors.text.primary }}
@@ -279,13 +330,13 @@ function Contact() {
                   </span>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
 
           {/* Right Panel - Contact Form */}
           <motion.div
             variants={itemVariants}
-            className="p-8 rounded-lg shadow-sm"
+            className="p-8 rounded-lg shadow-sm self-start"
             style={{
               backgroundColor: "#FFFFFF",
               border: `1px solid ${theme.colors.border.light}`,

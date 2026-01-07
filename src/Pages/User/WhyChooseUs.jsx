@@ -38,7 +38,7 @@ export default function WhyChooseUs() {
         <div className="flex items-center justify-center gap-2">
         <CheckCircle size={40} className="inline-block ml-2 text-green-800 font-bold animate-pulse bg-green-200 rounded-full p-1" />
 
-      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center mb-4">
+      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center">
           <span>Why C</span>
           <span
             className="border-b-4 pb-1"

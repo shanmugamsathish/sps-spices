@@ -12,6 +12,8 @@ import { Toaster } from "react-hot-toast";
 import Loader from "./Components/Loader";
 import Common from "./Routes/Common";
 import { ROUTES } from "./lib/constant";
+import ScrollToTop from "./Components/ScrollToTop";
+import WhatsApp from "./Components/Whatsapp";
 
 function AppContent() {
   const location = useLocation();
@@ -50,6 +52,8 @@ function AppContent() {
         </>
       )}
       <Toaster />
+      <ScrollToTop />
+      <WhatsApp />
     </div>
     </>
   );

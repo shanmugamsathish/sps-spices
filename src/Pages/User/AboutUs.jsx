@@ -1,9 +1,10 @@
 import React from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import aboutUsImage from "../../assets/AboutUs.png";
 import theme from "../../lib/theme"
 import WhyChooseUs from "./WhyChooseUs";
+import Contact from "./Contact";
+import { ABOUT_US, ABOUT_US_IMAGES } from "../../lib/constant";
 
 const AboutUs = () => {
   const containerVariants = {
@@ -29,24 +30,19 @@ const AboutUs = () => {
       >
         <motion.div variants={itemVariants}>
           <p className="text-sm tracking-widest uppercase font-bold mb-3" style={{color: theme.colors.accent.primary}}>
-            SPS Spices & Dry Fruits
+            {ABOUT_US.TITLE}
           </p>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight " style={{color: theme.colors.text.primary}}>
-            Royal Spices. <span style={{color: theme.colors.accent.primary}}>Premium Dry Fruits.</span> <span style={{color: theme.colors.text.primary}}>Refined Taste.</span>
+            {ABOUT_US.SUB_TITLE.TEXT} <span style={{color: theme.colors.accent.primary}}>{ABOUT_US.SUB_TITLE.TEXT_2}.</span> <span style={{color: theme.colors.text.primary}}>{ABOUT_US.SUB_TITLE.TEXT_3}.</span>
           </h1>
 
           <p className="mt-5 text-neutral-700 text-base sm:text-lg leading-relaxed">
-            Pure, carefully sourced spices crafted to elevate everyday cooking 
-            into an experience of elegance. Rooted in tradition and refined through 
-            modern craftsmanship, every product reflects our commitment to purity, 
-            consistency, and timeless taste.
+            {ABOUT_US.DESCRIPTION1}
           </p>
 
           <p className="mt-4 text-neutral-700 text-base sm:text-lg leading-relaxed">
-            From premium-grade spices to hand-selected dry fruits, our collections 
-            are curated to serve homes, chefs, and culinary enthusiasts who value 
-            authenticity, aroma, and balanced flavor.
+            {ABOUT_US.DESCRIPTION2}
           </p>
 
           {/* <div className="mt-6 p-4 rounded-2xl bg-white shadow-lg border border-neutral-200">
@@ -59,7 +55,7 @@ const AboutUs = () => {
         <motion.div variants={itemVariants} className="relative">
           <div className="rounded-3xl overflow-hidden shadow-2xl border border-neutral-200">
             <img
-              src={aboutUsImage}
+              src={ABOUT_US_IMAGES.ABOUT_US_IMAGE}
               alt="Premium Spices & Dry Fruits"
               className="w-full h-[320px] sm:h-[380px] lg:h-[460px] object-cover"
             />
@@ -67,7 +63,7 @@ const AboutUs = () => {
 
           <motion.div whileHover={{ scale: 1.02 }} className="absolute -bottom-6 -right-4 shadow-xl rounded-2xl px-4 py-3 border border-gray-400" style={{backgroundColor: theme.colors.accent.primary}}>
             <p className="text-sm font-bold text-white">
-            The Trusted Choice for Authentic Spices and Exquisite Dry Fruits.
+            {ABOUT_US.TRUST_LINE}
             </p>
           </motion.div>
         </motion.div>
@@ -76,6 +72,12 @@ const AboutUs = () => {
       <div className="w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 ">
           <WhyChooseUs />
+        </div>
+      </div>
+
+      <div className="w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 ">
+          <Contact />
         </div>
       </div>
 

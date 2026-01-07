@@ -102,20 +102,20 @@ function Footer() {
             <div className="flex flex-col gap-2 justify-center md:justify-start my-6">
               <span>{FOOTER_TEXT.FOLLOW_US.TEXT.TITLE} <span className="font-semibold">{FOOTER_TEXT.BRAND_NAME}</span> {FOOTER_TEXT.FOLLOW_US.TEXT.TEXT_2}</span>
               <div className="flex gap-4">
-              <a href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.INSTAGRAM} target="_blank" rel="noopener noreferrer">
-                <FaInstagram className="w-6 h-6" />
+              <a className="bg-red-500 hover:bg-red-600 text-white p-1 rounded-full" href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.INSTAGRAM} target="_blank" rel="noopener noreferrer">
+                <FaInstagram className="w-5 h-5 " />
               </a>
-              <a href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.WHATSAPP} target="_blank" rel="noopener noreferrer">
-                <FaWhatsapp className="w-6 h-6" />
+              <a className="bg-green-500 hover:bg-green-600 text-white p-1 rounded-full" href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.WHATSAPP} target="_blank" rel="noopener noreferrer">
+                <FaWhatsapp className="w-5 h-5 " />
               </a>
-              <a href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.YOUTUBE} target="_blank" rel="noopener noreferrer">
-                <FaYoutube className="w-6 h-6" />
+              <a className="bg-red-600 hover:bg-red-600 text-white p-1 rounded-full" href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.YOUTUBE} target="_blank" rel="noopener noreferrer">
+                <FaYoutube className="w-5 h-5" />
               </a>
-              <a href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.FACEBOOK} target="_blank" rel="noopener noreferrer">
-                <FaFacebook className="w-6 h-6" />
+              <a className="bg-blue-500 hover:bg-blue-600 text-white p-1 rounded-full" href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.FACEBOOK} target="_blank" rel="noopener noreferrer">
+                <FaFacebook className="w-5 h-5" />
               </a>
-              <a href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.TWITTER} target="_blank" rel="noopener noreferrer">
-                <FaTwitter className="w-6 h-6" />
+              <a className="bg-blue-600 hover:bg-blue-700 text-white p-1 rounded-full" href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.TWITTER} target="_blank" rel="noopener noreferrer">
+                <FaTwitter className="w-5 h-5" />
               </a>
             </div>
             </div>

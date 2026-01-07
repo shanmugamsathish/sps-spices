@@ -52,16 +52,21 @@ function Home() {
     <div>
       <HeroSection />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center mb-4 flex items-center justify-center gap-2 ">
-      <ShoppingBag className="text-white w-8 h-8 animate-pulse rounded-full p-1.5" style={{backgroundColor: theme.colors.accent.primary}}/>  
+        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center mb-4 flex items-center justify-center gap-2 ">
+          <ShoppingBag
+            className="text-white w-8 h-8 animate-pulse rounded-full p-1.5"
+            style={{ backgroundColor: theme.colors.accent.primary }}
+          />
           <div>
-          <span>Our </span>
-          <span
-            style={{ borderBottom: `4px solid ${theme.colors.accent.primary}` }}
-          >
-            Prod
-          </span>
-          <span>ucts</span>
+            <span>Our </span>
+            <span
+              style={{
+                borderBottom: `4px solid ${theme.colors.accent.primary}`,
+              }}
+            >
+              Prod
+            </span>
+            <span>ucts</span>
           </div>
         </div>
       </div>
@@ -76,50 +81,59 @@ function Home() {
       {/* border-b-2 border-gray-200 */}
       <div className="border-b-2 border-gray-200 my-4"></div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-6">
-      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center flex items-center justify-center gap-2 ">
-      <Folder className="text-white w-8 h-8 animate-pulse rounded-full p-1" style={{backgroundColor: theme.colors.accent.primary}}/>  
+        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center flex items-center justify-center gap-2 ">
+          <Folder
+            className="text-white w-8 h-8 animate-pulse rounded-full p-1"
+            style={{ backgroundColor: theme.colors.accent.primary }}
+          />
           <div>
-          <span>Col</span>
-          <span
-            style={{ borderBottom: `4px solid ${theme.colors.accent.primary}` }}
-          >
-            lecti
-          </span>
-          <span>ons</span>
+            <span>Col</span>
+            <span
+              style={{
+                borderBottom: `4px solid ${theme.colors.accent.primary}`,
+              }}
+            >
+              lecti
+            </span>
+            <span>ons</span>
           </div>
         </div>
       </div>
       <Collections />
       <div className="border-b-2 border-gray-200 my-4"></div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-6">
-      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center mb-4 flex items-center justify-center gap-2 ">
-      <Clock className="text-white w-8 h-8 animate-pulse rounded-full " style={{backgroundColor: theme.colors.accent.primary}}/>  
+        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center mb-4 flex items-center justify-center gap-2 ">
+          <Clock
+            className="text-white w-8 h-8 animate-pulse rounded-full "
+            style={{ backgroundColor: theme.colors.accent.primary }}
+          />
 
           <div>
-          <span>Lates</span>
-          <span
-            style={{ borderBottom: `4px solid ${theme.colors.accent.primary}` }}
-          >
-            t Prod
-          </span>
-          <span>ucts</span>
+            <span>Lates</span>
+            <span
+              style={{
+                borderBottom: `4px solid ${theme.colors.accent.primary}`,
+              }}
+            >
+              t Prod
+            </span>
+            <span>ucts</span>
           </div>
         </div>
       </div>
       <RecentProducts />
       <div className="border-b-2 border-gray-200 my-4"></div>
       <WhyChooseUs />
-      <div className='py-4 bg-black sm:py-6 lg:py-8 mt-4 sm:mt-6 lg:mt-8'>
+      <div className="py-4 bg-black sm:py-6 lg:py-8 mt-4 sm:mt-6 lg:mt-8">
         <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center my-8 text-white flex items-center justify-center gap-2 ">
-        <Smile className="text-white w-8 h-8 animate-pulse rounded-full " style={{backgroundColor: theme.colors.accent.primary}}/>  
+          <Smile
+            className="text-white w-8 h-8 animate-pulse rounded-full "
+            style={{ backgroundColor: theme.colors.accent.primary }}
+          />
           <div>
-          <span>Happy Cu</span>
-          <span
-            className="border-b-4 border-b-white pb-2"
-          >
-            stome
-          </span>
-          <span>rs Review</span>
+            <span>Happy Cu</span>
+            <span className="border-b-4 border-b-white pb-2">stome</span>
+            <span>rs Review</span>
           </div>
         </div>
         <Reviews />
