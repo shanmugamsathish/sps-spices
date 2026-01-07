@@ -110,7 +110,7 @@ function Home() {
       <div className="border-b-2 border-gray-200 my-4"></div>
       <WhyChooseUs />
       <div className='py-4 bg-black sm:py-6 lg:py-8 mt-4 sm:mt-6 lg:mt-8'>
-        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center mb-4 text-white flex items-center justify-center gap-2 ">
+        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center my-8 text-white flex items-center justify-center gap-2 ">
         <Smile className="text-white w-8 h-8 animate-pulse rounded-full " style={{backgroundColor: theme.colors.accent.primary}}/>  
           <div>
           <span>Happy Cu</span>
