@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import ProductCard from "../../Components/ProductCard";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ROUTES } from "../../lib/constant";
@@ -13,21 +13,49 @@ function ProductCategory({ categoryName, productType, sectionId }) {
   
   // Get all products from Redux
   const allProducts = useSelector((state) => state?.products?.products || []);
-  
+
+  const getTotalInventory = useCallback((product) => {
+    if (!product?.variants || !Array.isArray(product.variants)) {
+      return 0;
+    }
+    return product.variants.reduce((total, variant) => {
+      const quantity = Number(variant?.inventory_quantity || 0);
+      return total + quantity;
+    }, 0);
+  }, []);
+
   // Filter products by product_type dynamically
-  const categoryProducts = Array.isArray(allProducts)
-    ? allProducts.filter((product) => product.product_type === productType)
-    : [];
+  const filteredProducts = useMemo(() => {
+    return Array.isArray(allProducts)
+      ? allProducts.filter((product) => product.product_type === productType)
+      : [];
+  }, [allProducts, productType]);
+
+  const categoryProducts = useMemo(() => {
+    if (!filteredProducts || filteredProducts.length === 0) return filteredProducts;
+    
+    const withInventory = [];
+    const withoutInventory = [];
+    
+    filteredProducts.forEach((product) => {
+      const totalInventory = getTotalInventory(product);
+      if (totalInventory > 0) {
+        withInventory.push(product);
+      } else {
+        withoutInventory.push(product);
+      }
+    });
+    
+    return [...withInventory, ...withoutInventory];
+  }, [filteredProducts, getTotalInventory]);
 
   // Helper function to format category name for section ID
   const formatSectionId = (name) => {
     return name.toLowerCase().replace(/\s+/g, "-");
   };
 
-  // Use provided sectionId or generate from categoryName
   const finalSectionId = sectionId || formatSectionId(categoryName);
 
-  // Split category name for styling (e.g., "Whole Spices" -> ["Whole", "Spices"])
   const nameParts = categoryName.split(" ");
   const firstWord = nameParts[0];
   const restWords = nameParts.slice(1).join(" ");

@@ -190,7 +190,7 @@ export const TITLES = {
   },
   RECENT_PRODUCTS: {
     TITLE: {
-      TEXT: "Recent",
+      TEXT: "Latest",
       TEXT_2: "Products",
     },
     DESCRIPTION: "Discover our latest spice blends, carefully crafted with precision and tradition. Each blend delivers depth, aroma, and balance — created for kitchens that demand nothing but the finest.",
