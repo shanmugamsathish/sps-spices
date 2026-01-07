@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Send, CheckCircle2 } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle2, MessageCircle, Headphones } from "lucide-react";
 import theme from "../../lib/theme";
 import toast from "react-hot-toast";
 
@@ -122,7 +122,7 @@ function Contact() {
 
   return (
     <div
-      className="min-h-screen py-8 px-4 sm:px-6 md:px-8"
+      className="min-h-screen py-8 sm:py-8 md:py-12 lg:py-8 mt-4 sm:mt-6 lg:mt-8 px-4 sm:px-6 md:px-8"
       style={{ backgroundColor: theme.colors.background.main }}
     >
       <div className="max-w-6xl mx-auto">
@@ -133,14 +133,21 @@ function Contact() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h1
-            className="text-4xl md:text-5xl font-bold mb-4"
-            style={{ color: theme.colors.text.primary }}
+          <div className="flex items-center justify-center gap-2">
+          <Headphones className="text-white w-8 h-8 animate-pulse rounded-full p-1" style={{backgroundColor: theme.colors.accent.primary}}/>  
+      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center">
+          <span>Get i</span>
+          <span
+            className="border-b-4 pb-1"
+            style={{ borderColor: theme.colors.accent.primary }}
           >
-            Get in Touch
-          </h1>
+            n To
+          </span>
+          <span>uch</span>
+        </h2>
+        </div>
           <p
-            className="text-lg max-w-2xl mx-auto"
+            className="text-lg max-w-2xl mx-auto mt-6"
             style={{ color: theme.colors.text.secondary }}
           >
             We welcome inquiries, collaborations, and bulk orders. Our team is
@@ -428,7 +435,7 @@ function Contact() {
                 disabled={isSubmitting}
                 whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                 whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                className="w-full py-3 px-6 rounded-lg font-semibold text-white flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="glow-button w-full py-3 px-6 rounded-lg font-semibold text-white flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   backgroundColor: isSubmitted
                     ? "#10B981"

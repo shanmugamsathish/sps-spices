@@ -26,6 +26,8 @@ function EditProductModal({ productId, isOpen, onClose, onUpdate, tableWidth, ta
 
   const [variants, setVariants] = useState([
     {
+      id: null,
+      inventory_item_id: null,
       title: "",
       price: "",
       compare_at_price: "",
@@ -69,6 +71,8 @@ function EditProductModal({ productId, isOpen, onClose, onUpdate, tableWidth, ta
       if (product.variants && product.variants.length > 0) {
         setVariants(
           product.variants.map((variant) => ({
+            id: variant.id || null,
+            inventory_item_id: variant.inventory_item_id || null,
             title: variant.title || "",
             price: variant.price || "",
             compare_at_price: variant.compare_at_price || "",
@@ -194,6 +198,8 @@ function EditProductModal({ productId, isOpen, onClose, onUpdate, tableWidth, ta
     });
     setVariants([
       {
+        id: null,
+        inventory_item_id: null,
         title: "",
         price: "",
         compare_at_price: "",
@@ -238,6 +244,8 @@ function EditProductModal({ productId, isOpen, onClose, onUpdate, tableWidth, ta
     setVariants([
       ...variants,
       {
+        id: null,
+        inventory_item_id: null,
         title: "",
         price: "",
         compare_at_price: "",
@@ -311,6 +319,8 @@ function EditProductModal({ productId, isOpen, onClose, onUpdate, tableWidth, ta
         ? currentVariants
         : [
             {
+              id: null,
+              inventory_item_id: null,
               title: "",
               price: "",
               compare_at_price: "",
@@ -422,6 +432,8 @@ function EditProductModal({ productId, isOpen, onClose, onUpdate, tableWidth, ta
         handle: formData.handle || formData.title.toLowerCase().replace(/\s+/g, "-"),
         published_scope: formData.published_scope,
         variants: variants.map((variant, index) => ({
+          ...(variant.id && { id: variant.id }),
+          ...(variant.inventory_item_id && { inventory_item_id: variant.inventory_item_id }),
           title: variant.title,
           price: variant.price,
           compare_at_price: variant.compare_at_price || null,

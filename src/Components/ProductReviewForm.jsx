@@ -64,17 +64,33 @@ function ProductReviewForm({ productId, customerId, customerName, onReviewSubmit
     };
     return (
         <form onSubmit={handleSubmit} className="mb-8">
-          <div className="p-6 rounded-lg" style={{ backgroundColor: theme.colors.background.main, border: `1px solid ${theme.colors.border.light}` }}>
-            <h3 className="text-lg font-semibold mb-4" style={{ color: theme.colors.text.primary }}>
+          <div 
+            className="p-6 sm:p-8 rounded-lg transition-all duration-300" 
+            style={{ 
+              backgroundColor: theme.colors.background.main, 
+              border: `1px solid ${theme.colors.border.light}`,
+              boxShadow: "0 2px 8px rgba(79, 53, 33, 0.08)",
+            }}
+          >
+            <h3 
+              className="text-xl font-semibold mb-6 pb-3 border-b" 
+              style={{ 
+                color: theme.colors.text.primary,
+                borderColor: theme.colors.border.light
+              }}
+            >
               Write a Review
             </h3>
     
             {/* Star Rating Selection */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2" style={{ color: theme.colors.text.primary }}>
+            <div className="mb-6">
+              <label 
+                className="block text-sm font-medium mb-3" 
+                style={{ color: theme.colors.text.primary }}
+              >
                 Rating *
               </label>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -82,7 +98,7 @@ function ProductReviewForm({ productId, customerId, customerName, onReviewSubmit
                     onClick={() => setSelectedRating(star)}
                     onMouseEnter={() => setHoveredRating(star)}
                     onMouseLeave={() => setHoveredRating(0)}
-                    className="focus:outline-none transition-transform hover:scale-110"
+                    className="focus:outline-none transition-transform hover:scale-110 active:scale-95"
                     aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
                   >
                     <svg
@@ -96,7 +112,10 @@ function ProductReviewForm({ productId, customerId, customerName, onReviewSubmit
                   </button>
                 ))}
                 {selectedRating > 0 && (
-                  <span className="ml-2 text-sm" style={{ color: theme.colors.text.secondary }}>
+                  <span 
+                    className="ml-3 text-sm font-medium" 
+                    style={{ color: theme.colors.text.secondary }}
+                  >
                     {selectedRating} {selectedRating === 1 ? 'star' : 'stars'}
                   </span>
                 )}
@@ -104,8 +123,12 @@ function ProductReviewForm({ productId, customerId, customerName, onReviewSubmit
             </div>
     
             {/* Title Input */}
-            <div className="mb-4">
-              <label htmlFor="review-title" className="block text-sm font-medium mb-2" style={{ color: theme.colors.text.primary }}>
+            <div className="mb-6">
+              <label 
+                htmlFor="review-title" 
+                className="block text-sm font-medium mb-2" 
+                style={{ color: theme.colors.text.primary }}
+              >
                 Title *
               </label>
               <input
@@ -114,15 +137,15 @@ function ProductReviewForm({ productId, customerId, customerName, onReviewSubmit
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Give your review a title"
-                className="w-full px-4 py-2 rounded-md border focus:outline-none"
+                className="w-full px-4 py-3 rounded-md border focus:outline-none transition-all"
                 style={{
-                  backgroundColor: theme.colors.background.main,
+                  backgroundColor: "#FFFFFF",
                   borderColor: theme.colors.border.light,
                   color: theme.colors.text.primary,
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = theme.colors.accent.primary;
-                  e.target.style.boxShadow = `0 0 0 2px ${theme.colors.accent.primary}33`;
+                  e.target.style.boxShadow = `0 0 0 3px ${theme.colors.accent.primary}33`;
                 }}
                 onBlur={(e) => {
                   e.target.style.borderColor = theme.colors.border.light;
@@ -134,8 +157,12 @@ function ProductReviewForm({ productId, customerId, customerName, onReviewSubmit
             </div>
     
             {/* Comment Textarea */}
-            <div className="mb-4">
-              <label htmlFor="review-comment" className="block text-sm font-medium mb-2" style={{ color: theme.colors.text.primary }}>
+            <div className="mb-6">
+              <label 
+                htmlFor="review-comment" 
+                className="block text-sm font-medium mb-2" 
+                style={{ color: theme.colors.text.primary }}
+              >
                 Your Review *
               </label>
               <textarea
@@ -143,16 +170,16 @@ function ProductReviewForm({ productId, customerId, customerName, onReviewSubmit
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Share your experience with this product..."
-                rows={5}
-                className="w-full px-4 py-2 rounded-md border focus:outline-none resize-none"
+                rows={6}
+                className="w-full px-4 py-3 rounded-md border focus:outline-none resize-none transition-all"
                 style={{
-                  backgroundColor: theme.colors.background.main,
+                  backgroundColor: "#FFFFFF",
                   borderColor: theme.colors.border.light,
                   color: theme.colors.text.primary,
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = theme.colors.accent.primary;
-                  e.target.style.boxShadow = `0 0 0 2px ${theme.colors.accent.primary}33`;
+                  e.target.style.boxShadow = `0 0 0 3px ${theme.colors.accent.primary}33`;
                 }}
                 onBlur={(e) => {
                   e.target.style.borderColor = theme.colors.border.light;
@@ -161,7 +188,10 @@ function ProductReviewForm({ productId, customerId, customerName, onReviewSubmit
                 maxLength={1000}
                 required
               />
-              <p className="text-xs mt-1" style={{ color: theme.colors.text.secondary }}>
+              <p 
+                className="text-xs mt-2 text-right" 
+                style={{ color: theme.colors.text.secondary }}
+              >
                 {comment.length}/1000 characters
               </p>
             </div>
@@ -170,7 +200,7 @@ function ProductReviewForm({ productId, customerId, customerName, onReviewSubmit
             <button
               type="submit"
               disabled={isSubmitting || selectedRating === 0 || !title.trim() || !comment.trim()}
-              className="px-6 py-2 rounded-md font-semibold transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 rounded-md font-semibold transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed glow-button"
               style={{
                 backgroundColor: theme.colors.accent.primary,
                 color: theme.colors.background.main,

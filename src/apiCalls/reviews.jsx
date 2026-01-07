@@ -1,6 +1,18 @@
 import { axiosInstance } from ".";
 import { API_URL } from "../lib/constant";
 
+// Get all reviews
+export const getAllReviews = async () => {
+    try {
+        const url = `${API_URL}/products/reviews`;
+        const response = await axiosInstance.get(url);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
+        throw error;
+    }
+};
+
 // Get reviews for a product
 export const getProductReviews = async (productId) => {
     try {

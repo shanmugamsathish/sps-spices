@@ -7,11 +7,13 @@ import { setLoading } from '../../redux/loaderSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { createCart, addItemsToCart, updateItemQuantity, getCartDetails } from '../../apiCalls/cart'
 import { updateInventoryFromCart, setCart, selectCart } from '../../redux/productSlice'
-import { selectUser } from '../../redux/userSlice'
 import { getUserProfile } from '../../apiCalls/users'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import ProductReviews from '../../Components/ProductReviews'
+import { getFavourites, addFavourite, removeFavourite } from "../../apiCalls/favourites";
+import { Heart } from 'lucide-react'
+
 
 function ProductDetails() {
   const navigate = useNavigate()
@@ -24,9 +26,12 @@ function ProductDetails() {
   const [isUpdatingCart, setIsUpdatingCart] = useState(false)
   const dispatch = useDispatch()
   const cart = useSelector(selectCart)
-  const user = useSelector(selectUser)
   const [customerId, setCustomerId] = useState(null)
   const [customerName, setCustomerName] = useState(null)
+  const [favoritesSet, setFavoritesSet] = useState(new Set());
+
+  const token = sessionStorage.getItem("token");
+  const shopifyAccessToken = sessionStorage.getItem("shopifyAccessToken");
 
   useEffect(() => {
     const fetchCustomerInfo = async () => {
@@ -118,6 +123,30 @@ function ProductDetails() {
     }
     fetchProduct()
   }, [id, dispatch])
+
+  const fetchFavorites = useCallback(async () => {
+    try {
+      dispatch(setLoading(true));
+      const response = await getFavourites();
+      if (response?.success) {
+        const favs = response.favorites || response.favourites || [];
+        const ids = new Set(favs.map((p) => String(p.id)));
+        setFavoritesSet(ids);
+      }
+    } catch (err) {
+      // ignore - user may be not logged in
+      toast.error("Could not fetch favorites: " + (err?.message || err));
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }, [dispatch]);
+
+  // Fetch user's favorites once on mount
+  useEffect(() => {
+    if (token && shopifyAccessToken) {
+      fetchFavorites();
+    }
+  }, [token, shopifyAccessToken, fetchFavorites]);
 
   // Helper function to convert variant ID to GraphQL global ID format
   const getVariantGraphQLId = useCallback((variant) => {
@@ -432,10 +461,74 @@ function ProductDetails() {
           </div>
 
           <div className="flex flex-col gap-4 lg:gap-5">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight" style={{ color: theme.colors.text.primary }}>
+            <div className="flex items-center gap-6">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight " style={{ color: theme.colors.text.primary }}>
               {product.title}
             </h1>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            const prodId = product?.id;
+            if (!prodId) return;
+            (async () => {
+              try {
+                const idStr = String(prodId);
+                const isFavorited = favoritesSet.has(idStr);
 
+                if (isFavorited) {
+                  dispatch(setLoading(true));
+                  await removeFavourite({ favouriteId: idStr });
+                  dispatch(setLoading(false));
+                  setFavoritesSet((prev) => {
+                    const copy = new Set(prev);
+                    copy.delete(idStr);
+                    return copy;
+                  });
+                  toast.success("Removed from favorites");
+                } else {
+                  dispatch(setLoading(true));
+                  await addFavourite({ productId: prodId });
+                  dispatch(setLoading(false));
+                  setFavoritesSet((prev) => new Set(prev).add(idStr));
+                  toast.success("Added to favorites");
+                }
+              } catch (err) {
+                dispatch(setLoading(false));
+                toast.error(
+                  err.response?.data?.message || "Failed to update favorites"
+                );
+              }
+            })();
+          }}
+          aria-label="Toggle wishlist"
+          className="z-30 p-2 rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer"
+          style={{
+            backgroundColor: theme.colors.accent.primary,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minWidth: "40px",
+            minHeight: "40px",
+          }}
+        >
+          {favoritesSet.has(String(product?.id)) ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-6 h-6"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              style={{ color: 'white' }}
+            >
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          ) : (
+            <Heart
+              className="w-6 h-6"
+              style={{ color: 'white' }}
+            />
+          )}
+        </button>
+        </div>
             <div className="flex items-baseline gap-3">
               <span className="text-2xl sm:text-3xl font-bold" style={{ color: theme.colors.text.primary }}>
                 Rs. {formatPrice(currentPrice)}

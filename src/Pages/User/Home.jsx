@@ -12,6 +12,8 @@ import toast from "react-hot-toast";
 import theme from "../../lib/theme";
 import HeroSection from "./HeroSection";
 import { TITLES } from "../../lib/constant";
+import Reviews from "./Reviews";
+import { Smile, Clock, Folder, Boxes, Box, ShoppingBag } from "lucide-react";
 
 function Home() {
   const dispatch = useDispatch();
@@ -50,17 +52,18 @@ function Home() {
     <div>
       <HeroSection />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase">
+      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center mb-4 flex items-center justify-center gap-2 ">
+      <ShoppingBag className="text-white w-8 h-8 animate-pulse rounded-full p-1.5" style={{backgroundColor: theme.colors.accent.primary}}/>  
+          <div>
+          <span>Our </span>
           <span
-            className="border-b-4 pb-1"
-            style={{ borderColor: theme.colors.accent.primary }}
+            style={{ borderBottom: `4px solid ${theme.colors.accent.primary}` }}
           >
-            {TITLES.PRODUCTS.TITLE}
+            Prod
           </span>
-        </h2>
-        <p className=" mt-10 text-lg font-medium text-center" style={{ color: theme.colors.text.primary }}>
-          {TITLES.PRODUCTS.DESCRIPTION}
-        </p>
+          <span>ucts</span>
+          </div>
+        </div>
       </div>
       {productTypes.map((productType) => (
         <ProductCategory
@@ -72,39 +75,55 @@ function Home() {
       ))}
       {/* border-b-2 border-gray-200 */}
       <div className="border-b-2 border-gray-200 my-4"></div>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-6">
+      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center flex items-center justify-center gap-2 ">
+      <Folder className="text-white w-8 h-8 animate-pulse rounded-full p-1" style={{backgroundColor: theme.colors.accent.primary}}/>  
+          <div>
+          <span>Col</span>
           <span
-            className="border-b-4 pb-1"
-            style={{ borderColor: theme.colors.accent.primary }}
+            style={{ borderBottom: `4px solid ${theme.colors.accent.primary}` }}
           >
-            {TITLES.COLLECTIONS.TITLE}
+            lecti
           </span>
-        </h2>
-        <p className=" mt-10 text-lg font-medium " style={{ color: theme.colors.text.primary }}>
-        {TITLES.COLLECTIONS.DESCRIPTION}
-        </p>
+          <span>ons</span>
+          </div>
+        </div>
       </div>
       <Collections />
       <div className="border-b-2 border-gray-200 my-4"></div>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-6">
+      <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center mb-4 flex items-center justify-center gap-2 ">
+      <Clock className="text-white w-8 h-8 animate-pulse rounded-full " style={{backgroundColor: theme.colors.accent.primary}}/>  
+
+          <div>
+          <span>Lates</span>
           <span
-            className="border-b-4 pb-1"
-            style={{ borderColor: theme.colors.accent.primary }}
+            style={{ borderBottom: `4px solid ${theme.colors.accent.primary}` }}
           >
-            {TITLES.RECENT_PRODUCTS.TITLE.TEXT} 
+            t Prod
           </span>
-          {" "}{TITLES.RECENT_PRODUCTS.TITLE.TEXT_2}
-        </h2>
-        <p className=" mt-10 text-lg font-medium " style={{ color: theme.colors.text.primary }}>
-        {TITLES.RECENT_PRODUCTS.DESCRIPTION}
-        </p>
+          <span>ucts</span>
+          </div>
+        </div>
       </div>
       <RecentProducts />
       <div className="border-b-2 border-gray-200 my-4"></div>
       <WhyChooseUs />
-      <div className="border-b-2 border-gray-200 my-4"></div>
+      <div className='py-4 bg-black sm:py-6 lg:py-8 mt-4 sm:mt-6 lg:mt-8'>
+        <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center mb-4 text-white flex items-center justify-center gap-2 ">
+        <Smile className="text-white w-8 h-8 animate-pulse rounded-full " style={{backgroundColor: theme.colors.accent.primary}}/>  
+          <div>
+          <span>Happy Cu</span>
+          <span
+            className="border-b-4 border-b-white pb-2"
+          >
+            stome
+          </span>
+          <span>rs Review</span>
+          </div>
+        </div>
+        <Reviews />
+      </div>
       <Contact />
     </div>
   );

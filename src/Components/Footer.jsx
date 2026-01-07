@@ -13,7 +13,6 @@ import { setUser } from "../redux/userSlice";
 import { FOOTER_TEXT } from "../lib/constant";
 import { useLocation } from "react-router-dom";
 
-
 function Footer() {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -29,6 +28,8 @@ function Footer() {
   }, [dispatch, auth]);
   
   return (
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#B8860B" fill-opacity="1" d="M0,288L40,266.7C80,245,160,203,240,186.7C320,171,400,181,480,197.3C560,213,640,235,720,240C800,245,880,235,960,213.3C1040,192,1120,160,1200,160C1280,160,1360,192,1400,208L1440,224L1440,320L1400,320C1360,320,1280,320,1200,320C1120,320,1040,320,960,320C880,320,800,320,720,320C640,320,560,320,480,320C400,320,320,320,240,320C160,320,80,320,40,320L0,320Z"></path></svg>
     <footer
       className="text-center lg:text-left"
       style={{
@@ -141,6 +142,8 @@ function Footer() {
         </span>
       </div> */}
     </footer>
+    </div>
+    
   );
 }
 

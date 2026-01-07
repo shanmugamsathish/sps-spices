@@ -5,7 +5,7 @@ import { getRelativeTime } from "../utils/dateUtils";
 import theme from "../lib/theme";
 import { setLoading } from "../redux/loaderSlice";
 import ProductReviewForm from "./ProductReviewForm";
-import { TrashIcon } from "lucide-react";
+import { Loader2Icon, TrashIcon } from "lucide-react";
 import toast from "react-hot-toast";
 
 // Star Rating Display Component
@@ -149,13 +149,19 @@ function ProductReviews({ productId, customerId, customerName }) {
 
   if (isLoading) {
     return (
-      <div className="py-8">
+      <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-center items-center">
           <div
-            className="text-center"
-            style={{ color: theme.colors.text.secondary }}
+            className="text-center p-6 rounded-lg "
+            style={{
+              color: theme.colors.text.secondary,
+              backgroundColor: theme.colors.background.main,
+            }}
           >
-            <p>Loading reviews...</p>
+            <div className="w-32 h-32 flex flex-col items-center justify-center">
+              <Loader2Icon className="w-8 h-8 animate-spin" />
+              <p className="text-sm">Loading reviews...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -163,10 +169,13 @@ function ProductReviews({ productId, customerId, customerName }) {
   }
 
   return (
-    <div className="py-4 max-w-7xl mx-auto">
+    <div className="py-4 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <h2
-        className="text-2xl font-bold my-6"
-        style={{ color: theme.colors.text.primary }}
+        className="text-2xl sm:text-3xl font-bold mb-6 pb-3 border-b"
+        style={{
+          color: theme.colors.text.primary,
+          borderColor: theme.colors.border.light,
+        }}
       >
         Customer Reviews
       </h2>
@@ -176,55 +185,61 @@ function ProductReviews({ productId, customerId, customerName }) {
           style={{
             backgroundColor: theme.colors.background.main,
             border: `1px solid ${theme.colors.border.light}`,
+            boxShadow: "0 2px 8px rgba(79, 53, 33, 0.08)",
           }}
         >
-          <p style={{ color: theme.colors.text.secondary }}>
+          <p
+            className="text-base"
+            style={{ color: theme.colors.text.secondary }}
+          >
             No reviews yet. Be the first to review this product!
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {reviews.map((review, index) => (
             <div
               key={index}
-              className="p-6 rounded-lg"
+              className="p-6 rounded-lg transition-all duration-300 hover:shadow-lg"
               style={{
                 backgroundColor: theme.colors.background.main,
                 border: `1px solid ${theme.colors.border.light}`,
+                boxShadow: "0 2px 8px rgba(79, 53, 33, 0.08)",
               }}
             >
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-12 mb-2">
-                    <div className="flex items-center gap-3">
-                    <h4
-                      className="text-lg font-semibold"
-                      style={{ color: theme.colors.text.primary }}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h4
+                        className="text-lg font-semibold"
+                        style={{ color: theme.colors.text.primary }}
+                      >
+                        {review.customer || "Anonymous"}
+                      </h4>
+                      {review.verified && (
+                        <span
+                          className="px-2.5 py-1 text-xs font-semibold rounded-full"
+                          style={{
+                            backgroundColor: "#dcfce7",
+                            color: "#166534",
+                          }}
+                        >
+                          ✓ Verified Purchase
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleDeleteReview(review.id)}
+                      className="p-1.5 rounded-md hover:bg-red-50 transition-colors"
+                      style={{ color: "#EF4444" }}
+                      aria-label="Delete review"
                     >
-                      {review.customer || "Anonymous"}
-                    </h4>
-                    {review.verified && (
-                      <span
-                        className="px-2 py-1 text-xs font-semibold rounded-full"
-                        style={{ backgroundColor: "#dcfce7", color: "#166534" }}
-                      >
-                        ✓ Verified Purchase
-                      </span>
-                    )}
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <button
-                        className="text-sm text-red-500"
-                        onClick={() => handleDeleteReview(review.id)}
-                      >
-                        <TrashIcon
-                          className="w-5 h-5 cursor-pointer"
-                        />
-                      </button>
-                    </div>
+                      <TrashIcon className="w-4 h-4" />
+                    </button>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 mb-3">
                     <StarRating rating={review.rating || 0} />
                     <span
                       className="text-sm"
@@ -238,7 +253,7 @@ function ProductReviews({ productId, customerId, customerName }) {
 
               {review.title && (
                 <h5
-                  className="text-base font-semibold mb-2"
+                  className="text-base font-semibold mb-3"
                   style={{ color: theme.colors.text.primary }}
                 >
                   {review.title}
@@ -258,8 +273,11 @@ function ProductReviews({ productId, customerId, customerName }) {
         </div>
       )}
       <h2
-        className="text-2xl font-bold my-6"
-        style={{ color: theme.colors.text.primary }}
+        className="text-2xl sm:text-3xl font-bold my-6 pb-3 border-b"
+        style={{
+          color: theme.colors.text.primary,
+          borderColor: theme.colors.border.light,
+        }}
       >
         Submit a Review
       </h2>
@@ -271,6 +289,7 @@ function ProductReviews({ productId, customerId, customerName }) {
               style={{
                 backgroundColor: theme.colors.background.main,
                 border: `1px solid ${theme.colors.border.light}`,
+                boxShadow: "0 2px 8px rgba(79, 53, 33, 0.08)",
               }}
             >
               <p style={{ color: theme.colors.text.secondary }}>
@@ -279,17 +298,21 @@ function ProductReviews({ productId, customerId, customerName }) {
             </div>
           ) : !hasPurchasedProduct ? (
             <div
-              className="mb-6 p-4 rounded-lg border flex flex-col items-center justify-center gap-4 "
-              style={{ border: `1px solid ${theme.colors.border.light}` }}
+              className="mb-6 p-6 rounded-lg flex flex-col items-center justify-center gap-4"
+              style={{
+                backgroundColor: theme.colors.background.main,
+                border: `1px solid ${theme.colors.border.light}`,
+                boxShadow: "0 2px 8px rgba(79, 53, 33, 0.08)",
+              }}
             >
               <p
-                className=" font-semibold"
+                className="text-lg font-semibold"
                 style={{ color: theme.colors.text.primary }}
               >
                 Review This Product
               </p>
               <p
-                className=" mt-1 text-sm"
+                className="text-sm text-center"
                 style={{ color: theme.colors.text.secondary }}
               >
                 You need to purchase and receive this product before you can
@@ -308,16 +331,32 @@ function ProductReviews({ productId, customerId, customerName }) {
       )}
 
       {error && (
-        <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
-          <p className="text-red-800 font-semibold">Error:</p>
-          <p className="text-red-700 mt-1">{error}</p>
+        <div
+          className="mb-6 p-4 rounded-lg border"
+          style={{
+            backgroundColor: "#FEE2E2",
+            borderColor: "#FCA5A5",
+          }}
+        >
+          <p className="font-semibold mb-1" style={{ color: "#DC2626" }}>
+            Error:
+          </p>
+          <p style={{ color: "#991B1B" }}>{error}</p>
         </div>
       )}
 
       {!productId && !isLoading && (
-        <div className="mb-6 p-4 rounded-lg bg-yellow-50 border border-yellow-200">
-          <p className="text-yellow-800 font-semibold">Warning:</p>
-          <p className="text-yellow-700 mt-1">
+        <div
+          className="mb-6 p-4 rounded-lg border"
+          style={{
+            backgroundColor: "#FEF3C7",
+            borderColor: "#FCD34D",
+          }}
+        >
+          <p className="font-semibold mb-1" style={{ color: "#92400E" }}>
+            Warning:
+          </p>
+          <p style={{ color: "#78350F" }}>
             Product ID is required to display reviews. Please provide a
             productId prop.
           </p>
