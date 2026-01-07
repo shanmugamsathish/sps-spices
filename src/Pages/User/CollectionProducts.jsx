@@ -14,7 +14,6 @@ function CollectionProducts() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const products = useSelector((state) => state?.products?.products || []);
-  console.log(products[0]?.product_type);
   // Fetch collection if not in state
   const fetchCollection = useCallback(async () => {
     if (id) {

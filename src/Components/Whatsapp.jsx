@@ -30,7 +30,7 @@ const WhatsApp = () => {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
-        className="fixed bottom-25 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-3 rounded-full shadow-lg transition-all hover:scale-110"
+        className="fixed bottom-25 right-6 z-50 bg-green-600 hover:bg-green-600 text-white p-3 rounded-full shadow-lg transition-all hover:scale-110"
       >
             <BsWhatsapp size={28} />
         </a>

@@ -48,7 +48,7 @@ const ScrollToTop = () => {
             e.currentTarget.style.backgroundColor = theme.colors.accent.hover || theme.colors.accent.primary;
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = theme.colors.accent.primary;
+            e.currentTarget.style.backgroundColor = theme.colors.text.primary;
           }}
         >
           <ArrowUpCircle className="w-6 h-6 sm:w-7 sm:h-7" />

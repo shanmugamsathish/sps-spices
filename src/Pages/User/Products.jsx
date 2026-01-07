@@ -6,6 +6,7 @@ import { setProducts } from "../../redux/productSlice";
 import ProductCategory from "./ProductCategory";
 import { setLoading } from "../../redux/loaderSlice";
 import toast from "react-hot-toast";
+import ProductCard from "../../Components/ProductCard";
 
 function Products() {
   const dispatch = useDispatch();
@@ -53,15 +54,19 @@ function Products() {
   const productTypes = getUniqueProductTypes();
 
   return (
-    <div >
-      {productTypes.map((productType) => (
-        <ProductCategory
-          key={productType}
-          categoryName={productType}
-          productType={productType}
-          sectionId={productType.toLowerCase().replace(/\s+/g, "-")}
-        />
-      ))}
+    <div>
+      {productsData.length === 0 ? (
+        <ProductCard productsList={[]} />
+      ) : (
+        productTypes.map((productType) => (
+          <ProductCategory
+            key={productType}
+            categoryName={productType}
+            productType={productType}
+            sectionId={productType.toLowerCase().replace(/\s+/g, "-")}
+          />
+        ))
+      )}
     </div>
   );
 }

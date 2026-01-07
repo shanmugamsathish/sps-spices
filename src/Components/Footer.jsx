@@ -102,7 +102,7 @@ function Footer() {
             <div className="flex flex-col gap-2 justify-center md:justify-start my-6">
               <span>{FOOTER_TEXT.FOLLOW_US.TEXT.TITLE} <span className="font-semibold">{FOOTER_TEXT.BRAND_NAME}</span> {FOOTER_TEXT.FOLLOW_US.TEXT.TEXT_2}</span>
               <div className="flex gap-4">
-              <a className="bg-red-500 hover:bg-red-600 text-white p-1 rounded-full" href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.INSTAGRAM} target="_blank" rel="noopener noreferrer">
+              <a className="bg-red-400 hover:bg-red-400 text-white p-1 rounded-full" href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.INSTAGRAM} target="_blank" rel="noopener noreferrer">
                 <FaInstagram className="w-5 h-5 " />
               </a>
               <a className="bg-green-500 hover:bg-green-600 text-white p-1 rounded-full" href={FOOTER_TEXT.FOLLOW_US.SOCIAL_MEDIA.WHATSAPP} target="_blank" rel="noopener noreferrer">

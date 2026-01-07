@@ -27,7 +27,6 @@ function ProductCard({ productsList, horizontal = false }) {
     : isHome
     ? productsListArray.slice(0, 8)
     : productsListArray;
-  console.log(productsData);
 
   // Check if we're in search mode with no results
   const isSearchMode = searchQuery && searchQuery.trim() !== "";

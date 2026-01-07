@@ -13,7 +13,8 @@ import theme from "../../lib/theme";
 import HeroSection from "./HeroSection";
 import { TITLES } from "../../lib/constant";
 import Reviews from "./Reviews";
-import { Smile, Clock, Folder, Boxes, Box, ShoppingBag } from "lucide-react";
+import { Smile, Clock, Folder, ShoppingBag } from "lucide-react";
+import ProductCard from "../../Components/ProductCard";
 
 function Home() {
   const dispatch = useDispatch();
@@ -70,14 +71,18 @@ function Home() {
           </div>
         </div>
       </div>
-      {productTypes.map((productType) => (
-        <ProductCategory
-          key={productType}
-          categoryName={productType}
-          productType={productType}
-          sectionId={productType.toLowerCase().replace(/\s+/g, "-")}
-        />
-      ))}
+      {allProducts.length === 0 ? (
+        <ProductCard productsList={[]} />
+      ) : (
+        productTypes.map((productType) => (
+          <ProductCategory
+            key={productType}
+            categoryName={productType}
+            productType={productType}
+            sectionId={productType.toLowerCase().replace(/\s+/g, "-")}
+          />
+        ))
+      )}
       {/* border-b-2 border-gray-200 */}
       <div className="border-b-2 border-gray-200 my-4"></div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-6">
