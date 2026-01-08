@@ -78,10 +78,10 @@ function Orders() {
   }
 
   // Handle cancel (no functionality needed for now)
-  const handleCancel = (orderId) => {
-    console.log('Cancel order:', orderId)
-    // TODO: Implement cancel functionality
-  }
+  // const handleCancel = (orderId) => {
+  //   console.log('Cancel order:', orderId)
+  //   // TODO: Implement cancel functionality
+  // }
 
   return (
     <div className="p-4 sm:p-6 md:p-8">
@@ -165,12 +165,12 @@ function Orders() {
                   >
                     Delivery Method
                   </th>
-                  <th
+                  {/* <th
                     className="px-4 py-3 text-center text-sm font-semibold"
                     style={{ color: theme.colors.text.primary }}
                   >
                     Actions
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody>
@@ -235,7 +235,7 @@ function Orders() {
                         {getDeliveryMethod(order)}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    {/* <td className="px-4 py-3">
                       <div className="flex justify-center items-center">
                         <button
                           onClick={() => handleCancel(order.id)}
@@ -245,7 +245,7 @@ function Orders() {
                           Cancel
                         </button>
                       </div>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>

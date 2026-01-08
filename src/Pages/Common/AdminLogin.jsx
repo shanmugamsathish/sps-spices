@@ -6,6 +6,7 @@ import { loginAdmin } from "../../apiCalls/users";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setLoading } from "../../redux/loaderSlice";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("josesamimmanuel@gmail.com");
   const [password, setPassword] = useState("jose@123");
   const [error, _setError] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -83,14 +84,31 @@ const AdminLogin = () => {
 
             <div>
               <label className="block text-sm font-medium mb-1">Password</label>
-              <input
-                type="password"
-                placeholder="Your Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              />
+
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Your Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 pr-10 border rounded-xl
+                 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3
+                 flex items-center cursor-pointer"
+                >
+                  {showPassword ? (
+                    <EyeIcon className="w-5 h-5" />
+                  ) : (
+                    <EyeOffIcon className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <button

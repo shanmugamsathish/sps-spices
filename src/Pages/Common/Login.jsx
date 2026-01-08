@@ -6,12 +6,14 @@ import { loginUser } from "../../apiCalls/users";
 import toast from "react-hot-toast";
 import { setLoading } from "../../redux/loaderSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("testcustomers@example.com");
   const [password, setPassword] = useState("password123");
   const [error, _setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.loader.loading);
   const handleLogin = async (e) => {
@@ -86,14 +88,31 @@ const Login = () => {
 
             <div>
               <label className="block text-sm font-medium mb-1">Password</label>
-              <input
-                type="password"
-                placeholder="Your Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              />
+
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Your Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 pr-10 border rounded-xl
+                 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3
+                 flex items-center cursor-pointer"
+                >
+                  {showPassword ? (
+                    <EyeIcon className="w-5 h-5" />
+                  ) : (
+                    <EyeOffIcon className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <button

@@ -37,6 +37,7 @@ export const ROUTES = {
     ADMIN_LOGIN: '/admin/login',
 
     HOME: '/',
+    MY_PROFILE: '/my-profile',
     ABOUT: '/about',
     CONTACT: '/contact',
     PRODUCTS: '/products',

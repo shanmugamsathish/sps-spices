@@ -4,7 +4,7 @@ import theme from "../../lib/theme";
 import { LOGO } from "../../lib/constant";
 import { registerUser } from "../../apiCalls/users";
 import toast from "react-hot-toast";
-
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 const Register = () => {
   const navigate = useNavigate();
 
@@ -15,7 +15,8 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, _setLoading] = useState(false);
   const [error, _setError] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
@@ -27,12 +28,11 @@ const Register = () => {
     } catch (error) {
       toast.error(error.response.data.message || "Invalid email or password");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center  ">
       <div className="w-full max-w-8xl  overflow-hidden grid grid-cols-1 md:grid-cols-[60%_40%]">
-
         {/* LEFT – Illustration */}
         <div className="hidden md:block relative bg-indigo-50">
           <img
@@ -56,9 +56,7 @@ const Register = () => {
             Create Account 🚀
           </h2>
 
-          <p className="text-gray-500 mb-6">
-            Please fill in the details below
-          </p>
+          <p className="text-gray-500 mb-6">Please fill in the details below</p>
 
           {error && (
             <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
@@ -67,7 +65,6 @@ const Register = () => {
           )}
 
           <form className="space-y-5" onSubmit={handleRegister}>
-
             {/* First & Last Name */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -116,17 +113,32 @@ const Register = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                placeholder="Your Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              />
+              <label className="block text-sm font-medium mb-1">Password</label>
+
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Your Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 pr-10 border rounded-xl
+                 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3
+                 flex items-center cursor-pointer"
+                >
+                  {showPassword ? (
+                    <EyeIcon className="w-5 h-5" />
+                  ) : (
+                    <EyeOffIcon className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Confirm Password */}
@@ -134,14 +146,30 @@ const Register = () => {
               <label className="block text-sm font-medium mb-1">
                 Confirm Password
               </label>
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              />
+
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 pr-10 border rounded-xl
+                 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center"
+                >
+                  {showConfirmPassword ? (
+                    <EyeIcon className="w-5 h-5" />
+                  ) : (
+                    <EyeOffIcon className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <button

@@ -157,7 +157,7 @@ function IconsSections({
                 <CircleUserRoundIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                 <p className="text-sm font-medium">
                   Welcome,{" "}
-                  <span className="font-bold">{user}</span>
+                  <span className="font-bold cursor-pointer hover:underline" onClick={() => {navigate(ROUTES.MY_PROFILE), window.scrollTo(0, 0)}}>{user}</span>
                 </p>
               </div>
             </div>

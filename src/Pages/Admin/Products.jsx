@@ -280,7 +280,7 @@ function Products() {
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className="font-medium cursor-pointer"
+                          className="font-medium cursor-pointer hover:underline"
                           style={{ color: theme.colors.text.primary }}
                           onClick={() => {navigate(`${ROUTES.ADMIN_PRODUCT_DETAILS}/${product.id}`); window.scrollTo(0, 0)}}
                         >
