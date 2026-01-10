@@ -7,20 +7,52 @@ import toast from "react-hot-toast";
 import { setLoading } from "../../redux/loaderSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { validateField } from "../../lib/validation";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("testcustomers@example.com");
-  const [password, setPassword] = useState("password123");
-  const [error, _setError] = useState("");
+  const [formData, setFormData] = useState({
+    email: "testcustomers@example.com",
+    password: "password123",
+  });
+  const [error, setError] = useState({
+    email: "",
+    password: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.loader.loading);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError({
+      ...error,
+      [e.target.name]: validateField(e.target.name, e.target.value)
+  });
+  };
+
+      // Validation functions
+      const validateLoginFields = (email, password) => {
+        const errors = {};
+        const emailError = validateField('email', email);
+        const passwordError = validateField('password', password);
+        
+        if (emailError) errors.email = emailError;
+        if (passwordError) errors.password = passwordError;
+        
+        return errors;
+    };
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    const errors = validateLoginFields(formData.email, formData.password);
+    if (Object.keys(errors).length > 0) {
+      setError(errors);
+      return;
+    }
     try {
       dispatch(setLoading(true));
-      const response = await loginUser({ email, password });
+      const response = await loginUser(formData);
       if (response) {
         navigate("/");
         toast.success(response.message);
@@ -67,23 +99,19 @@ const Login = () => {
 
           <p className="text-gray-500 mb-6">Please login to your account</p>
 
-          {error && (
-            <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
-              {error}
-            </div>
-          )}
-
           <form className="space-y-5" onSubmit={handleLogin}>
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
               <input
                 type="email"
                 placeholder="yourname@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
+                name="email"
                 required
                 className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
+              {error.email && <p className="text-red-500 text-sm mt-1">{error.email}</p>}
             </div>
 
             <div>
@@ -93,8 +121,9 @@ const Login = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Your Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleChange}
+                  name="password"
                   required
                   className="w-full px-4 py-3 pr-10 border rounded-xl
                  focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -113,6 +142,7 @@ const Login = () => {
                   )}
                 </button>
               </div>
+              {error.password && <p className="text-red-500 text-sm mt-1">{error.password}</p>}
             </div>
 
             <button

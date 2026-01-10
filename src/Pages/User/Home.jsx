@@ -14,6 +14,8 @@ import HeroSection from "./HeroSection";
 import { TITLES } from "../../lib/constant";
 import Reviews from "./Reviews";
 import { Smile, Clock, Folder, ShoppingBag } from "lucide-react";
+import AmazonProducts from "./AmazonProducts";
+import FlipkartProducts from "./FlipkartProducts";
 import ProductCard from "../../Components/ProductCard";
 
 function Home() {
@@ -83,7 +85,6 @@ function Home() {
           />
         ))
       )}
-      {/* border-b-2 border-gray-200 */}
       <div className="border-b-2 border-gray-200 my-4"></div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-6">
         <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center flex items-center justify-center gap-2 ">
@@ -106,6 +107,8 @@ function Home() {
       </div>
       <Collections />
       <div className="border-b-2 border-gray-200 my-4"></div>
+      <AmazonProducts />
+      <div className="border-b-2 border-gray-200 my-4"></div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-6">
         <div className="text-2xl sm:text-3xl lg:text-4xl font-bold uppercase text-center mb-4 flex items-center justify-center gap-2 ">
           <Clock
@@ -127,6 +130,8 @@ function Home() {
         </div>
       </div>
       <RecentProducts />
+      <div className="border-b-2 border-gray-200 my-4"></div>
+      <FlipkartProducts />
       <div className="border-b-2 border-gray-200 my-4"></div>
       <WhyChooseUs />
       <div className="py-4 bg-black sm:py-6 lg:py-8 mt-4 sm:mt-6 lg:mt-8">

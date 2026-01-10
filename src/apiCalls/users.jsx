@@ -13,6 +13,22 @@ export const loginUser = async (userData) => {
     return response.data;
 }
 
+// Forgot password /api/auth/forgot-password
+export const forgotPassword = async (email) => {
+    const response = await axiosInstance.post(`${API_URL}/auth/forgot-password`, { email });
+    return response.data;
+}
+
+// Reset password /api/auth/reset-password
+export const resetPassword = async (id, resetToken, password) => {
+    const response = await axiosInstance.post(`${API_URL}/auth/reset-password`, { 
+        id, 
+        resetToken, 
+        password 
+    });
+    return response.data;
+}
+
 // Login a admin /api/auth/admin/login
 export const loginAdmin = async (adminData) => {
     const response = await axiosInstance.post(`${API_URL}/auth/admin/login`, adminData);

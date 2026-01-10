@@ -5,22 +5,60 @@ import { LOGO } from "../../lib/constant";
 import { registerUser } from "../../apiCalls/users";
 import toast from "react-hot-toast";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { validateField } from "../../lib/validation";
 const Register = () => {
   const navigate = useNavigate();
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [loading, _setLoading] = useState(false);
-  const [error, _setError] = useState("");
+  const [error, setError] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const handleChange = (e) => {
+    const updatedFormData = { ...formData, [e.target.name]: e.target.value };
+    setFormData(updatedFormData);
+    setError({
+      ...error,
+      [e.target.name]: validateField(e.target.name, e.target.value, updatedFormData)
+  });
+  };
+
+  const validateRegisterFields = (firstName, lastName, email, password, confirmPassword) => {
+    const errors = {};
+    const formDataForValidation = { password };
+    const firstNameError = validateField('firstName', firstName);
+    const lastNameError = validateField('lastName', lastName);
+    const emailError = validateField('email', email);
+    const passwordError = validateField('password', password);
+    const confirmPasswordError = validateField('confirmPassword', confirmPassword, formDataForValidation);
+    if (firstNameError) errors.firstName = firstNameError;
+    if (lastNameError) errors.lastName = lastNameError;
+    if (emailError) errors.email = emailError;
+    if (passwordError) errors.password = passwordError;
+    if (confirmPasswordError) errors.confirmPassword = confirmPasswordError;
+    return errors;
+  };
   const handleRegister = async (e) => {
     e.preventDefault();
+    const errors = validateRegisterFields(formData.firstName, formData.lastName, formData.email, formData.password, formData.confirmPassword);
+    if (Object.keys(errors).length > 0) {
+      setError(errors);
+      return;
+    }
     try {
-      const response = await registerUser({ firstName, lastName, email, password, confirmPassword });
+      const response = await registerUser(formData);
       if (response) {
         navigate("/login");
         toast.success(response.message);
@@ -58,12 +96,6 @@ const Register = () => {
 
           <p className="text-gray-500 mb-6">Please fill in the details below</p>
 
-          {error && (
-            <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
-              {error}
-            </div>
-          )}
-
           <form className="space-y-5" onSubmit={handleRegister}>
             {/* First & Last Name */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -74,11 +106,13 @@ const Register = () => {
                 <input
                   type="text"
                   placeholder="Your First Name"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  name="firstName"
                   required
                   className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />
+                {error.firstName && <p className="text-red-500 text-sm mt-1">{error.firstName}</p>}
               </div>
 
               <div>
@@ -88,11 +122,13 @@ const Register = () => {
                 <input
                   type="text"
                   placeholder="Your Last Name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  name="lastName"
                   required
                   className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />
+                {error.lastName && <p className="text-red-500 text-sm mt-1">{error.lastName}</p>}
               </div>
             </div>
 
@@ -104,11 +140,13 @@ const Register = () => {
               <input
                 type="email"
                 placeholder="yourname@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
+                name="email"
                 required
                 className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
+              {error.email && <p className="text-red-500 text-sm mt-1">{error.email}</p>}
             </div>
 
             {/* Password */}
@@ -119,8 +157,9 @@ const Register = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Your Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleChange}
+                  name="password"
                   required
                   className="w-full px-4 py-3 pr-10 border rounded-xl
                  focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -139,6 +178,7 @@ const Register = () => {
                   )}
                 </button>
               </div>
+              {error.password && <p className="text-red-500 text-sm mt-1">{error.password}</p>}
             </div>
 
             {/* Confirm Password */}
@@ -151,8 +191,9 @@ const Register = () => {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  name="confirmPassword"
                   required
                   className="w-full px-4 py-3 pr-10 border rounded-xl
                  focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -170,6 +211,7 @@ const Register = () => {
                   )}
                 </button>
               </div>
+              {error.confirmPassword && <p className="text-red-500 text-sm mt-1">{error.confirmPassword}</p>}
             </div>
 
             <button

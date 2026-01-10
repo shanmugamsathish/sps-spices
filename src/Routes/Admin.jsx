@@ -14,6 +14,8 @@ import AdminAddCollection from '../Pages/Admin/AdminAddCollection';
 import ProductDetails from '../Pages/User/ProductDetails';
 import AdminAddCustomer from '../Pages/Admin/AdminAddCustomer';
 import AdminLogin from '../Pages/Common/AdminLogin';
+import AmazonProducts from '../Pages/Admin/AmazonProducts';
+import FlipkartProducts from '../Pages/Admin/FlipkartProducts';
 import PageNotFound from '../Components/PageNotFound';
 
 function Admin() {
@@ -43,6 +45,8 @@ function Admin() {
                   <Route path={ROUTES.ADMIN_COLLECTIONS} element={<Collections />} />
                   <Route path={ROUTES.ADMIN_ADD_COLLECTION} element={<AdminAddCollection />} />
                   <Route path={`${ROUTES.ADMIN_PRODUCT_DETAILS}/:id`} element={<ProductDetails userPage={false} />} />
+                  <Route path={ROUTES.ADMIN_AMAZON_PRODUCTS} element={<AmazonProducts />} />
+                  <Route path={ROUTES.ADMIN_FLIPKART_PRODUCTS} element={<FlipkartProducts />} />
                   <Route path="*" element={<PageNotFound />} />
                 </Route>
               </Routes>

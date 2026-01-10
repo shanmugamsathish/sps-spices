@@ -13,9 +13,9 @@ import Cart from '../Pages/User/Cart';
 import MyOrders from '../Pages/User/MyOrders';
 import PaymentPage from '../Pages/User/PaymentPage';
 import MyProfile from '../Pages/User/MyProfile';
-import Loader from '../Components/Loader';
-import Login from '../Pages/Common/Login';
-import Register from '../Pages/Common/Register';
+import TopSellingProducts from '../Pages/User/TopSellingProducts';
+import AmazonProducts from '../Pages/User/AmazonProducts';
+import FlipkartProducts from '../Pages/User/FlipkartProducts';
 import ProtectedRoutes from '../Components/Routes/ProtectedRoutes';
 import PageNotFound from '../Components/PageNotFound';
 
@@ -57,6 +57,9 @@ function User() {
       <Route path={ROUTES.MY_PROFILE} element={<ProtectedRoutes />}>
         <Route index element={<MyProfile />} />
       </Route>
+      <Route path={ROUTES.TOP_SELLING_PRODUCTS} element={<TopSellingProducts />} />
+      <Route path={ROUTES.AMAZON_PRODUCTS} element={<AmazonProducts />} />
+      <Route path={ROUTES.FLIPKART_PRODUCTS} element={<FlipkartProducts />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
 

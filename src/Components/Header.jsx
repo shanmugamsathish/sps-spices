@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import theme from "../lib/theme";
 import { getProductByTitle, getAllProducts } from "../apiCalls/products";
 import { useDispatch, useSelector } from "react-redux";
-import { setProducts } from "../redux/productSlice";
+import { setProducts, updateInventoryFromCart } from "../redux/productSlice";
 import { setUser } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -11,12 +11,8 @@ import DialogBox from "./DialogBox";
 import EditCustomerModal from "./AdminEditCustomer/EditCustomerModel";
 import { getUserProfile } from "../apiCalls/users";
 import { ROUTES, LOGO } from "../lib/constant";
-import { getCartDetails } from "../apiCalls/cart";
-import {
-  selectCart,
-  selectCartItemsCount,
-  setCart,
-} from "../redux/productSlice";
+import { createCart, getCartDetails } from "../apiCalls/cart";
+import { selectCart, selectCartItemsCount, setCart } from "../redux/productSlice";
 import Desktop from "./Header/Desktop";
 import IconsSections from "./Header/IconsSections";
 import Mobile from "./Header/Mobile";
@@ -27,6 +23,7 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Check the required current path
   const match = matchPath(
     { path: `${ROUTES.COLLECTION_PRODUCTS}/:id`, end: true },
     location.pathname
@@ -41,12 +38,17 @@ function Header() {
       location.pathname
     );
 
+    const isHome = location.pathname === ROUTES.HOME;
+    const isProductsPage = location.pathname === ROUTES.PRODUCTS;
+    const isCollectionPage = location.pathname === ROUTES.COLLECTIONS;
+
   const isProductSearch = [ROUTES.HOME, ROUTES.PRODUCTS].includes(location.pathname)
 
   const isCollectionSearch = !!matchPath(
     { path: `${ROUTES.COLLECTION_PRODUCTS}/:id`, end: true },
     location.pathname
   );
+
   const id = match?.params?.id;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -104,6 +106,56 @@ function Header() {
       setCartItemsCount(0);
     }
   }, [cart, cartItemsCountFromRedux, dispatch]);
+
+    // Cart initialization
+    useEffect(() => {
+      const initializeCart = async () => {
+        try {
+          const storedCartId = localStorage.getItem("cartId");
+          
+          if (storedCartId) {
+            if (!storedCartId.includes('?key=')) {
+              const response = await createCart();
+              if (response?.success && response?.cart?.id) {
+                const fullCartId = response.cart.id;
+                localStorage.setItem("cartId", fullCartId);
+                dispatch(setCart(response.cart));
+                // setCartId(fullCartId);
+              }
+            } else {
+              try {
+                const cartResponse = await getCartDetails(storedCartId);
+                if (cartResponse?.success && cartResponse.cart) {
+                  dispatch(updateInventoryFromCart(cartResponse.cart));
+                  dispatch(setCart(cartResponse.cart));
+                }
+                // setCartId(storedCartId);
+              } catch (error) {
+                toast.error(error.message);
+                const response = await createCart();
+                if (response?.success && response?.cart?.id) {
+                  const fullCartId = response.cart.id;
+                  localStorage.setItem("cartId", fullCartId);
+                  dispatch(setCart(response.cart));
+                  // setCartId(fullCartId);
+                }
+              }
+            }
+          } else {
+            const response = await createCart();
+            if (response?.success && response?.cart?.id) {
+              const fullCartId = response.cart.id;
+              localStorage.setItem("cartId", fullCartId);
+              dispatch(setCart(response.cart));
+              // setCartId(fullCartId);
+            }
+          }
+        } catch (error) {
+          toast.error("Error initializing cart: " + error.message);
+        }
+      };
+      initializeCart();
+    }, [dispatch, isHome, isProductsPage, isCollectionPage]);
 
   const handleLogout = () => {
     try {

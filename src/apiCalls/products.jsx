@@ -99,3 +99,36 @@ export const getProductCategories = async () => {
         throw error;
     }
 }
+
+// POST /api/marketplace/admin/add-product
+export const addMarketplaceProduct = async (data) => {
+    try {
+        const response = await axiosInstance.post(`${API_URL}/marketplace/admin/add-product`, data);
+        return response.data;
+    } catch (error) {
+        console.error('Error adding marketplace product:', error);
+        throw error;
+    }
+}
+
+// GET /api/marketplace/products
+export const getMarketplaceProducts = async (marketplace) => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/marketplace/products?marketplace=${marketplace}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error getting marketplace products:', error);
+        throw error;
+    }
+}
+
+// Delete a product
+export const deleteMarketplaceProduct = async (id) => {
+    try {
+        const response = await axiosInstance.delete(`${API_URL}/marketplace/admin/delete-product/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting marketplace product:', error);
+        throw error;
+    }
+}

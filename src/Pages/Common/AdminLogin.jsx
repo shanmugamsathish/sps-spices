@@ -7,19 +7,49 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setLoading } from "../../redux/loaderSlice";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { validateField } from "../../lib/validation";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("josesamimmanuel@gmail.com");
-  const [password, setPassword] = useState("jose@123");
-  const [error, _setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "josesamimmanuel@gmail.com",
+    password: "jose@123",
+  });
+  const [error, setError] = useState({
+    email: "",
+    password: "",
+  });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError({
+      ...error,
+      [e.target.name]: validateField(e.target.name, e.target.value)
+  });
+  };
+
+        // Validation functions
+        const validateLoginFields = (email, password) => {
+          const errors = {};
+          const emailError = validateField('email', email);
+          const passwordError = validateField('password', password);
+          
+          if (emailError) errors.email = emailError;
+          if (passwordError) errors.password = passwordError;
+          
+          return errors;
+      };
   const handleLogin = async (e) => {
     e.preventDefault();
+    const errors = validateLoginFields(formData.email, formData.password);
+    if (Object.keys(errors).length > 0) {
+      setError(errors);
+      return;
+    }
     try {
       dispatch(setLoading(true));
-      const response = await loginAdmin({ email, password });
+      const response = await loginAdmin(formData);
       if (response) {
         navigate("/admin/products");
         toast.success(response.message);
@@ -63,23 +93,19 @@ const AdminLogin = () => {
 
           <p className="text-gray-500 mb-6">Please login to your admin account</p>
 
-          {error && (
-            <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
-              {error}
-            </div>
-          )}
-
           <form className="space-y-5" onSubmit={handleLogin}>
             <div>
               <label className="block text-sm font-medium mb-1">Email</label>
               <input
                 type="email"
                 placeholder="yourname@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
+                name="email"
                 required
                 className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
+              {error.email && <p className="text-red-500 text-sm mt-1">{error.email}</p>}
             </div>
 
             <div>
@@ -89,8 +115,9 @@ const AdminLogin = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Your Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleChange}
+                  name="password"
                   required
                   className="w-full px-4 py-3 pr-10 border rounded-xl
                  focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -109,6 +136,7 @@ const AdminLogin = () => {
                   )}
                 </button>
               </div>
+              {error.password && <p className="text-red-500 text-sm mt-1">{error.password}</p>}
             </div>
 
             <button

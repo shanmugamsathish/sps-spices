@@ -35,12 +35,17 @@ export const ROUTES = {
     LOGIN: '/login',
     REGISTER: '/register',
     ADMIN_LOGIN: '/admin/login',
+    FORGOT_PASSWORD: '/forgot-password',
+    RESET_PASSWORD: '/reset-password',
 
     HOME: '/',
     MY_PROFILE: '/my-profile',
     ABOUT: '/about',
     CONTACT: '/contact',
     PRODUCTS: '/products',
+    TOP_SELLING_PRODUCTS: '/top-selling-products',
+    AMAZON_PRODUCTS: '/amazon-products',
+    FLIPKART_PRODUCTS: '/flipkart-products',
     PRODUCT_DETAILS: '/product-details',
     COLLECTIONS: '/collections',
     COLLECTION_PRODUCTS: '/collection-products',
@@ -57,6 +62,8 @@ export const ROUTES = {
     ADMIN_COLLECTIONS: '/admin/collections',
     ADMIN_ADD_COLLECTION: '/admin/add-collection',
     ADMIN_PRODUCT_DETAILS: '/admin/product-details',
+    ADMIN_AMAZON_PRODUCTS: '/admin/amazon-products',
+    ADMIN_FLIPKART_PRODUCTS: '/admin/flipkart-products',
 }
 
 // Hero Section Images

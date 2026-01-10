@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import theme from "../../lib/theme";
 import dryFruits from "../../assets/login.png";
 import wholeSpices from "../../assets/adminLogin.png";
-import allProducts from "../../assets/spicesanddryFruits.jpg";
 import { ROUTES } from "../../lib/constant";
 
 function Desktop({ isActive, isHeader, token, shopifyAccessToken }) {
@@ -117,21 +116,6 @@ function Desktop({ isActive, isHeader, token, shopifyAccessToken }) {
                 {/* Link to all products */}
                 <Link
                   to={ROUTES.PRODUCTS}
-                  className="px-4 py-2 text-sm hover:bg-gray-300 transition-colors border-b border-gray-300"
-                  style={{ color: theme.colors.text.primary }}
-                  onClick={() => window.scrollTo(0, 0)}
-                >
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={allProducts}
-                      alt="all-products"
-                      className="w-8 h-8"
-                    />
-                    <p className="text-md font-medium">All Products</p>
-                  </div>
-                </Link>
-                <Link
-                  to={ROUTES.PRODUCTS}
                   state={{ section: "dry-fruits" }}
                   className="px-4 py-2 text-sm hover:bg-gray-300 transition-colors border-b border-gray-300"
                   style={{ color: theme.colors.text.primary }}
@@ -156,6 +140,38 @@ function Desktop({ isActive, isHeader, token, shopifyAccessToken }) {
                       className="w-8 h-8"
                     />
                     <p className="text-md font-medium">Whole Spices</p>
+                  </div>
+                </Link>
+                <Link
+                  to={ROUTES.PRODUCTS}
+                  state={{ section: "amazon-products" }}
+                  className="px-4 py-2 text-sm hover:bg-gray-300 transition-colors border-b border-gray-300"
+                  style={{ color: theme.colors.text.primary }}
+                  onClick={() => window.scrollTo(0, 0)}
+                >
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={wholeSpices}
+                      alt="top-selling-products"
+                      className="w-8 h-8"
+                    />
+                    <p className="text-md font-medium">Top Selling</p>
+                  </div>
+                </Link>
+                <Link
+                  to={ROUTES.PRODUCTS}
+                  state={{ section: "flipkart-products" }}
+                  className="px-4 py-2 text-sm hover:bg-gray-300 transition-colors border-b border-gray-300"
+                  style={{ color: theme.colors.text.primary }}
+                  onClick={() => window.scrollTo(0, 0)}
+                >
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={wholeSpices}
+                      alt="top-selling-products"
+                      className="w-8 h-8"
+                    />
+                    <p className="text-md font-medium">Daily Deals</p>
                   </div>
                 </Link>
               </div>

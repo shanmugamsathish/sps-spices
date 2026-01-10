@@ -319,7 +319,7 @@ function PaymentPage() {
 
               // Redirect to orders page after 2 seconds
               setTimeout(() => {
-                navigate(ROUTES.MY_ORDERS);
+                navigate(ROUTES.HOME);
               }, 2000);
             } else {
               // Payment verification failed

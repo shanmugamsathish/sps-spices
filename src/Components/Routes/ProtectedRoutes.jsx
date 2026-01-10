@@ -64,7 +64,7 @@ function ProtectedRoutes() {
         const decoded = decodeToken(token);
         const userRole = decoded?.role;
         if (userRole !== "admin") {
-          toast.error("Admin only can access this page");
+          toast.error("Access Restricted — Admins Only");
           navigate("/");
           setLoading(false);
           return;

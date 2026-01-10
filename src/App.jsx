@@ -18,7 +18,7 @@ import WhatsApp from "./Components/Whatsapp";
 function AppContent() {
   const location = useLocation();
   const isAdmin = location.pathname.includes("/admin");
-  const isCommon = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.TERMS_AND_CONDITION, ROUTES.PRIVACY_POLICY].includes(location.pathname);
+  const isCommon = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.TERMS_AND_CONDITION, ROUTES.PRIVACY_POLICY, ROUTES.FORGOT_PASSWORD, ROUTES.RESET_PASSWORD].includes(location.pathname);
   const isHeader = [ROUTES.TERMS_AND_CONDITION, ROUTES.PRIVACY_POLICY].includes(location.pathname);
   const isLoading = useSelector((state) => state.loader.isLoading);
 

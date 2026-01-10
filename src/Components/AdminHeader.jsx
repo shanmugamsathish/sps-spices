@@ -59,6 +59,16 @@ function AdminHeader() {
       icon: Folder,
     },
     {
+      path: ROUTES.ADMIN_AMAZON_PRODUCTS,
+      label: "Amazon Products",
+      icon: ShoppingBag,
+    },
+    {
+      path: ROUTES.ADMIN_FLIPKART_PRODUCTS,
+      label: "Flipkart Products",
+      icon: ShoppingBag,
+    },
+    {
       path: ROUTES.ADMIN_LOGOUT,
       label: "Logout",
       icon: LogOut,
