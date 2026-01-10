@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { ShoppingCart, ChevronLeft, ChevronRight, ClockIcon, Flame, Loader2Icon } from "lucide-react";
 import theme from "../lib/theme";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation as useRouterLocation, useNavigate } from "react-router-dom";
 import { ROUTES } from "../lib/constant";
 import { useSelector, useDispatch } from "react-redux";
 import ProductCardShimmer from "./ProductCardShimmer";
@@ -9,9 +9,12 @@ import { addItemsToCart, getCartDetails } from "../apiCalls/cart";
 import toast from "react-hot-toast";
 import { updateInventoryFromCart, setCart } from "../redux/productSlice";
 import EditLoginModal from "./EditLoginModal";
+import { useLocation } from "../hooks/useLocation";
+import DeliveryBadge from "./DeliveryBadge";
+import { getNumericProductId } from "../utils/productHelpers";
 
 function ProductCard({ productsList, horizontal = false }) {
-  const location = useLocation();
+  const location = useRouterLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isSearching = useSelector((state) => state.products.isSearching);
@@ -20,6 +23,10 @@ function ProductCard({ productsList, horizontal = false }) {
   const isLoadingState = useSelector((state) => state.loader.isLoading);
   const cartId = useSelector((state) => state.products.cart?.id);
   const [openEditLoginModal, setOpenEditLoginModal] = useState(false);
+  
+  // Location management for refrigerated products
+  const { validateLocation, requestLocation } = useLocation();
+  const [productLocationStatus, setProductLocationStatus] = useState({}); // { productId: { isRefrigerated, allowed, distance, isLoading } }
   // Ensure productsList is an array before using slice
   const productsListArray = Array.isArray(productsList) ? productsList : [];
   const productsData = horizontal
@@ -41,7 +48,7 @@ function ProductCard({ productsList, horizontal = false }) {
 
   const token = sessionStorage.getItem("token");
   const shopifyAccessToken = sessionStorage.getItem("shopifyAccessToken");
-
+  
   // Helper function to format price
   const formatPrice = (price) => {
     return parseFloat(price || 0).toFixed(2);
@@ -105,7 +112,7 @@ function ProductCard({ productsList, horizontal = false }) {
       }
       return null;
     },
-    [getTotalInventory, theme]
+    [getTotalInventory]
   );
 
   // Helper function to get product images
@@ -221,11 +228,11 @@ function ProductCard({ productsList, horizontal = false }) {
     );
   };
 
-  // Helper function to check availability
-  const isAvailable = (product) => {
+  // Helper function to check availability (based on total inventory across all variants)
+  const isAvailable = useCallback((product) => {
     const totalInventory = getTotalInventory(product);
     return product?.status === "active" && totalInventory > 0;
-  };
+  }, [getTotalInventory]);
 
   // Determine shimmer count
   const shimmerCount = isHome
@@ -259,6 +266,65 @@ function ProductCard({ productsList, horizontal = false }) {
     return null;
   }, []);
 
+  /**
+   * Check if product is refrigerated and validate location
+   * @param {Object} product - Product object
+   * @returns {Promise<Object>} Location validation result
+   */
+  const checkProductLocation = useCallback(async (product) => {
+    const productId = getNumericProductId(product?.id);
+    if (!productId) {
+      return { isRefrigerated: false, allowed: true, distance: null };
+    }
+
+    // Check if already validated
+    const cachedStatus = productLocationStatus[productId];
+    if (cachedStatus && !cachedStatus.isLoading) {
+      return cachedStatus;
+    }
+
+    // Set loading state
+    setProductLocationStatus(prev => ({
+      ...prev,
+      [productId]: { ...prev[productId], isLoading: true }
+    }));
+
+    try {
+      const result = await validateLocation({ productId });
+      
+      const status = {
+        isRefrigerated: result.isRefrigerated || false,
+        allowed: result.allowed !== false, // Default to true if not specified
+        distance: result.distance || null,
+        isLoading: false,
+        error: result.error || null,
+      };
+
+      setProductLocationStatus(prev => ({
+        ...prev,
+        [productId]: status
+      }));
+
+      return status;
+    } catch (error) {
+      // If validation fails, assume not refrigerated (allow cart)
+      const status = {
+        isRefrigerated: false,
+        allowed: true,
+        distance: null,
+        isLoading: false,
+        error: error.message,
+      };
+
+      setProductLocationStatus(prev => ({
+        ...prev,
+        [productId]: status
+      }));
+
+      return status;
+    }
+  }, [validateLocation, productLocationStatus]);
+
   // Handle add to cart
   const handleAddToCart = useCallback(
     async (product) => {
@@ -279,6 +345,21 @@ function ProductCard({ productsList, horizontal = false }) {
         return;
       }
 
+      // Check if the first variant (displayed variant) has zero inventory
+      const firstVariantInventory = Number(variant?.inventory_quantity || 0);
+      if (firstVariantInventory === 0) {
+        const variantTitle = variant?.title || "This variant";
+        toast.error(
+          `Sorry, ${variantTitle} is unavailable. See other options.`,
+          {
+            duration: 5000,
+          }
+        );
+        navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`);
+        window.scrollTo(0, 0);
+        return;
+      }
+
       // Get GraphQL global ID for the variant
       const merchandiseId = getVariantGraphQLId(variant);
       if (!merchandiseId) {
@@ -286,12 +367,49 @@ function ProductCard({ productsList, horizontal = false }) {
         return;
       }
 
-      // Check if product is available
-      const available =
-        product?.status === "active" && (variant?.inventory_quantity || 0) > 0;
+      // Check if product is available (based on total inventory across all variants)
+      const available = isAvailable(product);
       if (!available) {
         toast.error("Product is not available");
         return;
+      }
+
+      // Check location for refrigerated products
+      try {
+        const locationCheck = await checkProductLocation(product);
+        
+        if (locationCheck.isRefrigerated && !locationCheck.allowed) {
+          console.log(
+            locationCheck.error || 
+            `Refrigerated products are only available within 30 km radius. You are ${locationCheck.distance || 'too far'} km away.`
+          );
+          return;
+        }
+
+        // If refrigerated and needs location but user denied, show message
+        if (locationCheck.isRefrigerated && locationCheck.needsLocation) {
+          toast.error("Location access is required to order refrigerated products. Please enable location permissions.");
+          try {
+            await requestLocation();
+            // Retry location check after permission granted
+            const retryCheck = await checkProductLocation(product);
+            if (retryCheck.isRefrigerated && !retryCheck.allowed) {
+              toast.error(
+                retryCheck.error || 
+                `Refrigerated products are only available within 30 km radius. You are ${retryCheck.distance || 'too far'} km away.`
+              );
+              return;
+            }
+          } catch {
+            // User denied location
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Error checking location:", error);
+        // On error, still allow non-refrigerated products to be added
+        // For safety, we could block refrigerated products if location check fails
+        // But for better UX, we'll try to proceed and backend will validate
       }
 
       try {
@@ -355,8 +473,16 @@ function ProductCard({ productsList, horizontal = false }) {
       dispatch,
       token,
       shopifyAccessToken,
+      checkProductLocation,
+      requestLocation,
+      isAvailable,
+      navigate,
     ]
   );
+
+  // Note: Location is checked on-demand when user tries to add to cart
+  // This avoids requesting location for all products on page load
+  // Only refrigerated products require location check
 
   const scrollRef = useRef(null);
   const scrollStep = useCallback(() => {
@@ -423,30 +549,39 @@ function ProductCard({ productsList, horizontal = false }) {
                   </div>
                 ))
               : sortedProductsData.slice(0, 7)?.map((product) => {
-                  const variant = getFirstVariant(product);
-                  const available = isAvailable(product);
+          const variant = getFirstVariant(product);
+          const available = isAvailable(product);
+                  const productId = getNumericProductId(product?.id);
+                  const locationStatus = productLocationStatus[productId] || {
+                    isRefrigerated: false,
+                    allowed: true,
+                    distance: null,
+                    isLoading: false,
+                  };
+                  const isLocationBlocked = locationStatus.isRefrigerated && !locationStatus.allowed;
+                  
                   // const stockQuantity = variant?.inventory_quantity || 0;
                   const comparePrice =
                     variant?.compare_at_price || variant?.price;
-                  const currentPrice = variant?.price;
+          const currentPrice = variant?.price;
 
-                  return (
-                    <div
-                      key={product.id}
+          return (
+            <div
+              key={product.id}
                       className="flex-none w-72 flex flex-col gap-2 sm:gap-3 rounded-md p-3 sm:p-4 lg:p-5 transition-shadow duration-300 shadow-lg"
-                      style={{
-                        backgroundColor: theme.colors.background.main,
-                        border: `1px solid ${theme.colors.border.light}`,
-                        color: theme.colors.text.primary,
-                      }}
-                    >
+              style={{
+                backgroundColor: theme.colors.background.main,
+                border: `1px solid ${theme.colors.border.light}`,
+                color: theme.colors.text.primary,
+              }}
+            >
                       <ProductImageCarousel
                         product={product}
                         onClick={() => {
                           navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`);
                           window.scrollTo(0, 0);
                         }}
-                      />
+              />
                       <div className="flex items-center justify-center h-14 text-center border-b border-gray-200 pb-2">
                         <h2
                           className="text-base sm:text-lg lg:text-xl font-semibold cursor-pointer "
@@ -458,8 +593,8 @@ function ProductCard({ productsList, horizontal = false }) {
                             color: theme.colors.text.primary,
                           }}
                         >
-                          {product.title}
-                        </h2>
+                {product.title}
+              </h2>
                       </div>
                       <div className="flex justify-between items-center">
                         <div className="flex flex-col gap-1 items-start">
@@ -474,11 +609,11 @@ function ProductCard({ productsList, horizontal = false }) {
                           </span>
 
                           {/* MRP (only show if different from currentPrice) */}
-                          {comparePrice && comparePrice !== currentPrice && (
+                      {comparePrice && comparePrice !== currentPrice && (
                             <span className="text-sm sm:text-sm lg:text-xs line-through text-gray-500">
                               MRP: ₹ {formatPrice(comparePrice)}
-                            </span>
-                          )}
+                        </span>
+                      )}
                         </div>
 
                         {/* Availability */}
@@ -499,16 +634,26 @@ function ProductCard({ productsList, horizontal = false }) {
                                   100
                               )}
                               %)
-                            </span>
+                    </span>
                           )}
                         </div>
                       </div>
+                      {/* Delivery Badge */}
+                      {productId && (
+                        <DeliveryBadge
+                          isRefrigerated={locationStatus.isRefrigerated}
+                          isLocationAllowed={locationStatus.allowed}
+                          distance={locationStatus.distance}
+                          isLoading={locationStatus.isLoading}
+                          error={locationStatus.error}
+                        />
+                      )}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAddToCart(product);
                         }}
-                        disabled={!available || !cartId}
+                        disabled={!available || !cartId || isLocationBlocked}
                         className="glow-button px-4 py-2 rounded-md flex justify-center items-center gap-2 hover:opacity-90 transition-opacity relative z-10 disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{
                           backgroundColor: theme.colors.accent.primary,
@@ -545,6 +690,15 @@ function ProductCard({ productsList, horizontal = false }) {
             : sortedProductsData?.map((product) => {
                 const variant = getFirstVariant(product);
                 const available = isAvailable(product);
+                const productId = getNumericProductId(product?.id);
+                const locationStatus = productLocationStatus[productId] || {
+                  isRefrigerated: false,
+                  allowed: true,
+                  distance: null,
+                  isLoading: false,
+                };
+                const isLocationBlocked = locationStatus.isRefrigerated && !locationStatus.allowed;
+                
                 const comparePrice =
                   variant?.compare_at_price || variant?.price;
                 const currentPrice = variant?.price;
@@ -587,24 +741,24 @@ function ProductCard({ productsList, horizontal = false }) {
                             color: theme.colors.text.primary,
                           }}
                         >
-                          ₹ {formatPrice(currentPrice)}
-                        </span>
+                      ₹ {formatPrice(currentPrice)}
+                    </span>
 
                         {/* MRP (only show if different from currentPrice) */}
                         {comparePrice && comparePrice !== currentPrice && (
                           <span className="text-sm sm:text-sm lg:text-xs line-through text-gray-500">
                             MRP: ₹ {formatPrice(comparePrice)}
-                          </span>
+                  </span>
                         )}
-                      </div>
+                </div>
 
                       {/* Availability */}
                       <div className="flex flex-col gap-1 items-end">
-                        <span
-                          className={`text-xs sm:text-sm lg:text-md font-medium ${
+                <span
+                  className={`text-xs sm:text-sm lg:text-md font-medium ${
                             available ? "text-green-600" : "text-red-600"
-                          }`}
-                        >
+                  }`}
+                >
                           {available ? "" : "Out of Stock"}
                         </span>
                         {/* Save Percentage */}
@@ -616,28 +770,39 @@ function ProductCard({ productsList, horizontal = false }) {
                                 100
                             )}
                             %)
-                          </span>
+                </span>
                         )}
                       </div>
-                    </div>
+              </div>
 
-                    <button
+                    {/* Delivery Badge */}
+                    {productId && (
+                      <DeliveryBadge
+                        isRefrigerated={locationStatus.isRefrigerated}
+                        isLocationAllowed={locationStatus.allowed}
+                        distance={locationStatus.distance}
+                        isLoading={locationStatus.isLoading}
+                        error={locationStatus.error}
+                      />
+                    )}
+
+              <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAddToCart(product);
                       }}
-                      disabled={!available || !cartId}
+                      disabled={!available || !cartId || isLocationBlocked}
                       className="glow-button px-4 py-2 rounded-md flex justify-center items-center gap-2 hover:opacity-90 transition-opacity relative z-10 disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{
-                        backgroundColor: theme.colors.accent.primary,
-                        color: theme.colors.background.main,
-                      }}
-                    >
-                      <ShoppingCart className="w-4 h-4 font-bold relative z-10" />
-                      <span className="relative z-10">Add to Cart</span>
-                    </button>
-                  </div>
-                );
+                style={{
+                  backgroundColor: theme.colors.accent.primary,
+                  color: theme.colors.background.main,
+                }}
+              >
+                <ShoppingCart className="w-4 h-4 font-bold relative z-10" />
+                <span className="relative z-10">Add to Cart</span>
+              </button>
+            </div>
+          );
               })}
           {hasNoSearchResults && (
             <div
@@ -652,8 +817,8 @@ function ProductCard({ productsList, horizontal = false }) {
                   </p>
                 </div>
               </div>
-            </div>
-          )}
+        </div>
+      )}
         </div>
       )}
       <EditLoginModal

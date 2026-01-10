@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation as useRouterLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { selectCart, clearCart } from "../../redux/productSlice";
 import { selectUser } from "../../redux/userSlice";
@@ -12,7 +12,7 @@ import PaymentPageComponent from "../../Components/PaymentPageComponent";
 import { setLoading } from "../../redux/loaderSlice";
 import { getCustomerById } from "../../apiCalls/customers";
 import AdminAddCustomerForm from "../../Components/AdminAddCustomerComponent/AdminAddCustomerForm";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "../../hooks/useLocation";
 
 function PaymentPage() {
   const dispatch = useDispatch();
@@ -21,8 +21,12 @@ function PaymentPage() {
   const user = useSelector(selectUser);
   const customerId = user?.customer?.id;
   const loading = useSelector((state) => state.loader.isLoading);
-  const location = useLocation();
+  const location = useRouterLocation();
   const isPaymentPage = location.pathname === "/payment";
+  
+  // Location management for refrigerated products
+  const { location: userLocation, requestLocation, validateLocation } = useLocation();
+  const [locationError, setLocationError] = useState(null);
   
   // Payment status states
   const [paymentStatus, setPaymentStatus] = useState(null); 
@@ -232,6 +236,54 @@ function PaymentPage() {
       return;
     }
 
+    // Get user location for refrigerated product validation
+    let currentLocation = userLocation;
+    if (!currentLocation) {
+      try {
+        // Try to get cached location first
+        const cached = localStorage.getItem('userLocation');
+        if (cached) {
+          const data = JSON.parse(cached);
+          const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+          if (Date.now() - data.timestamp < CACHE_DURATION) {
+            currentLocation = { lat: data.lat, lng: data.lng };
+          }
+        }
+
+        // If no cached location, request it
+        if (!currentLocation) {
+          toast.info("Checking delivery location for refrigerated products...", { duration: 2000 });
+          currentLocation = await requestLocation();
+        }
+      } catch (locationErr) {
+        console.error("Error getting location:", locationErr);
+        // If location is denied but cart might have refrigerated products, validate anyway
+        // Backend will reject if needed
+      }
+    }
+
+    // Validate location for refrigerated products before payment
+    try {
+      const cartId = cart?.id;
+      if (cartId && currentLocation) {
+        const locationValidation = await validateLocation({ cartId });
+        if (!locationValidation.allowed && locationValidation.isRefrigerated) {
+          toast.error(
+            locationValidation.error ||
+            `Refrigerated products are only available within 30 km radius. You are ${locationValidation.distance || 'too far'} km away.`
+          );
+          return;
+        }
+      } else if (!currentLocation) {
+        // If no location and cart might have refrigerated products, warn user
+        // But allow to proceed - backend will validate
+        toast.warning("Location not available. Refrigerated products require location access.", { duration: 3000 });
+      }
+    } catch (locationErr) {
+      console.error("Error validating location:", locationErr);
+      // Continue with payment - backend will validate
+    }
+
     // Reset error and payment status
     setError(null);
     setPaymentStatus(null);
@@ -265,12 +317,20 @@ function PaymentPage() {
           email: formData.email || user?.email,
         },
         shippingAddress: addresses[0] || null,
-        billingAddress: addresses[0] || null, 
+        billingAddress: addresses[0] || null,
+        userLat: currentLocation?.lat || null,
+        userLng: currentLocation?.lng || null,
       };
 
       const orderResponse = await createPaymentOrder(orderPayload);
 
       if (!orderResponse.success) {
+        // Check if it's a location validation error
+        if (orderResponse.error === "LOCATION_OUT_OF_RANGE") {
+          toast.error(orderResponse.message || "Refrigerated products are only available within 30 km radius.");
+          setLocationError(orderResponse.message);
+          throw new Error(orderResponse.message);
+        }
         throw new Error(
           orderResponse.message || "Failed to create payment order"
         );
@@ -377,7 +437,7 @@ function PaymentPage() {
       dispatch(setLoading(false));
       // DO NOT clear cart on error
     }
-  }, [
+  },     [
     cartTotal,
     cart,
     dispatch,
@@ -387,6 +447,9 @@ function PaymentPage() {
     addresses,
     customerId,
     validateForm,
+    userLocation,
+    requestLocation,
+    validateLocation,
   ]);
 
   if (loading && !paymentStatus && !isRazorpayLoading) {

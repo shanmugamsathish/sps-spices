@@ -13,6 +13,10 @@ import { useNavigate } from 'react-router-dom'
 import ProductReviews from '../../Components/ProductReviews'
 import { getFavourites, addFavourite, removeFavourite } from "../../apiCalls/favourites";
 import { Heart } from 'lucide-react'
+import { useLocation } from '../../hooks/useLocation'
+import DeliveryBadge from '../../Components/DeliveryBadge'
+import { getNumericProductId } from '../../utils/productHelpers'
+import { checkRadius } from '../../apiCalls/geo'
 
 
 function ProductDetails() {
@@ -29,9 +33,79 @@ function ProductDetails() {
   const [customerId, setCustomerId] = useState(null)
   const [customerName, setCustomerName] = useState(null)
   const [favoritesSet, setFavoritesSet] = useState(new Set());
+  
+  // Location management for refrigerated products
+  const { validateLocation, requestLocation } = useLocation();
+  const [locationStatus, setLocationStatus] = useState({
+    isRefrigerated: false,
+    allowed: true,
+    distance: null,
+    isLoading: false,
+    error: null,
+    needsLocation: false,
+  });
 
   const token = sessionStorage.getItem("token");
   const shopifyAccessToken = sessionStorage.getItem("shopifyAccessToken");
+
+  // Check if product is refrigerated (lazy check - only collection, no location needed)
+  useEffect(() => {
+    const checkProductCollection = async () => {
+      if (!product?.id) return;
+      
+      try {
+        const productId = getNumericProductId(product.id);
+        if (productId) {
+          console.log(`[ProductDetails] Checking if product ${productId} is refrigerated (collection check only)...`);
+          
+          // Only check collection first - don't request location yet
+          try {
+            const collectionCheck = await checkRadius({
+              productId: productId,
+              checkCollectionOnly: true, // Backend will only check collection
+            });
+            
+            console.log(`[ProductDetails] Collection check result:`, {
+              isRefrigerated: collectionCheck.isRefrigerated,
+              needsLocation: collectionCheck.needsLocation,
+            });
+            
+            setLocationStatus({
+              isRefrigerated: collectionCheck.isRefrigerated || false,
+              allowed: !collectionCheck.isRefrigerated || collectionCheck.allowed !== false,
+              distance: null,
+              isLoading: false,
+              error: null,
+              needsLocation: collectionCheck.needsLocation || false,
+            });
+          } catch (collectionError) {
+            console.error("[ProductDetails] Collection check error:", collectionError);
+            // On error, assume not refrigerated (allow product)
+            setLocationStatus({
+              isRefrigerated: false,
+              allowed: true,
+              distance: null,
+              isLoading: false,
+              error: null,
+              needsLocation: false,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("[ProductDetails] Error in product collection check:", error);
+        setLocationStatus(prev => ({ 
+          ...prev, 
+          isLoading: false,
+          error: null, // Don't show error for collection check failures
+        }));
+      }
+    };
+
+    if (product?.id) {
+      // Check collection only (no location request) - this is fast and won't timeout
+      checkProductCollection();
+    }
+  }, [product?.id]);
 
   useEffect(() => {
     const fetchCustomerInfo = async () => {
@@ -320,6 +394,75 @@ function ProductDetails() {
       return;
     }
 
+    // Check location for refrigerated products before adding to cart
+    try {
+      const productId = getNumericProductId(product?.id);
+      if (productId) {
+        setLocationStatus(prev => ({ ...prev, isLoading: true }));
+        const locationCheck = await validateLocation({ productId });
+        
+        if (locationCheck.isRefrigerated && !locationCheck.allowed) {
+          toast.error(
+            locationCheck.error || 
+            `Refrigerated products are only available within 30 km radius. You are ${locationCheck.distance || 'too far'} km away.`
+          );
+          setLocationStatus({
+            isRefrigerated: locationCheck.isRefrigerated,
+            allowed: false,
+            distance: locationCheck.distance,
+            isLoading: false,
+          });
+          setIsUpdatingCart(false);
+          return;
+        }
+
+        // If refrigerated and needs location but user denied, show message
+        if (locationCheck.isRefrigerated && locationCheck.needsLocation) {
+          toast.error("Location access is required to order refrigerated products. Please enable location permissions.");
+          try {
+            await requestLocation();
+            // Retry location check after permission granted
+            const retryCheck = await validateLocation({ productId });
+            if (retryCheck.isRefrigerated && !retryCheck.allowed) {
+              toast.error(
+                retryCheck.error || 
+                `Refrigerated products are only available within 30 km radius. You are ${retryCheck.distance || 'too far'} km away.`
+              );
+              setLocationStatus({
+                isRefrigerated: retryCheck.isRefrigerated,
+                allowed: false,
+                distance: retryCheck.distance,
+                isLoading: false,
+              });
+              setIsUpdatingCart(false);
+              return;
+            }
+            setLocationStatus({
+              isRefrigerated: retryCheck.isRefrigerated,
+              allowed: retryCheck.allowed,
+              distance: retryCheck.distance,
+              isLoading: false,
+            });
+          } catch {
+            // User denied location
+            setIsUpdatingCart(false);
+            return;
+          }
+        } else {
+          setLocationStatus({
+            isRefrigerated: locationCheck.isRefrigerated || false,
+            allowed: locationCheck.allowed !== false,
+            distance: locationCheck.distance || null,
+            isLoading: false,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error checking location:", error);
+      // On error, still allow non-refrigerated products to be added
+      setLocationStatus(prev => ({ ...prev, isLoading: false }));
+    }
+
     try {
       setIsUpdatingCart(true);
       let currentCartId = cartId;
@@ -606,12 +749,23 @@ function ProductDetails() {
               </div>
             </div>
 
+            {/* Delivery Badge */}
+            {product?.id && (
+              <DeliveryBadge
+                isRefrigerated={locationStatus.isRefrigerated}
+                isLocationAllowed={locationStatus.allowed}
+                distance={locationStatus.distance}
+                isLoading={locationStatus.isLoading}
+                error={locationStatus.error}
+              />
+            )}
+
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => {
-                  handleAddToCart(true)
+                  handleAddToCart(false)
                 }}
-                disabled={!cartId || isUpdatingCart || !selectedVariant || (selectedVariant?.inventory_quantity || 0) <= 0}
+                disabled={!cartId || isUpdatingCart || !selectedVariant || (selectedVariant?.inventory_quantity || 0) <= 0 || (locationStatus.isRefrigerated && !locationStatus.allowed)}
                 className="flex items-center justify-center gap-2 px-6 py-3 rounded-md font-semibold hover:opacity-90 transition-opacity flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   backgroundColor: theme.colors.accent.primary,
