@@ -27,7 +27,11 @@ function ProductCategory({ categoryName, productType, sectionId }) {
   // Filter products by product_type dynamically
   const filteredProducts = useMemo(() => {
     return Array.isArray(allProducts)
-      ? allProducts.filter((product) => product.product_type === productType)
+      ? allProducts.filter(
+          (product) =>
+            product.product_type === productType &&
+            product.product_type !== "Top Selling Items"
+        )
       : [];
   }, [allProducts, productType]);
 
@@ -49,7 +53,6 @@ function ProductCategory({ categoryName, productType, sectionId }) {
     return [...withInventory, ...withoutInventory];
   }, [filteredProducts, getTotalInventory]);
 
-  // Helper function to format category name for section ID
   const formatSectionId = (name) => {
     return name.toLowerCase().replace(/\s+/g, "-");
   };
@@ -59,6 +62,10 @@ function ProductCategory({ categoryName, productType, sectionId }) {
   const nameParts = categoryName.split(" ");
   const firstWord = nameParts[0];
   const restWords = nameParts.slice(1).join(" ");
+
+  if (!categoryProducts || categoryProducts.length === 0) {
+    return null;
+  }
 
   return (
     <section id={finalSectionId}>
