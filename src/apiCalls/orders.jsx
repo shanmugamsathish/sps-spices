@@ -23,13 +23,35 @@ export const getCustomerOrders = async () => {
     }
 };
 
-// Get a single order by ID
+// Fulfill order (admin only)
+export const fulfillOrder = async (orderId) => {
+    try {
+        const response = await axiosInstance.patch(`${API_URL}/admin/orders/${orderId}/fulfill`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fulfilling order:', error);
+        throw error;
+    }
+};
+
+// Get a single order by ID (customer endpoint)
 export const getOrderById = async (orderId) => {
     try {
         const response = await axiosInstance.get(`${API_URL}/orders/${orderId}`);
         return response.data; 
     } catch (error) {
         console.error('Error fetching order:', error);
+        throw error;
+    }
+};
+
+// Get admin order by ID
+export const getAdminOrderById = async (orderId) => {
+    try {
+        const response = await axiosInstance.get(`${API_URL}/admin/orders/${orderId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching admin order:', error);
         throw error;
     }
 };

@@ -49,11 +49,11 @@ function AppContent() {
           <Header />
           <User />
           <Footer />
+          <ScrollToTop />
+          <WhatsApp />
         </>
       )}
       <Toaster />
-      <ScrollToTop />
-      <WhatsApp />
     </div>
     </>
   );
