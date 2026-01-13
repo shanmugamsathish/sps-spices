@@ -252,7 +252,7 @@ function PaymentPage() {
 
         // If no cached location, request it
         if (!currentLocation) {
-          toast.info("Checking delivery location for refrigerated products...", { duration: 2000 });
+          toast.error("Checking delivery location for refrigerated products...", { duration: 2000 });
           currentLocation = await requestLocation();
         }
       } catch (locationErr) {

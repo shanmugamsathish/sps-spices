@@ -40,7 +40,6 @@ function Header() {
 
     const isHome = location.pathname === ROUTES.HOME;
     const isProductsPage = location.pathname === ROUTES.PRODUCTS;
-    const isCollectionPage = location.pathname === ROUTES.COLLECTIONS;
 
   const isProductSearch = [ROUTES.HOME, ROUTES.PRODUCTS].includes(location.pathname)
 
@@ -155,7 +154,7 @@ function Header() {
         }
       };
       initializeCart();
-    }, [dispatch, isHome, isProductsPage, isCollectionPage]);
+    }, [dispatch, isHome, isProductsPage, isCollectionSearch]);
 
   const handleLogout = () => {
     try {

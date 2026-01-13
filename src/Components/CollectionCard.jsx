@@ -29,7 +29,7 @@ function CollectionCard({ collectionsList }) {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4  lg:gap-8 py-4 sm:py-4 lg:py-4 container mx-auto px-4 sm:px-6 lg:px-8 ">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-7 lg:gap-8 py-4 sm:py-4 lg:py-4 container mx-auto px-4 sm:px-6 lg:px-8 ">
       {collectionsListArray.map((collection) => {
         const collectionImage = getCollectionImage(collection);
         const productCount = getProductCount(collection);
@@ -68,19 +68,17 @@ function CollectionCard({ collectionsList }) {
             </div>
 
             {/* Collection Title */}
-            <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-center min-h-12">
+            <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-center min-h-12 border-b-2 border-gray-200 pb-2 line-clamp-1">
               {collection.title || "Untitled Collection"}
             </h2>
 
             {/* Collection Description */}
             {collection.body_html && (
               <p
-                className="text-sm line-clamp-2"
+                className="text-sm line-clamp-2 h-10"
                 style={{ color: theme.colors.text.secondary }}
               >
-                {collection.body_html.replace(/<[^>]*>/g, "").substring(0, 100)}
-                {collection.body_html.replace(/<[^>]*>/g, "").length > 100 &&
-                  "..."}
+                {collection.body_html.replace(/<[^>]*>/g, "")}
               </p>
             )}
 

@@ -16,6 +16,7 @@ import logoWhite from '../assets/LOGO sps bg.png';
 import login from '../assets/login.png';
 import register from '../assets/register.png';
 import pageNotFound from '../assets/page-not-found.png';
+import masterVideo from '../assets/masterVideo.mp4';
 
 // About Us Images
 import aboutUsImage from '../assets/AboutUs.png';
@@ -90,6 +91,7 @@ export const LOGO = {
     LOGO_WHITE: logoWhite,
     LOGIN: login,
     REGISTER: register,
+    MASTER_VIDEO: masterVideo,
 }
 
 // Page Not Found Images

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { getProductById } from '../../apiCalls/products'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart, ShoppingBag } from 'lucide-react'
 import theme from '../../lib/theme'
 import { setLoading } from '../../redux/loaderSlice'
 import { useDispatch, useSelector } from 'react-redux'
@@ -371,10 +371,6 @@ function ProductDetails() {
 
   // Handle add to cart button
   const handleAddToCart = async (navigateToCart = false) => {
-    if (navigateToCart) {
-      navigate('/cart')
-      return
-    }
     if (!cartId || !selectedVariant || isUpdatingCart) {
       if (!cartId) {
         toast.error("Cart not initialized yet. Please try again.");
@@ -500,6 +496,9 @@ function ProductDetails() {
           dispatch(setCart(response.cart));
           dispatch(updateInventoryFromCart(response.cart));
           setQuantity(newQuantity);
+          if (navigateToCart) {
+            navigate('/cart');
+          }
         } else {
           toast.error(response?.errors?.[0]?.message || "Failed to update cart");
         }
@@ -528,6 +527,9 @@ function ProductDetails() {
             dispatch(updateInventoryFromCart(cartResponse.cart));
             dispatch(setCart(cartResponse.cart));
           }
+          if (navigateToCart) {
+            navigate('/cart');
+          }
         } else {
           toast.error("Failed to add item to cart: " + (addResponse?.errors || addResponse?.message));
         }
@@ -538,6 +540,11 @@ function ProductDetails() {
     } finally {
       setIsUpdatingCart(false);
     }
+  }
+
+  // Handle buy it now button- same logic as add to cart but navigates to cart page
+  const handleBuyNow = async () => {
+    await handleAddToCart(true);
   }
 
   const formatPrice = (price) => {
@@ -766,7 +773,7 @@ function ProductDetails() {
                   handleAddToCart(false)
                 }}
                 disabled={!cartId || isUpdatingCart || !selectedVariant || (selectedVariant?.inventory_quantity || 0) <= 0 || (locationStatus.isRefrigerated && !locationStatus.allowed)}
-                className="flex items-center justify-center gap-2 px-6 py-3 rounded-md font-semibold hover:opacity-90 transition-opacity flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded-md font-semibold hover:opacity-90 transition-opacity flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 style={{
                   backgroundColor: theme.colors.accent.primary,
                   color: theme.colors.background.main,
@@ -776,13 +783,18 @@ function ProductDetails() {
                 {isUpdatingCart ? "Adding..." : "Add to cart"}
               </button>
               <button
-                className="px-6 py-3 rounded-md font-semibold hover:opacity-90 transition-opacity flex-1 sm:flex-none"
+                onClick={() => {
+                  handleBuyNow()
+                }}
+                disabled={!cartId || isUpdatingCart || !selectedVariant || (selectedVariant?.inventory_quantity || 0) <= 0 || (locationStatus.isRefrigerated && !locationStatus.allowed)}
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded-md font-semibold hover:opacity-90 transition-opacity flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 style={{
                   backgroundColor: theme.colors.accent.primary,
                   color: theme.colors.background.main,
                 }}
               >
-                Buy it now
+                <ShoppingBag className="w-5 h-5" />
+                {isUpdatingCart ? "Adding..." : "Buy it now"}
               </button>
             </div>
 

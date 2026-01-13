@@ -8,6 +8,7 @@ import { setLoading } from "../../redux/loaderSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { validateField } from "../../lib/validation";
+import LoopVideo from "./LoopVideo";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -75,16 +76,15 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center ">
       <div className="w-full max-w-8xl min-h-screen overflow-hidden grid grid-cols-1 md:grid-cols-[60%_40%]">
         {/* LEFT – Illustration */}
-        <div className="hidden md:block relative bg-indigo-50">
-          <img
-            src={LOGO.LOGIN}
-            alt="Login Illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+        <div className="hidden md:block relative bg-indigo-50 overflow-hidden">
+          <div className="absolute inset-0 scale-[1.40]">
+            <LoopVideo />
+          </div>
+
           <img
             src={LOGO.LOGO_WHITE}
             alt="Logo"
-            className="absolute top-4 right-10 w-22 h-22 object-cover"
+            className="absolute top-4 right-10 w-22 h-22 object-cover z-10"
           />
         </div>
 

@@ -369,6 +369,37 @@ function AdminAddProduct() {
         if (response) {
           dispatch(setLoading(false));
           toast.success(response.message);
+          setFormData({
+            title: "",
+            body_html: "",
+            vendor: "",
+            product_type: "",
+            tags: "",
+            status: "active",
+            handle: "",
+            published_scope: "global",
+          });
+          setVariants([
+            {
+              title: "",
+              price: "",
+              compare_at_price: "",
+              sku: "",
+              inventory_quantity: "",
+              weight: "",
+              weight_unit: "kg",
+              grams: "",
+              option1: "",
+            },
+          ]);
+          setOptions([
+            {
+              name: "",
+              values: [""],
+            },
+          ]);
+          setImages([null]);
+          generateHandle();
         } else {
           dispatch(setLoading(false));
           toast.error(response.message);
@@ -381,7 +412,7 @@ function AdminAddProduct() {
         dispatch(setLoading(false));
       }
     },
-    [formData, variants, options, images, dispatch]
+    [formData, variants, options, images, dispatch, generateHandle]
   );
 
   return (

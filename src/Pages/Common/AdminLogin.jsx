@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import { setLoading } from "../../redux/loaderSlice";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { validateField } from "../../lib/validation";
-
+import LoopVideo from "./LoopVideo";
 const AdminLogin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -70,16 +70,7 @@ const AdminLogin = () => {
       <div className="w-full max-w-8xl min-h-screen overflow-hidden grid grid-cols-1 md:grid-cols-[60%_40%]">
         {/* LEFT – Illustration */}
         <div className="hidden md:block relative bg-indigo-50">
-          <img
-            src={LOGO.LOGIN}
-            alt="Login Illustration"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <img
-            src={LOGO.LOGO_WHITE}
-            alt="Logo"
-            className="absolute top-4 right-10 w-22 h-22 object-cover"
-          />
+          <LoopVideo />
         </div>
 
         {/* RIGHT – Login Form */}
