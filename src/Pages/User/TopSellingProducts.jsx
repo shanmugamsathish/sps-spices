@@ -58,7 +58,7 @@ function TopSellingProducts({ marketplace = "amazon" }) {
     } finally {
       dispatch(setLoading(false));
     }
-  }, [marketplace]);
+  }, [marketplace, dispatch]);
 
   useEffect(() => {
     handleGetProducts();

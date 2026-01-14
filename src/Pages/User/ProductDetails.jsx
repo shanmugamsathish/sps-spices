@@ -17,7 +17,7 @@ import { useLocation } from '../../hooks/useLocation'
 import DeliveryBadge from '../../Components/DeliveryBadge'
 import { getNumericProductId } from '../../utils/productHelpers'
 import { checkRadius } from '../../apiCalls/geo'
-
+import ProductImageCarousel from '../../Components/ProductImageCarousel'
 
 function ProductDetails() {
   const navigate = useNavigate()
@@ -33,6 +33,8 @@ function ProductDetails() {
   const [customerId, setCustomerId] = useState(null)
   const [customerName, setCustomerName] = useState(null)
   const [favoritesSet, setFavoritesSet] = useState(new Set());
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   
   // Location management for refrigerated products
   const { validateLocation, requestLocation } = useLocation();
@@ -48,7 +50,7 @@ function ProductDetails() {
   const token = sessionStorage.getItem("token");
   const shopifyAccessToken = sessionStorage.getItem("shopifyAccessToken");
 
-  // Check if product is refrigerated (lazy check - only collection, no location needed)
+  // Check if product is refrigerated and validate location if available
   useEffect(() => {
     const checkProductCollection = async () => {
       if (!product?.id) return;
@@ -56,13 +58,61 @@ function ProductDetails() {
       try {
         const productId = getNumericProductId(product.id);
         if (productId) {
-          console.log(`[ProductDetails] Checking if product ${productId} is refrigerated (collection check only)...`);
+          console.log(`[ProductDetails] Checking if product ${productId} is refrigerated...`);
           
-          // Only check collection first - don't request location yet
+          // First, check if we have cached location
+          const cachedLocation = localStorage.getItem('userLocation');
+          let hasCachedLocation = false;
+          let cachedCoords = null;
+          
+          if (cachedLocation) {
+            try {
+              const data = JSON.parse(cachedLocation);
+              const CACHE_DURATION = 30 * 60 * 1000; 
+              if (Date.now() - data.timestamp < CACHE_DURATION) {
+                cachedCoords = { lat: data.lat, lng: data.lng };
+                hasCachedLocation = true;
+                console.log(`[ProductDetails] Using cached location:`, cachedCoords);
+              }
+            } catch (e) {
+              console.warn('[ProductDetails] Error parsing cached location:', e);
+            }
+          }
+          
+          // If we have cached location, do full validation
+          if (hasCachedLocation && cachedCoords) {
+            try {
+              const fullCheck = await checkRadius({
+                productId: productId,
+                lat: cachedCoords.lat,
+                lng: cachedCoords.lng,
+              });
+              
+              console.log(`[ProductDetails] Full validation result:`, {
+                isRefrigerated: fullCheck.isRefrigerated,
+                allowed: fullCheck.allowed,
+                distance: fullCheck.distance,
+              });
+              
+              setLocationStatus({
+                isRefrigerated: fullCheck.isRefrigerated || false,
+                allowed: fullCheck.allowed !== false,
+                distance: fullCheck.distance || null,
+                isLoading: false,
+                error: null,
+                needsLocation: fullCheck.isRefrigerated && !fullCheck.allowed,
+              });
+              return;
+            } catch (fullCheckError) {
+              console.error("[ProductDetails] Full validation error:", fullCheckError);
+              // Fall through to collection-only check
+            }
+          }
+          
           try {
             const collectionCheck = await checkRadius({
               productId: productId,
-              checkCollectionOnly: true, // Backend will only check collection
+              checkCollectionOnly: true, 
             });
             
             console.log(`[ProductDetails] Collection check result:`, {
@@ -72,7 +122,7 @@ function ProductDetails() {
             
             setLocationStatus({
               isRefrigerated: collectionCheck.isRefrigerated || false,
-              allowed: !collectionCheck.isRefrigerated || collectionCheck.allowed !== false,
+              allowed: collectionCheck.isRefrigerated ? null : true, 
               distance: null,
               isLoading: false,
               error: null,
@@ -80,7 +130,6 @@ function ProductDetails() {
             });
           } catch (collectionError) {
             console.error("[ProductDetails] Collection check error:", collectionError);
-            // On error, assume not refrigerated (allow product)
             setLocationStatus({
               isRefrigerated: false,
               allowed: true,
@@ -96,13 +145,12 @@ function ProductDetails() {
         setLocationStatus(prev => ({ 
           ...prev, 
           isLoading: false,
-          error: null, // Don't show error for collection check failures
+          error: null, 
         }));
       }
     };
 
     if (product?.id) {
-      // Check collection only (no location request) - this is fast and won't timeout
       checkProductCollection();
     }
   }, [product?.id]);
@@ -184,7 +232,6 @@ function ProductDetails() {
         const response = await getProductById(id)
         const productData = response?.product?.product || response?.product || response
         setProduct(productData)
-        // Set first variant as default
         if (productData?.variants && productData.variants.length > 0) {
           setSelectedVariant(productData.variants[0])
         }
@@ -208,21 +255,18 @@ function ProductDetails() {
         setFavoritesSet(ids);
       }
     } catch (err) {
-      // ignore - user may be not logged in
       toast.error("Could not fetch favorites: " + (err?.message || err));
     } finally {
       dispatch(setLoading(false));
     }
   }, [dispatch]);
 
-  // Fetch user's favorites once on mount
   useEffect(() => {
     if (token && shopifyAccessToken) {
       fetchFavorites();
     }
   }, [token, shopifyAccessToken, fetchFavorites]);
 
-  // Helper function to convert variant ID to GraphQL global ID format
   const getVariantGraphQLId = useCallback((variant) => {
     if (variant?.admin_graphql_api_id) {
       return variant.admin_graphql_api_id;
@@ -551,9 +595,16 @@ function ProductDetails() {
     return parseFloat(price || 0).toFixed(2)
   }
 
-  const getProductImage = () => {
-    return product?.image?.src || product?.images?.[0]?.src || ''
-  }
+  // Helper function to get product images as an array
+  const getProductImages = (productData) => {
+    if (productData?.images && productData.images.length > 0) {
+      return productData.images.map((img) => img.src);
+    }
+    if (productData?.image?.src) {
+      return [productData.image.src];
+    }
+    return [];
+  };
 
   const parseHTML = (htmlString) => {
     // Extract text and list items from HTML
@@ -581,7 +632,6 @@ function ProductDetails() {
   }
 
   const { paragraphs, listItems } = parseHTML(product.body_html || '')
-  const productImage = getProductImage()
   const currentPrice = selectedVariant?.price || '0.00'
   const comparePrice = selectedVariant?.compare_at_price || null
   const hasDiscount = comparePrice && comparePrice !== currentPrice
@@ -601,11 +651,7 @@ function ProductDetails() {
                   maxHeight: '600px'
                 }}
               >
-                <img
-                  src={productImage}
-                  alt={product.title || 'Product'}
-                  className="w-full h-full object-contain p-4 transition-transform duration-500 ease-in-out hover:scale-150"
-                />
+                <ProductImageCarousel product={product} getProductImages={getProductImages} currentImageIndex={currentImageIndex} setCurrentImageIndex={setCurrentImageIndex} isPaused={isPaused} setIsPaused={setIsPaused} />
               </div>
             </div>
           </div>
@@ -772,7 +818,7 @@ function ProductDetails() {
                 onClick={() => {
                   handleAddToCart(false)
                 }}
-                disabled={!cartId || isUpdatingCart || !selectedVariant || (selectedVariant?.inventory_quantity || 0) <= 0 || (locationStatus.isRefrigerated && !locationStatus.allowed)}
+                disabled={!cartId || isUpdatingCart || !selectedVariant || (selectedVariant?.inventory_quantity || 0) <= 0 || (locationStatus.isRefrigerated && locationStatus.allowed === false)}
                 className="flex items-center justify-center gap-2 px-6 py-3 rounded-md font-semibold hover:opacity-90 transition-opacity flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 style={{
                   backgroundColor: theme.colors.accent.primary,
@@ -786,7 +832,7 @@ function ProductDetails() {
                 onClick={() => {
                   handleBuyNow()
                 }}
-                disabled={!cartId || isUpdatingCart || !selectedVariant || (selectedVariant?.inventory_quantity || 0) <= 0 || (locationStatus.isRefrigerated && !locationStatus.allowed)}
+                disabled={!cartId || isUpdatingCart || !selectedVariant || (selectedVariant?.inventory_quantity || 0) <= 0 || (locationStatus.isRefrigerated && locationStatus.allowed === false)}
                 className="flex items-center justify-center gap-2 px-6 py-3 rounded-md font-semibold hover:opacity-90 transition-opacity flex-1 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 style={{
                   backgroundColor: theme.colors.accent.primary,

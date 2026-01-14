@@ -41,7 +41,8 @@ function DeliveryBadge({ isRefrigerated, isLocationAllowed, distance, isLoading 
   }
 
   if (isRefrigerated) {
-    if (isLocationAllowed) {
+    // isLocationAllowed can be: true (allowed), false (blocked), null/undefined (pending validation)
+    if (isLocationAllowed === true) {
       return (
         <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
           <Truck className="w-3 h-3" />
@@ -51,7 +52,7 @@ function DeliveryBadge({ isRefrigerated, isLocationAllowed, distance, isLoading 
           </span>
         </div>
       );
-    } else {
+    } else if (isLocationAllowed === false) {
       return (
         <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
           <MapPin className="w-3 h-3" />
@@ -59,6 +60,14 @@ function DeliveryBadge({ isRefrigerated, isLocationAllowed, distance, isLoading 
             Delivery available only within 30 km radius
             {distance !== null && ` • You are ${distance} km away`}
           </span>
+        </div>
+      );
+    } else {
+      // isLocationAllowed is null/undefined - pending validation
+      return (
+        <div className="flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+          <MapPin className="w-3 h-3" />
+          <span>Location will be checked at checkout</span>
         </div>
       );
     }
