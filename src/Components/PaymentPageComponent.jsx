@@ -7,11 +7,14 @@ function PaymentPageComponent({
   error, 
   loading, 
   handlePayment,
-  isFormValid 
+  isFormValid,
+  gstPercentage = 0,
+  gstAmount = 0,
 }) {
   // Shipping cost (hardcoded to 0)
   const shippingCost = 0;
-  const finalTotal = cartTotal + shippingCost;
+  const subtotal = cartTotal;
+  const total = subtotal + gstAmount + shippingCost;
 
   return (
     <div className="w-full">
@@ -53,9 +56,24 @@ function PaymentPageComponent({
               className="font-semibold"
               style={{ color: theme.colors.text.primary }}
             >
-              ₹{cartTotal.toFixed(2)}
+              ₹{subtotal.toFixed(2)}
             </span>
           </div>
+
+          {/* GST */}
+          {gstPercentage > 0 && (
+            <div className="flex justify-between">
+              <span style={{ color: theme.colors.text.secondary }}>
+                GST ({gstPercentage}%):
+              </span>
+              <span
+                className="font-semibold"
+                style={{ color: theme.colors.text.primary }}
+              >
+                ₹{gstAmount.toFixed(2)}
+              </span>
+            </div>
+          )}
 
           {/* Shipping */}
           <div className="flex justify-between">
@@ -77,13 +95,13 @@ function PaymentPageComponent({
               className="font-bold"
               style={{ color: theme.colors.text.primary }}
             >
-              Total:
+              {gstPercentage > 0 ? 'Total (Including GST):' : 'Total:'}
             </span>
             <span
               className="font-bold text-xl"
               style={{ color: theme.colors.accent.primary }}
             >
-              ₹{finalTotal.toFixed(2)}
+              ₹{total.toFixed(2)}
             </span>
           </div>
 

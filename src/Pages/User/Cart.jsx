@@ -11,6 +11,7 @@ import OrderProducts from "../../Components/Cart/OrderProducts";
 import RecentProducts from "../User/RecentProducts";
 import { ROUTES } from "../../lib/constant";
 import { useNavigate } from "react-router-dom";
+import { getGstPercentage } from "../../apiCalls/tax";
 
 function Cart() {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ function Cart() {
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [updatingLineId, setUpdatingLineId] = useState(null);
+  const [gstPercentage, setGstPercentage] = useState(0);
 
   const cartId = localStorage.getItem("cartId");
 
@@ -34,6 +36,21 @@ function Cart() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  // Fetch GST percentage
+  useEffect(() => {
+    const fetchGst = async () => {
+      try {
+        const gstData = await getGstPercentage();
+        if (gstData.success) {
+          setGstPercentage(gstData.percentage || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching GST:", error);
+      }
+    };
+    fetchGst();
+  }, []);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -162,10 +179,10 @@ function Cart() {
     }
   };
 
-  // Calculate totals
+  // Calculate totals including GST
   const calculateTotals = () => {
     if (!cart || !cart.lines || !cart.lines.edges) {
-      return { totalItems: 0, subtotal: 0 };
+      return { totalItems: 0, subtotal: 0, gstAmount: 0, total: 0 };
     }
 
     const totalItems = cart.lines.edges.reduce(
@@ -174,11 +191,19 @@ function Cart() {
     );
 
     const subtotal = parseFloat(cart.cost?.subtotalAmount?.amount || 0);
+    const gstAmount = (subtotal * gstPercentage) / 100;
+    const total = subtotal + gstAmount;
 
-    return { totalItems, subtotal };
+    return { 
+      totalItems, 
+      subtotal, 
+      gstPercentage, 
+      gstAmount: parseFloat(gstAmount.toFixed(2)), 
+      total: parseFloat(total.toFixed(2)) 
+    };
   };
 
-  const { totalItems, subtotal } = calculateTotals();
+  const { totalItems, subtotal, gstPercentage: gstPct, gstAmount, total } = calculateTotals();
 
   if (loading) {
     return (
@@ -266,7 +291,7 @@ function Cart() {
                     {totalItems}
                   </span>
                 </div>
-                <div className="flex justify-between text-lg">
+                <div className="flex justify-between">
                   <span
                     className="font-semibold"
                     style={{ color: theme.colors.text.primary }}
@@ -274,12 +299,59 @@ function Cart() {
                     Subtotal:
                   </span>
                   <span
-                    className="font-bold"
+                    className="font-semibold"
                     style={{ color: theme.colors.text.primary }}
                   >
                     ₹{subtotal.toFixed(2)}
                   </span>
                 </div>
+                {gstPct > 0 && (
+                  <>
+                    <div className="flex justify-between">
+                      <span style={{ color: theme.colors.text.secondary }}>
+                        GST ({gstPct}%):
+                      </span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: theme.colors.text.primary }}
+                      >
+                        ₹{gstAmount.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="border-t pt-2 mt-2" style={{ borderColor: theme.colors.border.light }}>
+                      <div className="flex justify-between text-lg">
+                        <span
+                          className="font-bold"
+                          style={{ color: theme.colors.text.primary }}
+                        >
+                          Total (Including GST):
+                        </span>
+                        <span
+                          className="font-bold"
+                          style={{ color: theme.colors.text.primary }}
+                        >
+                          ₹{total.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
+                {gstPct === 0 && (
+                  <div className="flex justify-between text-lg">
+                    <span
+                      className="font-bold"
+                      style={{ color: theme.colors.text.primary }}
+                    >
+                      Total:
+                    </span>
+                    <span
+                      className="font-bold"
+                      style={{ color: theme.colors.text.primary }}
+                    >
+                      ₹{subtotal.toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <button

@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { HERO_SECTION_IMAGES } from "../../lib/constant";
 import { ROUTES } from "../../lib/constant";
 import theme from "../../lib/theme";
+import { getBannerImages } from "../../apiCalls/bannerImage";
+import { setLoading } from '../../redux/loaderSlice'
+import { useDispatch } from 'react-redux'
 
 function HeroSection() {
   const navigate = useNavigate();
-  const images = HERO_SECTION_IMAGES;
+  const dispatch = useDispatch();
+  const [bannerImages, setBannerImages] = useState([]);
+  const images = bannerImages[0]?.images || [];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+      setCurrentImageIndex((prevIndex) =>
+        images.length ? (prevIndex + 1) % images.length : 0
+      );
     }, 5000);
 
     return () => clearInterval(interval);
@@ -27,6 +33,26 @@ function HeroSection() {
     window.scrollTo(0, 0);
   };
 
+  useEffect(() => {
+    const fetchBannerImages = async () => {
+      try {
+        dispatch(setLoading(true));
+        const response = await getBannerImages();
+        if (response) {
+          setBannerImages(response.products);
+          dispatch(setLoading(false));
+        } else {
+          console.error("Error fetching banner images:", response.message);
+          dispatch(setLoading(false));
+        }
+      } catch (error) {
+        console.error("Error fetching banner images:", error);
+        dispatch(setLoading(false));
+      }
+    };
+    fetchBannerImages();
+  }, []);
+
   return (
     <section className="relative w-full h-[70vh] sm:h-[80vh] md:h-[80vh] overflow-hidden">
       <div className="absolute inset-0">
@@ -38,10 +64,11 @@ function HeroSection() {
             }`}
           >
             <img
-              src={image}
+              src={image.src}
               alt={`Hero ${index + 1}`}
               className="w-full h-full object-cover"
             />
+
             <div
               className="absolute inset-0 bg-black/40"
               style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}

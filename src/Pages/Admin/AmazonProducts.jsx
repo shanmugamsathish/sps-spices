@@ -24,7 +24,6 @@ function AmazonProducts() {
         marketplace: 'amazon'
       };
       const response = await addMarketplaceProduct(data);
-      console.log('Product added successfully:', response);
       
       if (response.success) {
         toast.success('Product added successfully!');

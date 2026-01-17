@@ -88,7 +88,6 @@ function ProductCard({ productsList, horizontal = false }) {
     return [...withInventory, ...withoutInventory];
   }, [productsData, getTotalInventory]);
 
-  console.log(sortedProductsData);
 
   // Helper function to get badge information based on inventory
   const getBadgeInfo = useCallback(
@@ -379,10 +378,7 @@ function ProductCard({ productsList, horizontal = false }) {
         const locationCheck = await checkProductLocation(product);
         
         if (locationCheck.isRefrigerated && !locationCheck.allowed) {
-          console.log(
-            locationCheck.error || 
-            `Refrigerated products are only available within 30 km radius. You are ${locationCheck.distance || 'too far'} km away.`
-          );
+          console.log("Refrigerated product is not available in your area");
           return;
         }
 

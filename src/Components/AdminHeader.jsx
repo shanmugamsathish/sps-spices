@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ShoppingBag, LogOut, Users, Folder, ListOrdered } from "lucide-react";
+import { Menu, X, ShoppingBag, LogOut, Users, Folder, ListOrdered, Image } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import theme from "../lib/theme";
 import { ROUTES, LOGO } from "../lib/constant";
@@ -14,12 +14,45 @@ import DialogBox from "./DialogBox";
 function AdminHeader() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLogoDropdownOpen, setIsLogoDropdownOpen] = useState(false);
   const { isCollapsed, toggleCollapse } = UseAdminSidebar();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isActive = (path) => location.pathname === path;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const desktopLogoDropdownRef = useRef(null);
+  const mobileLogoDropdownRef = useRef(null);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const isDesktopClick = desktopLogoDropdownRef.current && desktopLogoDropdownRef.current.contains(event.target);
+      const isMobileClick = mobileLogoDropdownRef.current && mobileLogoDropdownRef.current.contains(event.target);
+      
+      if (!isDesktopClick && !isMobileClick) {
+        setIsLogoDropdownOpen(false);
+      }
+    };
+
+    if (isLogoDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isLogoDropdownOpen]);
+
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    setIsLogoDropdownOpen(!isLogoDropdownOpen);
+  };
+
+  const handleChangeBannerImage = () => {
+    setIsLogoDropdownOpen(false);
+    navigate(ROUTES.ADMIN_EDIT_BANNER_IMAGES);
+  };
 
   const handleLogout = () => {
     try {
@@ -91,11 +124,39 @@ function AdminHeader() {
         {/* Logo Section */}
         <div className="flex items-center justify-between p-4 border-b" style={{ borderColor: theme.colors.border.light }}>
           {!isCollapsed && (
-            <img
-              src={LOGO.LOGO}
-              alt="logo"
-              className="h-12 w-auto object-contain"
-            />
+            <div className="relative" ref={desktopLogoDropdownRef}>
+              <button
+                onClick={handleLogoClick}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
+                aria-label="Logo menu"
+              >
+                <img
+                  src={LOGO.LOGO}
+                  alt="logo"
+                  className="h-12 w-auto object-contain"
+                />
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isLogoDropdownOpen && (
+                <div
+                  className="absolute top-full left-0 mt-2 w-56 rounded-lg shadow-lg z-50"
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    border: `1px solid ${theme.colors.border.light}`,
+                  }}
+                >
+                  <button
+                    onClick={handleChangeBannerImage}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors rounded-lg"
+                    style={{ color: theme.colors.text.primary }}
+                  >
+                    <Image className="w-5 h-5" />
+                    <span className="font-medium text-sm">Change Banner Image</span>
+                  </button>
+                </div>
+              )}
+            </div>
           )}
           <button
             onClick={toggleCollapse}
@@ -206,11 +267,39 @@ function AdminHeader() {
         }}
       >
         <div className="flex items-center justify-between px-4 py-3">
-          <img
-            src={LOGO.LOGO}
-            alt="logo"
-            className="h-10 w-auto object-contain"
-          />
+          <div className="relative" ref={mobileLogoDropdownRef}>
+            <button
+              onClick={handleLogoClick}
+              className="cursor-pointer hover:opacity-80 transition-opacity"
+              aria-label="Logo menu"
+            >
+              <img
+                src={LOGO.LOGO}
+                alt="logo"
+                className="h-10 w-auto object-contain"
+              />
+            </button>
+            
+            {/* Dropdown Menu */}
+            {isLogoDropdownOpen && (
+              <div
+                className="absolute top-full left-0 mt-2 w-56 rounded-lg shadow-lg z-50"
+                style={{
+                  backgroundColor: "#FFFFFF",
+                  border: `1px solid ${theme.colors.border.light}`,
+                }}
+              >
+                <button
+                  onClick={handleChangeBannerImage}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors rounded-lg"
+                  style={{ color: theme.colors.text.primary }}
+                >
+                  <Image className="w-5 h-5" />
+                  <span className="font-medium text-sm">Change Banner Image</span>
+                </button>
+              </div>
+            )}
+          </div>
           <button
             onClick={toggleMobileMenu}
             className="p-2 rounded-md hover:bg-gray-100 transition-colors"

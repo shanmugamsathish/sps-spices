@@ -356,7 +356,11 @@ function Orders() {
                         className="font-medium"
                         style={{ color: theme.colors.text.primary }}
                       >
-                        {formatCurrency(order.total_price)}
+                        {formatCurrency(
+                          order.gst?.hasGst && order.gst.total 
+                            ? order.gst.total 
+                            : (order.total_price || 0)
+                        )}
                       </span>
                     </td>
                     <td className="px-4 py-3">

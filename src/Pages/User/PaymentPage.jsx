@@ -13,6 +13,7 @@ import { setLoading } from "../../redux/loaderSlice";
 import { getCustomerById } from "../../apiCalls/customers";
 import AdminAddCustomerForm from "../../Components/AdminAddCustomerComponent/AdminAddCustomerForm";
 import { useLocation } from "../../hooks/useLocation";
+import { getGstPercentage } from "../../apiCalls/tax";
 
 function PaymentPage() {
   const dispatch = useDispatch();
@@ -31,7 +32,8 @@ function PaymentPage() {
   // Payment status states
   const [paymentStatus, setPaymentStatus] = useState(null); 
   const [error, setError] = useState(null);
-  const [isRazorpayLoading, setIsRazorpayLoading] = useState(false); 
+  const [isRazorpayLoading, setIsRazorpayLoading] = useState(false);
+  const [gstPercentage, setGstPercentage] = useState(0); 
 
   // Form data states
   const [formData, setFormData] = useState({
@@ -185,6 +187,21 @@ function PaymentPage() {
     }
   }, [customerId, fetchCustomerData]);
 
+  // Fetch GST percentage
+  useEffect(() => {
+    const fetchGst = async () => {
+      try {
+        const gstData = await getGstPercentage();
+        if (gstData.success) {
+          setGstPercentage(gstData.percentage || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching GST:", error);
+      }
+    };
+    fetchGst();
+  }, []);
+
   // This is used for display only - backend will recalculate from Shopify
   const calculateCartTotal = useCallback(() => {
     if (!cart || !cart.cost?.subtotalAmount?.amount) {
@@ -192,6 +209,12 @@ function PaymentPage() {
     }
     return parseFloat(cart.cost.subtotalAmount.amount);
   }, [cart]);
+
+  // Calculate GST amount
+  const calculateGstAmount = useCallback(() => {
+    const subtotal = calculateCartTotal();
+    return (subtotal * gstPercentage) / 100;
+  }, [calculateCartTotal, gstPercentage]);
 
   // Calculate total items count
   const calculateCartItemsCount = useCallback(() => {
@@ -619,6 +642,8 @@ function PaymentPage() {
             loading={loading}
             handlePayment={handlePayment}
             isFormValid={isFormValid}
+            gstPercentage={gstPercentage}
+            gstAmount={calculateGstAmount()}
           />
         </div>
       </div>

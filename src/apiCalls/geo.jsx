@@ -71,7 +71,6 @@ export const getUserLocation = (options = {}, retries = 2) => {
 
           // Retry with lower accuracy if timeout or unavailable
           if (shouldRetry && (error.code === error.TIMEOUT || error.code === error.POSITION_UNAVAILABLE)) {
-            console.log(`[Geo Location] Retrying with lower accuracy settings...`);
             setTimeout(() => {
               attemptGetLocation(attemptNumber + 1, true); // Use low accuracy on retry
             }, 1000); // Wait 1 second before retry

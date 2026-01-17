@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-
+import { LOGO } from "../lib/constant"
 
 
 // Generate invoice PDF for Shopify orders
@@ -43,6 +43,16 @@ export const generateShopifyInvoicePDF = (order) => {
       pdf.line(margin, y, pageWidth - margin, y);
     };
 
+    // Helper function to check if we need a new page and add one if needed
+    const checkPageBreak = (requiredSpace = 20) => {
+      if (yPosition + requiredSpace > pageHeight - margin) {
+        pdf.addPage();
+        yPosition = margin;
+        return true; // Page was added
+      }
+      return false; // No page break needed
+    };
+
 
     // Format date
     const formatDate = (dateString) => {
@@ -81,21 +91,68 @@ export const generateShopifyInvoicePDF = (order) => {
     addText('INVOICE', pageWidth / 2, yPosition + 12, 24, 'bold', 'center', [255, 255, 255]);
     yPosition += 24;
 
-    yPosition += 10;
-    // Company name and details
-    addText('SPS SPICES AND DRY FRUITS', margin, yPosition, 14, 'bold', 'left', primaryColor);
-    addText('www.spsspicesanddryfruits.com', pageWidth - margin, yPosition, 10, 'normal', 'right', secondaryColor);
-    yPosition += 8;
+    const logoSize = 20;
+const textGap = 3;
+const lineGap = 4;
+
+// Vertical center of the row (like align-items: center)
+const centerY = yPosition + logoSize / 2;
+
+// LEFT: Logo
+pdf.addImage(
+  LOGO.LOGO_WHITE,
+  'PNG',
+  margin,
+  yPosition,
+  logoSize,
+  logoSize
+);
+
+// LEFT: Company Name (slightly above center)
+addText(
+  'SPS SPICES AND DRY FRUITS',
+  margin + logoSize + textGap,
+  centerY - 2,
+  14,
+  'bold',
+  'left',
+  primaryColor
+);
+
+// LEFT: GST Number (below company name)
+addText(
+  'GST No: XXXXXXXXXX',
+  margin + logoSize + textGap,
+  centerY + lineGap,
+  9,
+  'bold',
+  'left',
+  secondaryColor
+);
+
+// RIGHT: Website (center aligned with logo)
+addText(
+  'www.spsspicesanddryfruits.com',
+  pageWidth - margin,
+  centerY,
+  10,
+  'normal',
+  'right',
+  secondaryColor
+);
+
+// Move Y down after header row
+yPosition += logoSize + 8;
+
 
     // --- Invoice To & Details ---
-    yPosition += 4;
     addText('Invoice To:', margin, yPosition, 12, 'bold', 'left', primaryColor);
     addText('Invoice Details:', pageWidth - margin, yPosition, 12, 'bold', 'right', primaryColor);
     yPosition += 7;
 
     // Customer Info (Left)
     addText(customerName, margin, yPosition, 11, 'bold');
-    addText(`Invoice #: ${order.name || order.order_number || order.id}`, pageWidth - margin, yPosition, 10, 'normal', 'right');
+    addText(`Invoice No: ${order.name || order.order_number || order.id}`, pageWidth - margin, yPosition, 10, 'normal', 'right');
     yPosition += 6;
 
     if (address.address1) {
@@ -193,9 +250,28 @@ export const generateShopifyInvoicePDF = (order) => {
     // Table Rows
     const lineItems = order.line_items || [];
     lineItems.forEach((item, idx) => {
-      if (yPosition > pageHeight - 50) {
-        pdf.addPage();
-        yPosition = margin;
+      // Check if we need a new page before adding this row
+      if (checkPageBreak(rowHeight + 10)) {
+        // Re-draw table header on new page
+        pdf.setFillColor(...accentColor);
+        pdf.setTextColor(255, 255, 255);
+        pdf.rect(margin, yPosition - 5, tableWidth, rowHeight, 'F');
+        pdf.setDrawColor(...primaryColor);
+        pdf.setLineWidth(0.3);
+        pdf.rect(margin, yPosition - 5, tableWidth, rowHeight);
+        
+        // Re-draw table headers
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.text('Item', colItem + 3, yPosition + 5);
+        pdf.text(qtyText, colQty + colQtyWidth - 3, yPosition + 5, { align: 'right' });
+        pdf.text(priceText, colPrice + colPriceWidth - 3, yPosition + 5, { align: 'right' });
+        pdf.text(totalText, colTotal + colTotalWidth - 3, yPosition + 5, { align: 'right' });
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        pdf.setTextColor(0, 0, 0);
+        yPosition += rowHeight;
       }
 
       // Zebra striping with light background
@@ -253,14 +329,42 @@ export const generateShopifyInvoicePDF = (order) => {
       yPosition += rowHeight;
     });
 
+    // --- Extract GST information ---
+    let gstInfo = null;
+    if (order.gst && order.gst.hasGst) {
+      gstInfo = order.gst;
+    } else if (order.note_attributes) {
+      // Fallback: extract from note_attributes if gst object not present
+      const gstPercentageAttr = order.note_attributes.find(attr => attr.name === 'gst_percentage');
+      const gstAmountAttr = order.note_attributes.find(attr => attr.name === 'gst_amount');
+      const subtotalAttr = order.note_attributes.find(attr => attr.name === 'subtotal');
+      
+      if (gstPercentageAttr && gstAmountAttr) {
+        const gstPercentage = parseFloat(gstPercentageAttr.value) || 0;
+        const gstAmount = parseFloat(gstAmountAttr.value) || 0;
+        const subtotal = subtotalAttr ? parseFloat(subtotalAttr.value) : parseFloat(order.subtotal_price || 0);
+        
+        gstInfo = {
+          hasGst: true,
+          gstPercentage,
+          gstAmount,
+          subtotal,
+          total: subtotal + gstAmount,
+        };
+      }
+    }
+
     // --- Calculate totals ---
-    const subtotal = parseFloat(order.subtotal_price || order.total_line_items_price || order.total_price || 0);
+    const subtotal = gstInfo ? gstInfo.subtotal : parseFloat(order.subtotal_price || order.total_line_items_price || order.total_price || 0);
     const totalDiscounts = parseFloat(order.total_discounts || 0);
     // const totalTax = parseFloat(order.total_tax || 0);
     // const shippingPrice = parseFloat((order.shipping_lines?.[0]?.price || 0));
-    const total = parseFloat(order.total_price || order.current_total_price || 0);
+    // Use GST total if available, otherwise use Shopify's total_price
+    const total = gstInfo ? gstInfo.total : parseFloat(order.total_price || order.current_total_price || 0);
 
     // --- Summary (Right-aligned to match table) ---
+    // Check if we have enough space for summary section (needs ~60mm)
+    checkPageBreak(20);
     yPosition += 4;
     addLine(yPosition, primaryColor, 0.2);
     yPosition += 8;
@@ -286,31 +390,32 @@ export const generateShopifyInvoicePDF = (order) => {
     pdf.setTextColor(0, 0, 0);
     yPosition += 6;
 
-    // // Shipping - format without locale to avoid spacing
-    // const shippingFormatted = `Rs. ${shippingPrice.toFixed(2)}`;
-    // pdf.text('Shipping:', summaryLabelStart, yPosition, { align: 'right' });
-    // pdf.text(shippingFormatted, summaryRightEdge, yPosition, { align: 'right' });
-    // yPosition += 6;
-
-    // // Tax - format without locale to avoid spacing
-    // const taxFormatted = `Rs. ${totalTax.toFixed(2)}`;
-    // pdf.text('Tax:', summaryLabelStart, yPosition, { align: 'right' });
-    // pdf.text(taxFormatted, summaryRightEdge, yPosition, { align: 'right' });
-    // yPosition += 6;
+    // GST - format without locale to avoid spacing
+    if (gstInfo && gstInfo.hasGst && gstInfo.gstPercentage > 0) {
+      const gstFormatted = `Rs. ${gstInfo.gstAmount.toFixed(2)}`;
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(11);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`GST (${gstInfo.gstPercentage}%):`, summaryLabelStart, yPosition, { align: 'right' });
+      pdf.text(gstFormatted, summaryRightEdge, yPosition, { align: 'right' });
+      yPosition += 6;
+    }
 
     // Total (highlighted) - format without locale to avoid spacing
     yPosition += 2;
     pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(14);
+    pdf.setFontSize(12);
     pdf.setTextColor(...primaryColor);
     const totalFormatted = `Rs. ${total.toFixed(2)}`;
-    pdf.text('Total:', summaryLabelStart, yPosition, { align: 'right' });
+    const totalLabel = gstInfo && gstInfo.hasGst ? 'Total (Including GST):' : 'Total:';
+    pdf.text(totalLabel, summaryLabelStart, yPosition, { align: 'right' });
     pdf.text(totalFormatted, summaryRightEdge, yPosition, { align: 'right' });
     pdf.setTextColor(0, 0, 0);
     yPosition += 8;
 
     // Payment method if available
     if (order.payment_gateway_names && order.payment_gateway_names.length > 0) {
+      checkPageBreak(10);
       pdf.setFont('helvetica', 'normal');
       pdf.setFontSize(10);
       pdf.setTextColor(...secondaryColor);
@@ -319,6 +424,8 @@ export const generateShopifyInvoicePDF = (order) => {
     }
 
     pdf.setTextColor(0, 0, 0);
+    // Check if we have enough space for footer section (needs ~50mm)
+    checkPageBreak(20);
     addLine(yPosition, primaryColor, 0.8);
     yPosition += 10;
 
@@ -326,11 +433,20 @@ export const generateShopifyInvoicePDF = (order) => {
 
     // Order note if available-center aligned
     if (order.note) {
-      pdf.setTextColor(...secondaryColor);
-      addText(`Note: ${order.note}`, pageWidth / 2, yPosition, 9, 'normal', 'center');
-      yPosition += 6;
+      // Remove GST details section from note to avoid duplication
+      let noteText = order.note;
+      // Remove the GST Details section if it exists
+      noteText = noteText.replace(/\n\nGST Details:[\s\S]*?Total \(Including GST\): ₹[\d,]+\.?\d*/i, '');
+      // Only show note if there's meaningful content left
+      if (noteText.trim() && noteText.trim() !== 'Payment processed via Razorpay. Payment ID:') {
+        checkPageBreak(10);
+        pdf.setTextColor(...secondaryColor);
+        addText(`Note: ${noteText.trim()}`, pageWidth / 2, yPosition, 9, 'normal', 'center');
+        yPosition += 6;
+      }
     }
 
+    checkPageBreak(20);
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(11);
     addText('Thank you for your purchase!', pageWidth / 2, yPosition, 12, 'bold', 'center', primaryColor);

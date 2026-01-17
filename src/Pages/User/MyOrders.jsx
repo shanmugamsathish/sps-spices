@@ -365,31 +365,63 @@ function MyOrders() {
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between">
-                          <span style={{ color: theme.colors.text.secondary }}>
-                            Tax:
-                          </span>
-                          <span style={{ color: theme.colors.text.primary }}>
-                            {formatPrice(
-                              order.totalTaxV2?.amount,
-                              order.totalTaxV2?.currencyCode
-                            )}
-                          </span>
-                        </div>
-                        <div
-                          className="flex justify-between pt-2 border-t font-bold text-base"
-                          style={{ borderColor: theme.colors.border.light }}
-                        >
-                          <span style={{ color: theme.colors.text.primary }}>
-                            Total:
-                          </span>
-                          <span style={{ color: theme.colors.accent.primary }}>
-                            {formatPrice(
-                              order.totalPriceV2?.amount,
-                              order.totalPriceV2?.currencyCode
-                            )}
-                          </span>
-                        </div>
+                        {order.gst?.hasGst && order.gst.gstPercentage > 0 ? (
+                          <>
+                            <div className="flex justify-between">
+                              <span style={{ color: theme.colors.text.secondary }}>
+                                GST ({order.gst.gstPercentage}%):
+                              </span>
+                              <span style={{ color: theme.colors.text.primary }}>
+                                {formatPrice(
+                                  order.gst.gstAmount,
+                                  order.totalPriceV2?.currencyCode
+                                )}
+                              </span>
+                            </div>
+                            <div
+                              className="flex justify-between pt-2 border-t font-bold text-base"
+                              style={{ borderColor: theme.colors.border.light }}
+                            >
+                              <span style={{ color: theme.colors.text.primary }}>
+                                Total (Including GST):
+                              </span>
+                              <span style={{ color: theme.colors.accent.primary }}>
+                                {formatPrice(
+                                  order.gst.total || (parseFloat(order.gst.subtotal || 0) + parseFloat(order.gst.gstAmount || 0)),
+                                  order.totalPriceV2?.currencyCode
+                                )}
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex justify-between">
+                              <span style={{ color: theme.colors.text.secondary }}>
+                                Tax:
+                              </span>
+                              <span style={{ color: theme.colors.text.primary }}>
+                                {formatPrice(
+                                  order.totalTaxV2?.amount || 0,
+                                  order.totalPriceV2?.currencyCode
+                                )}
+                              </span>
+                            </div>
+                            <div
+                              className="flex justify-between pt-2 border-t font-bold text-base"
+                              style={{ borderColor: theme.colors.border.light }}
+                            >
+                              <span style={{ color: theme.colors.text.primary }}>
+                                Total:
+                              </span>
+                              <span style={{ color: theme.colors.accent.primary }}>
+                                {formatPrice(
+                                  order.totalPriceV2?.amount,
+                                  order.totalPriceV2?.currencyCode
+                                )}
+                              </span>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
 

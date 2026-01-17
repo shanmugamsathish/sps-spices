@@ -58,7 +58,6 @@ function ProductDetails() {
       try {
         const productId = getNumericProductId(product.id);
         if (productId) {
-          console.log(`[ProductDetails] Checking if product ${productId} is refrigerated...`);
           
           // First, check if we have cached location
           const cachedLocation = localStorage.getItem('userLocation');
@@ -72,7 +71,6 @@ function ProductDetails() {
               if (Date.now() - data.timestamp < CACHE_DURATION) {
                 cachedCoords = { lat: data.lat, lng: data.lng };
                 hasCachedLocation = true;
-                console.log(`[ProductDetails] Using cached location:`, cachedCoords);
               }
             } catch (e) {
               console.warn('[ProductDetails] Error parsing cached location:', e);
@@ -86,12 +84,6 @@ function ProductDetails() {
                 productId: productId,
                 lat: cachedCoords.lat,
                 lng: cachedCoords.lng,
-              });
-              
-              console.log(`[ProductDetails] Full validation result:`, {
-                isRefrigerated: fullCheck.isRefrigerated,
-                allowed: fullCheck.allowed,
-                distance: fullCheck.distance,
               });
               
               setLocationStatus({
@@ -113,11 +105,6 @@ function ProductDetails() {
             const collectionCheck = await checkRadius({
               productId: productId,
               checkCollectionOnly: true, 
-            });
-            
-            console.log(`[ProductDetails] Collection check result:`, {
-              isRefrigerated: collectionCheck.isRefrigerated,
-              needsLocation: collectionCheck.needsLocation,
             });
             
             setLocationStatus({

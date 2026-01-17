@@ -16,6 +16,8 @@ import AdminAddCustomer from '../Pages/Admin/AdminAddCustomer';
 import AdminLogin from '../Pages/Common/AdminLogin';
 import AmazonProducts from '../Pages/Admin/AmazonProducts';
 import FlipkartProducts from '../Pages/Admin/FlipkartProducts';
+import AdminGstSettings from '../Pages/Admin/AdminGstSettings';
+import EditBannerImages from '../Pages/Admin/EditBannerImages';
 import PageNotFound from '../Components/PageNotFound';
 
 function Admin() {
@@ -47,6 +49,8 @@ function Admin() {
                   <Route path={`${ROUTES.ADMIN_PRODUCT_DETAILS}/:id`} element={<ProductDetails userPage={false} />} />
                   <Route path={ROUTES.ADMIN_AMAZON_PRODUCTS} element={<AmazonProducts />} />
                   <Route path={ROUTES.ADMIN_FLIPKART_PRODUCTS} element={<FlipkartProducts />} />
+                  <Route path={ROUTES.ADMIN_GST_SETTINGS} element={<AdminGstSettings />} />
+                  <Route path={ROUTES.ADMIN_EDIT_BANNER_IMAGES} element={<EditBannerImages />} />
                   <Route path="*" element={<PageNotFound />} />
                 </Route>
               </Routes>

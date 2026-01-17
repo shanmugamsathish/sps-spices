@@ -40,7 +40,6 @@ function TopSellingProducts({ marketplace = "amazon" }) {
     try {
       dispatch(setLoading(true));
       const response = await getMarketplaceProducts("amazon");
-      console.log("Products fetched successfully:", response);
       const allProducts = Array.isArray(response) ? response : [];
 
       const filteredProducts = allProducts.filter((product) =>

@@ -65,14 +65,9 @@ export const useLocation = () => {
             checkCollectionOnly: true, // Backend will only check collection, not require location
           });
           
-          console.log('[Location Validation] Collection check result:', {
-            isRefrigerated: collectionCheck.isRefrigerated,
-            needsLocation: collectionCheck.needsLocation,
-          });
 
           // If product is NOT refrigerated, return early (no location needed)
           if (!collectionCheck.isRefrigerated) {
-            console.log('[Location Validation] Product is NOT refrigerated - location not needed');
             return {
               ...collectionCheck,
               location: null,

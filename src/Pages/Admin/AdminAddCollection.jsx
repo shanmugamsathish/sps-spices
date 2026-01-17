@@ -94,7 +94,6 @@ function AdminAddCollection() {
     async (e) => {
       const query = e.target.value;
       setSearchQuery(query);
-      console.log(query);
       if (query.trim().length > 0) {
         try {
           dispatch(setLoading(true));
@@ -116,7 +115,6 @@ function AdminAddCollection() {
     [dispatch]
   );
 
-  console.log(selectedProducts);
 
   // Select product from autocomplete
   const selectProductFromSearch = useCallback(

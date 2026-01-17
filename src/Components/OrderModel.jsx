@@ -112,6 +112,14 @@ function OrderModel({ isOpen, onClose, orderId, isAdmin = false }) {
         amount: orderData.total_price,
         currencyCode: orderData.currency || "INR"
       },
+      subtotalPriceV2: {
+        amount: orderData.gst?.hasGst ? orderData.gst.subtotal : (orderData.subtotal_price || orderData.total_price),
+        currencyCode: orderData.currency || "INR"
+      },
+      totalTaxV2: {
+        amount: orderData.gst?.hasGst ? orderData.gst.gstAmount : (orderData.total_tax || 0),
+        currencyCode: orderData.currency || "INR"
+      },
       lineItems: {
         edges: (orderData.line_items || []).map(item => ({
           node: {
@@ -229,7 +237,12 @@ function OrderModel({ isOpen, onClose, orderId, isAdmin = false }) {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CreditCard className="w-4 h-4" />
-                  <span>{formatPrice(transformedOrder.totalPriceV2?.amount || transformedOrder.total_price || order?.total_price, transformedOrder.totalPriceV2?.currencyCode || transformedOrder.currency || order?.currency || "INR")}</span>
+                  <span>{formatPrice(
+                    transformedOrder.gst?.hasGst && transformedOrder.gst.total 
+                      ? transformedOrder.gst.total 
+                      : (transformedOrder.totalPriceV2?.amount || transformedOrder.total_price || order?.total_price || 0),
+                    transformedOrder.totalPriceV2?.currencyCode || transformedOrder.currency || order?.currency || "INR"
+                  )}</span>
                 </div>
               </div>
             </div>
@@ -291,6 +304,79 @@ function OrderModel({ isOpen, onClose, orderId, isAdmin = false }) {
                 No items found in this order.
               </div>
             )}
+
+            {/* Order Summary */}
+            <div>
+              <h3 className="text-base font-semibold mb-3" style={{ color: theme.colors.text.primary }}>
+                {TITLES.MY_ORDERS.ORDER_SUMMARY}
+              </h3>
+              <div className="space-y-2 text-sm p-4 rounded-md border" style={{ borderColor: theme.colors.border.light }}>
+                <div className="flex justify-between">
+                  <span style={{ color: theme.colors.text.secondary }}>
+                    Subtotal:
+                  </span>
+                  <span style={{ color: theme.colors.text.primary }}>
+                    {formatPrice(
+                      transformedOrder.gst?.hasGst 
+                        ? transformedOrder.gst.subtotal 
+                        : (transformedOrder.subtotalPriceV2?.amount || order?.subtotal_price || transformedOrder.totalPriceV2?.amount || order?.total_price || 0),
+                      transformedOrder.totalPriceV2?.currencyCode || transformedOrder.currency || order?.currency || "INR"
+                    )}
+                  </span>
+                </div>
+                {transformedOrder.gst?.hasGst && transformedOrder.gst.gstPercentage > 0 ? (
+                  <>
+                    <div className="flex justify-between">
+                      <span style={{ color: theme.colors.text.secondary }}>
+                        GST ({transformedOrder.gst.gstPercentage}%):
+                      </span>
+                      <span style={{ color: theme.colors.text.primary }}>
+                        {formatPrice(
+                          transformedOrder.gst.gstAmount,
+                          transformedOrder.totalPriceV2?.currencyCode || transformedOrder.currency || order?.currency || "INR"
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t font-bold text-base" style={{ borderColor: theme.colors.border.light }}>
+                      <span style={{ color: theme.colors.text.primary }}>
+                        Total (Including GST):
+                      </span>
+                      <span style={{ color: theme.colors.accent.primary }}>
+                        {formatPrice(
+                          transformedOrder.gst?.total || (parseFloat(transformedOrder.gst?.subtotal || 0) + parseFloat(transformedOrder.gst?.gstAmount || 0)) || transformedOrder.totalPriceV2?.amount || transformedOrder.total_price || order?.total_price || 0,
+                          transformedOrder.totalPriceV2?.currencyCode || transformedOrder.currency || order?.currency || "INR"
+                        )}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between">
+                      <span style={{ color: theme.colors.text.secondary }}>
+                        Tax:
+                      </span>
+                      <span style={{ color: theme.colors.text.primary }}>
+                        {formatPrice(
+                          transformedOrder.totalTaxV2?.amount || order?.total_tax || 0,
+                          transformedOrder.totalPriceV2?.currencyCode || transformedOrder.currency || order?.currency || "INR"
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t font-bold text-base" style={{ borderColor: theme.colors.border.light }}>
+                      <span style={{ color: theme.colors.text.primary }}>
+                        Total:
+                      </span>
+                      <span style={{ color: theme.colors.accent.primary }}>
+                        {formatPrice(
+                          transformedOrder.totalPriceV2?.amount || transformedOrder.total_price || order?.total_price || 0,
+                          transformedOrder.totalPriceV2?.currencyCode || transformedOrder.currency || order?.currency || "INR"
+                        )}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
 
             {/* Shipping Address */}
             {transformedOrder.shippingAddress && (

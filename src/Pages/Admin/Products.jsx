@@ -144,6 +144,21 @@ function Products() {
         >
           Products
         </h1>
+        <div className="flex items-center gap-2">
+        <button
+          onClick={() => {navigate(ROUTES.ADMIN_GST_SETTINGS); window.scrollTo(0, 0)}}
+          className="flex items-center gap-2 px-4 py-2 rounded-md text-white text-sm font-medium transition-colors cursor-pointer"
+          style={{ backgroundColor: theme.colors.accent.primary }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = theme.colors.accent.hover;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = theme.colors.accent.primary;
+          }}
+        >
+          <Plus className="w-4 h-4" />
+          Add GST
+        </button>
         <button
           onClick={() => {navigate(ROUTES.ADMIN_ADD_PRODUCT); window.scrollTo(0, 0)}}
           className="flex items-center gap-2 px-4 py-2 rounded-md text-white text-sm font-medium transition-colors cursor-pointer"
@@ -158,6 +173,7 @@ function Products() {
           <Plus className="w-4 h-4" />
           Add Product
         </button>
+        </div>
       </div>
 
       {products.length === 0 ? (
