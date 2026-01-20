@@ -5,9 +5,9 @@ function PaymentPageComponent({
   cartTotal, 
   cartItemsCount,
   error, 
+  isFormValid,
   loading, 
   handlePayment,
-  isFormValid,
   gstPercentage = 0,
   gstAmount = 0,
 }) {

@@ -1,6 +1,7 @@
 import React from "react";
 import theme from "../../lib/theme";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, MapPin } from "lucide-react";
+import AddressSelectionModal from "../AddressSelectionModal";
 
 function Address({
   addresses,
@@ -9,6 +10,10 @@ function Address({
   handleAddressChange,
   isPaymentPage,
   validationErrors = {},
+  isAddressModalOpen = false,
+  setIsAddressModalOpen,
+  handleSelectAddress,
+  states = [],
 }) {
   return (
     <div
@@ -35,7 +40,23 @@ function Address({
           </h2>
         )}
          {isPaymentPage ? (
-           null 
+           addresses.length > 1 && setIsAddressModalOpen ? (
+             <button
+               type="button"
+               onClick={() => setIsAddressModalOpen(true)}
+               className="flex items-center gap-2 px-4 py-2 rounded-md text-white text-sm font-medium transition-colors"
+               style={{ backgroundColor: theme.colors.accent.primary }}
+               onMouseEnter={(e) => {
+                 e.target.style.backgroundColor = theme.colors.accent.hover;
+               }}
+               onMouseLeave={(e) => {
+                 e.target.style.backgroundColor = theme.colors.accent.primary;
+               }}
+             >
+               <MapPin className="w-4 h-4" />
+               Choose Address
+             </button>
+           ) : null
         ) : (
         <button
           type="button"
@@ -56,33 +77,40 @@ function Address({
       </div>
 
       <div className="space-y-6">
-        {addresses.map((address, index) => (
+        {(isPaymentPage ? (addresses[0] ? [addresses[0]] : []) : addresses).map((address, index) => {
+          // For payment page, always use index 0 for the displayed address
+          const actualIndex = isPaymentPage ? 0 : index;
+          // Handle nested error structure (for EditCustomerModal) or flat structure (for PaymentPage)
+          const addressErrors = validationErrors[actualIndex] || validationErrors || {};
+          return (
           <div
-            key={index}
+            key={actualIndex}
             className="p-4 rounded-lg border"
             style={{
               backgroundColor: theme.colors.background.main,
               borderColor: theme.colors.border.light,
             }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3
-                className="text-md font-semibold"
-                style={{ color: theme.colors.text.primary }}
-              >
-                Address {index + 1}
-              </h3>
-              {addresses.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeAddress(index)}
-                  className="p-2 rounded-md text-red-500 hover:bg-red-50 transition-colors"
-                  title="Remove Address"
+            {!isPaymentPage && (
+              <div className="flex items-center justify-between mb-4">
+                <h3
+                  className="text-md font-semibold"
+                  style={{ color: theme.colors.text.primary }}
                 >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-            </div>
+                  Address {actualIndex + 1}
+                </h3>
+                {addresses.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeAddress(actualIndex)}
+                    className="p-2 rounded-md text-red-500 hover:bg-red-50 transition-colors"
+                    title="Remove Address"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -90,25 +118,25 @@ function Address({
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  First Name {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
+                  First Name {isPaymentPage && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
                   value={address.first_name}
                   onChange={(e) =>
-                    handleAddressChange(index, "first_name", e.target.value)
+                    handleAddressChange(actualIndex, "first_name", e.target.value)
                   }
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: validationErrors.first_name && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: addressErrors.first_name ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter first name"
                 />
-                {validationErrors.first_name && index === 0 && (
+                {addressErrors.first_name && (
                   <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
-                    {validationErrors.first_name}
+                    {addressErrors.first_name}
                   </p>
                 )}
               </div>
@@ -118,25 +146,25 @@ function Address({
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  Last Name {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
+                  Last Name {isPaymentPage && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
                   value={address.last_name}
                   onChange={(e) =>
-                    handleAddressChange(index, "last_name", e.target.value)
+                    handleAddressChange(actualIndex, "last_name", e.target.value)
                   }
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: validationErrors.last_name && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: addressErrors.last_name ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter last name"
                 />
-                {validationErrors.last_name && index === 0 && ( 
+                {addressErrors.last_name && ( 
                   <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
-                    {validationErrors.last_name}
+                    {addressErrors.last_name}
                   </p>
                 )}
               </div>
@@ -152,7 +180,7 @@ function Address({
                   type="text"
                   value={address.company}
                   onChange={(e) =>
-                    handleAddressChange(index, "company", e.target.value)
+                    handleAddressChange(actualIndex, "company", e.target.value)
                   }
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
@@ -169,25 +197,25 @@ function Address({
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  Address Line 1 {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
+                  Address Line 1 {isPaymentPage && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
                   value={address.address1}
                   onChange={(e) =>
-                    handleAddressChange(index, "address1", e.target.value)
+                    handleAddressChange(actualIndex, "address1", e.target.value)
                   }
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: validationErrors.address1 && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: addressErrors.address1 ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Street address"
                 />
-                {validationErrors.address1 && index === 0 && ( 
+                {addressErrors.address1 && ( 
                   <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
-                    {validationErrors.address1}
+                    {addressErrors.address1}
                   </p>
                 )}
               </div>
@@ -203,7 +231,7 @@ function Address({
                   type="text"
                   value={address.address2}
                   onChange={(e) =>
-                    handleAddressChange(index, "address2", e.target.value)
+                    handleAddressChange(actualIndex, "address2", e.target.value)
                   }
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
@@ -220,25 +248,25 @@ function Address({
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  City {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
+                  City {isPaymentPage && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
                   value={address.city}
                   onChange={(e) =>
-                    handleAddressChange(index, "city", e.target.value)
+                    handleAddressChange(actualIndex, "city", e.target.value)
                   }
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: validationErrors.city && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: addressErrors.city ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter city"
                 />
-                {validationErrors.city && index === 0 && ( 
+                {addressErrors.city && ( 
                   <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
-                    {validationErrors.city}
+                    {addressErrors.city}
                   </p>
                 )}
               </div>
@@ -248,25 +276,30 @@ function Address({
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  State/Province {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
+                  State/Province {isPaymentPage && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
-                <input
-                  type="text"
-                  value={address.province}
+                <select
+                  value={address.province || ""}
                   onChange={(e) =>
-                    handleAddressChange(index, "province", e.target.value)
+                    handleAddressChange(actualIndex, "province", e.target.value)
                   }
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: validationErrors.province && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: addressErrors.province ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
-                  placeholder="Enter state/province"
-                />
-                {validationErrors.province && index === 0 && ( 
+                >
+                  <option value="">Select State/Province</option>
+                  {states.map((state) => (
+                    <option key={state.id} value={state.name}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
+                {addressErrors.province && ( 
                   <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
-                    {validationErrors.province}
+                    {addressErrors.province}
                   </p>
                 )}
               </div>
@@ -276,25 +309,25 @@ function Address({
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  Country {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
+                  Country {isPaymentPage && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
                   value={address.country}
                   onChange={(e) =>
-                    handleAddressChange(index, "country", e.target.value)
+                    handleAddressChange(actualIndex, "country", e.target.value)
                   }
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: validationErrors.country && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: addressErrors.country ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter country"
                 />
-                {validationErrors.country && index === 0 && ( 
+                {addressErrors.country && ( 
                   <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
-                    {validationErrors.country}
+                    {addressErrors.country}
                   </p>
                 )}
               </div>
@@ -304,25 +337,25 @@ function Address({
                   className="block text-sm font-medium mb-2"
                   style={{ color: theme.colors.text.secondary }}
                 >
-                  ZIP/Postal Code {isPaymentPage && index === 0 && <span style={{ color: "#DC2626" }}>*</span>}
+                  ZIP/Postal Code {isPaymentPage && <span style={{ color: "#DC2626" }}>*</span>}
                 </label>
                 <input
                   type="text"
                   value={address.zip}
                   onChange={(e) =>
-                    handleAddressChange(index, "zip", e.target.value)
+                    handleAddressChange(actualIndex, "zip", e.target.value)
                   }
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: validationErrors.zip && index === 0 ? "#DC2626" : theme.colors.border.light,
+                    borderColor: addressErrors.zip ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="Enter ZIP code"
                 />
-                {validationErrors.zip && index === 0 && ( 
+                {addressErrors.zip && ( 
                   <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
-                    {validationErrors.zip}
+                    {addressErrors.zip}
                   </p>
                 )}
               </div>
@@ -338,21 +371,30 @@ function Address({
                   type="tel"
                   value={address.phone}
                   onChange={(e) =>
-                    handleAddressChange(index, "phone", e.target.value)
+                    handleAddressChange(actualIndex, "phone", e.target.value)
                   }
                   className="w-full px-4 py-2 rounded-md border focus:outline-none focus:ring-2"
                   style={{
                     backgroundColor: "#FFFFFF",
-                    borderColor: theme.colors.border.light,
+                    borderColor: addressErrors.phone ? "#DC2626" : theme.colors.border.light,
                     color: theme.colors.text.primary,
                   }}
                   placeholder="+91 1234567890"
                 />
+                {addressErrors.phone && ( 
+                  <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+                    {addressErrors.phone}
+                  </p>
+                )}
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
+
+      {/* Address Selection Modal */}
+      <AddressSelectionModal isPaymentPage={isPaymentPage} isAddressModalOpen={isAddressModalOpen} setIsAddressModalOpen={setIsAddressModalOpen} handleSelectAddress={handleSelectAddress} addresses={addresses} theme={theme} />
     </div>
   );
 }

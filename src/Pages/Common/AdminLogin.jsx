@@ -146,12 +146,13 @@ const AdminLogin = () => {
               style={{ color: theme.colors.accent.primary }}
               onClick={() => navigate("/login")}
             >
-              Login as a User <span className="text-gray-500 mx-2"> | </span>
+              Login as a User 
+              {/* <span className="text-gray-500 mx-2"> | </span> */}
             </span> 
 
           </p>
 
-          <p className="mt-6 text-sm text-center text-gray-600">
+          {/* <p className="mt-6 text-sm text-center text-gray-600">
             <span
               className="cursor-pointer font-semibold hover:underline"
               style={{ color: theme.colors.accent.primary }}
@@ -159,7 +160,7 @@ const AdminLogin = () => {
             >
               Forgot Password?
             </span>
-          </p>
+          </p> */}
           </div>
         </div>
       </div>

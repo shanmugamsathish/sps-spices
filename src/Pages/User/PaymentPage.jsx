@@ -14,6 +14,7 @@ import { getCustomerById } from "../../apiCalls/customers";
 import AdminAddCustomerForm from "../../Components/AdminAddCustomerComponent/AdminAddCustomerForm";
 import { useLocation } from "../../hooks/useLocation";
 import { getGstPercentage } from "../../apiCalls/tax";
+import { fetchStates } from "../../apiCalls/fetchstates";
 
 function PaymentPage() {
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ function PaymentPage() {
   
   // Location management for refrigerated products
   const { location: userLocation, requestLocation, validateLocation } = useLocation();
-  const [locationError, setLocationError] = useState(null);
+  const [_locationError, setLocationError] = useState(null);
   
   // Payment status states
   const [paymentStatus, setPaymentStatus] = useState(null); 
@@ -64,6 +65,12 @@ function PaymentPage() {
 
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState({});
+
+    // Address selection modal state
+    const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+
+    // States data
+    const [states, setStates] = useState([]);
 
   const validateForm = useCallback(() => {
     const errors = {};
@@ -148,6 +155,20 @@ function PaymentPage() {
     }
   }, [addresses, validationErrors]);
 
+  // Handle address selection from modal
+  const handleSelectAddress = useCallback((selectedIndex) => {
+    if (selectedIndex >= 0 && selectedIndex < addresses.length && selectedIndex !== 0) {
+      const updatedAddresses = [...addresses];
+      const temp = updatedAddresses[0];
+      updatedAddresses[0] = { ...updatedAddresses[selectedIndex] };
+      updatedAddresses[selectedIndex] = { ...temp };
+      setAddresses(updatedAddresses);
+      setIsAddressModalOpen(false);
+    } else if (selectedIndex === 0) {
+      setIsAddressModalOpen(false);
+    }
+  }, [addresses]);
+
   const fetchCustomerData = useCallback(async () => {
     try {
       dispatch(setLoading(true));
@@ -200,6 +221,21 @@ function PaymentPage() {
       }
     };
     fetchGst();
+  }, []);
+
+  // Fetch states data
+  useEffect(() => {
+    const fetchStatesData = async () => {
+      try {
+        const statesData = await fetchStates();
+        if (statesData.success && Array.isArray(statesData.states)) {
+          setStates(statesData.states);
+        }
+      } catch (error) {
+        console.error("Error fetching states:", error);
+      }
+    };
+    fetchStatesData();
   }, []);
 
   // This is used for display only - backend will recalculate from Shopify
@@ -460,7 +496,7 @@ function PaymentPage() {
       dispatch(setLoading(false));
       // DO NOT clear cart on error
     }
-  },     [
+  },[
     cartTotal,
     cart,
     dispatch,
@@ -631,6 +667,10 @@ function PaymentPage() {
             handleAddressChange={handleAddressChange}
             isPaymentPage={isPaymentPage}
             validationErrors={validationErrors}
+            isAddressModalOpen={isAddressModalOpen}
+            setIsAddressModalOpen={setIsAddressModalOpen}
+            handleSelectAddress={handleSelectAddress}
+            states={states}
           />
         </div>
 

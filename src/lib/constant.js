@@ -56,6 +56,7 @@ export const ROUTES = {
   PAYMENT: '/payment',
 
   ADMIN_PRODUCTS: '/admin/products',
+  ADMIN_PRODUCT_LIST: '/admin/product-list',
   ADMIN_ADD_PRODUCT: '/admin/add-product',
   ADMIN_CUSTOMERS: '/admin/customers',
   ADMIN_ADD_CUSTOMER: '/admin/add-customer',

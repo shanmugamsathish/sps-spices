@@ -277,7 +277,7 @@ function OrderModel({ isOpen, onClose, orderId, isAdmin = false }) {
                         <h4
                           className={`text-base sm:text-lg font-semibold mb-1 ${item.product_id ? 'cursor-pointer hover:underline' : ''}`}
                           style={{ color: theme.colors.text.primary }}
-                          onClick={() => item.product_id && navigate(`/product-details/${item.product_id}`)}
+                          onClick={() => item.product_id && navigate(`/admin/product-details/${item.product_id}`)}
                         >
                           {item.title}
                         </h4>

@@ -14,6 +14,7 @@ import ProductReviews from '../../Components/ProductReviews'
 import { getFavourites, addFavourite, removeFavourite } from "../../apiCalls/favourites";
 import { Heart } from 'lucide-react'
 import { useLocation } from '../../hooks/useLocation'
+import { useLocation as useRouterLocation} from 'react-router-dom'
 import DeliveryBadge from '../../Components/DeliveryBadge'
 import { getNumericProductId } from '../../utils/productHelpers'
 import { checkRadius } from '../../apiCalls/geo'
@@ -46,6 +47,10 @@ function ProductDetails() {
     error: null,
     needsLocation: false,
   });
+
+  const routerLocation = useRouterLocation();
+
+  const isAdmin = routerLocation.pathname.includes('/admin');
 
   const token = sessionStorage.getItem("token");
   const shopifyAccessToken = sessionStorage.getItem("shopifyAccessToken");
@@ -249,10 +254,11 @@ function ProductDetails() {
   }, [dispatch]);
 
   useEffect(() => {
+    if (isAdmin) return;
     if (token && shopifyAccessToken) {
       fetchFavorites();
     }
-  }, [token, shopifyAccessToken, fetchFavorites]);
+  }, [token, shopifyAccessToken, fetchFavorites, isAdmin]);
 
   const getVariantGraphQLId = useCallback((variant) => {
     if (variant?.admin_graphql_api_id) {
@@ -648,6 +654,7 @@ function ProductDetails() {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight " style={{ color: theme.colors.text.primary }}>
               {product.title}
             </h1>
+            {!isAdmin && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -711,6 +718,7 @@ function ProductDetails() {
             />
           )}
         </button>
+        )}
         </div>
             <div className="flex items-baseline gap-3">
               <span className="text-2xl sm:text-3xl font-bold" style={{ color: theme.colors.text.primary }}>
@@ -789,8 +797,8 @@ function ProductDetails() {
               </div>
             </div>
 
-            {/* Delivery Badge */}
-            {product?.id && (
+            {/* Delivery Badge */} 
+            {product?.id && !isAdmin && (
               <DeliveryBadge
                 isRefrigerated={locationStatus.isRefrigerated}
                 isLocationAllowed={locationStatus.allowed}
@@ -800,6 +808,7 @@ function ProductDetails() {
               />
             )}
 
+            {!isAdmin && (
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={() => {
@@ -830,7 +839,7 @@ function ProductDetails() {
                 {isUpdatingCart ? "Adding..." : "Buy it now"}
               </button>
             </div>
-
+            )}
             <div className="border-t pt-4" style={{ borderColor: theme.colors.border.light }}></div>
 
             {paragraphs.length > 0 && (
@@ -869,6 +878,7 @@ function ProductDetails() {
             productId={product.id}
             customerId={customerId}
             customerName={customerName}
+            isAdmin={isAdmin}
           />
         </div>
       )}

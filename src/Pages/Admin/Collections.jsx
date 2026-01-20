@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState, useRef } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { getAllCollections, deleteCollection } from '../../apiCalls/collections';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../lib/constant';
@@ -17,9 +17,6 @@ function Collections() {
   const [selectedCollectionTitle, setSelectedCollectionTitle] = useState(null);
   const [productCounts, setProductCounts] = useState({});
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [tableWidth, setTableWidth] = useState(null);
-  const [tablePosition, setTablePosition] = useState({ top: 0, left: 0 });
-  const tableRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -58,28 +55,6 @@ function Collections() {
   useEffect(() => {
     fetchCollections();
   }, [fetchCollections]);
-
-  // Get table width and position for modal
-  const updateTableDimensions = useCallback(() => {
-    if (tableRef.current) {
-      const rect = tableRef.current.getBoundingClientRect();
-      setTableWidth(rect.width);
-      setTablePosition({ top: rect.top, left: rect.left });
-    }
-  }, []);
-
-  useEffect(() => {
-    updateTableDimensions();
-    
-    // Update on window resize and scroll
-    window.addEventListener('resize', updateTableDimensions);
-    window.addEventListener('scroll', updateTableDimensions);
-    
-    return () => {
-      window.removeEventListener('resize', updateTableDimensions);
-      window.removeEventListener('scroll', updateTableDimensions);
-    };
-  }, [collections, updateTableDimensions]);
 
   // Get collection image
   const getCollectionImage = (collection) => {
@@ -172,7 +147,6 @@ function Collections() {
         </div>
       ) : (
         <div
-          ref={tableRef}
           className="rounded-lg overflow-hidden shadow-sm"
           style={{
             backgroundColor: '#FFFFFF',
@@ -318,8 +292,6 @@ function Collections() {
         isOpen={editModalOpen}
         onClose={handleCloseModal}
         onUpdate={handleCollectionUpdate}
-        tableWidth={tableWidth}
-        tablePosition={tablePosition}
       />
 
       <DialogBox 

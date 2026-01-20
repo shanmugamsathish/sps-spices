@@ -109,6 +109,11 @@ function BasicInformation({
             }}
             placeholder="customer@example.com"
           />
+          {validationErrors.email && (
+            <p className="mt-1 text-sm" style={{ color: "#DC2626" }}>
+              {validationErrors.email}
+            </p>
+          )}
         </div>
 
         <div>

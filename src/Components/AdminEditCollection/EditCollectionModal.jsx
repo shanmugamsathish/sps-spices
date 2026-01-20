@@ -8,7 +8,7 @@ import BrowseProductModel from '../AdminAddCollectionComponent/BrowseProductMode
 import ScrollableContent from './EditCollectionModel/ScrollableContent';
 import Header from './EditCollectionModel/Header';
 
-function EditCollectionModal({ collectionId, isOpen, onClose, onUpdate, tableWidth, tablePosition }) {
+function EditCollectionModal({ collectionId, isOpen, onClose, onUpdate }) {
   const [loadingText, setLoadingText] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [initialData, setInitialData] = useState(null);
@@ -461,6 +461,9 @@ function EditCollectionModal({ collectionId, isOpen, onClose, onUpdate, tableWid
 
   if (!isOpen) return null;
 
+  // fallback for position if parent didn't pass tablePosition
+  const safePosition = { top: 0, left: 0 };
+
   return (
     <div
       className="fixed inset-0 z-50 overflow-y-auto"
@@ -475,16 +478,16 @@ function EditCollectionModal({ collectionId, isOpen, onClose, onUpdate, tableWid
         ref={modalRef}
         className="absolute bg-white rounded-lg shadow-xl overflow-hidden flex flex-col"
         style={{
-          width: tableWidth ? `${tableWidth}px` : "90%",
-          maxWidth: "1400px",
-          maxHeight: tablePosition.top > 150 
-            ? `${tablePosition.top - 60}px` 
+          width: "90%",
+          maxWidth: "1000px",
+          maxHeight: safePosition.top > 150 
+            ? `${safePosition.top - 60}px` 
             : "calc(100vh - 2rem)",
-          top: tablePosition.top > 150 
-            ? `${Math.max(1, tablePosition.top - (tablePosition.top > 500 ? 500 : tablePosition.top - 20))}px` 
+          top: safePosition.top > 150 
+            ? `${Math.max(1, safePosition.top - (safePosition.top > 500 ? 500 : safePosition.top - 20))}px` 
             : "1rem",
-          left: tablePosition.left > 0 ? `${tablePosition.left}px` : "50%",
-          transform: tablePosition.left > 0 ? "none" : "translateX(-50%)",
+          left: safePosition.left > 0 ? `${safePosition.left}px` : "50%",
+          transform: safePosition.left > 0 ? "none" : "translateX(-50%)",
         }}
         onClick={(e) => e.stopPropagation()}
       >

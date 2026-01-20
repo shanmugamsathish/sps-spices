@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, ShoppingBag, LogOut, Users, Folder, ListOrdered, Image } from "lucide-react";
+import { Menu, X, ShoppingBag, LogOut, Users, Folder, ListOrdered, Image, Package } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import theme from "../lib/theme";
 import { ROUTES, LOGO } from "../lib/constant";
@@ -148,11 +148,19 @@ function AdminHeader() {
                 >
                   <button
                     onClick={handleChangeBannerImage}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors rounded-lg"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors rounded-lg border-b border-gray-200"
                     style={{ color: theme.colors.text.primary }}
                   >
                     <Image className="w-5 h-5" />
-                    <span className="font-medium text-sm">Change Banner Image</span>
+                    <span className="font-medium text-sm">Change Banner Pic</span>
+                  </button>
+                  <button
+                    onClick={() => navigate(ROUTES.ADMIN_PRODUCT_LIST)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors rounded-lg"
+                    style={{ color: theme.colors.text.primary }}
+                  >
+                    <Package className="w-5 h-5" />
+                    <span className="font-medium text-sm">Product List</span>
                   </button>
                 </div>
               )}
@@ -296,6 +304,14 @@ function AdminHeader() {
                 >
                   <Image className="w-5 h-5" />
                   <span className="font-medium text-sm">Change Banner Image</span>
+                </button>
+                <button
+                  onClick={() => navigate(ROUTES.ADMIN_PRODUCT_LIST)}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors rounded-lg"
+                  style={{ color: theme.colors.text.primary }}
+                >
+                  <Package className="w-5 h-5" />
+                  <span className="font-medium text-sm">Product List</span>
                 </button>
               </div>
             )}

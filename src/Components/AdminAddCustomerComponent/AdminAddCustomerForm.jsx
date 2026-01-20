@@ -4,13 +4,13 @@ import { ROUTES } from '../../lib/constant'
 import theme from '../../lib/theme'
 import { useNavigate } from 'react-router-dom'
 
-function AdminAddCustomerForm({ formData, handleInputChange, addresses, addAddress, removeAddress, handleAddressChange, isPaymentPage, handleSubmit, validationErrors }) {
+function AdminAddCustomerForm({ formData, handleInputChange, addresses, addAddress, removeAddress, handleAddressChange, isPaymentPage, handleSubmit, validationErrors, formErrors = {}, isAddressModalOpen, setIsAddressModalOpen, handleSelectAddress, states = [] }) {
   const navigate = useNavigate();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-    <BasicInformation formData={formData} handleInputChange={handleInputChange} isPaymentPage={isPaymentPage} validationErrors={validationErrors}/>
-    <Address addresses={addresses} addAddress={addAddress} removeAddress={removeAddress} handleAddressChange={handleAddressChange} isPaymentPage={isPaymentPage} validationErrors={validationErrors}/>
+    <BasicInformation formData={formData} handleInputChange={handleInputChange} isPaymentPage={isPaymentPage} validationErrors={formErrors}/>
+    <Address addresses={addresses} addAddress={addAddress} removeAddress={removeAddress} handleAddressChange={handleAddressChange} isPaymentPage={isPaymentPage} validationErrors={validationErrors} isAddressModalOpen={isAddressModalOpen} setIsAddressModalOpen={setIsAddressModalOpen} handleSelectAddress={handleSelectAddress} states={states}/>
     {isPaymentPage ? (
       null
     ) : (

@@ -10,14 +10,11 @@ import DialogBox from '../../Components/DialogBox';
 import { useDispatch } from 'react-redux';
 import { setLoading } from '../../redux/loaderSlice';
 
-function Products() {
+function AdminProducts() {
   const [products, setProducts] = useState([]);
-  const [loadingText, setLoadingText] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [selectedProductTitle, setSelectedProductTitle] = useState(null);
-  const [tableWidth, setTableWidth] = useState(null);
-  const [tablePosition, setTablePosition] = useState({ top: 0, left: 0 });
   const tableRef = useRef(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const navigate = useNavigate();
@@ -25,7 +22,6 @@ function Products() {
 
   const fetchProducts = useCallback(async () => {
     try {
-      setLoadingText(true);
       dispatch(setLoading(true));
       const productsData = await getAllProducts();
       setProducts(Array.isArray(productsData) ? productsData : []);
@@ -33,7 +29,6 @@ function Products() {
       console.error('Error fetching products:', error);
       toast.error('Failed to fetch products');
     } finally {
-      setLoadingText(false);
       dispatch(setLoading(false));
     }
   }, [dispatch]);
@@ -41,28 +36,6 @@ function Products() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
-
-  // Get table width and position for modal
-  const updateTableDimensions = useCallback(() => {
-    if (tableRef.current) {
-      const rect = tableRef.current.getBoundingClientRect();
-      setTableWidth(rect.width);
-      setTablePosition({ top: rect.top, left: rect.left });
-    }
-  }, []);
-
-  useEffect(() => {
-    updateTableDimensions();
-    
-    // Update on window resize and scroll
-    window.addEventListener('resize', updateTableDimensions);
-    window.addEventListener('scroll', updateTableDimensions);
-    
-    return () => {
-      window.removeEventListener('resize', updateTableDimensions);
-      window.removeEventListener('scroll', updateTableDimensions);
-    };
-  }, [products, loadingText, updateTableDimensions]);
 
   // Calculate total stock from all variants
   const getTotalStock = (product) => {
@@ -376,12 +349,10 @@ function Products() {
         isOpen={editModalOpen}
         onClose={handleCloseModal}
         onUpdate={handleProductUpdate}
-        tableWidth={tableWidth}
-        tablePosition={tablePosition}
       />
       <DialogBox isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} title={selectedProductTitle} description={`Are you sure you want to delete "${selectedProductTitle}"?` } onConfirm={() => handleDelete(selectedProductId, selectedProductTitle)} />
     </div>
   );
 }
 
-export default Products;
+export default AdminProducts;

@@ -20,6 +20,7 @@ function ProductCard({ productsList, horizontal = false }) {
   const isSearching = useSelector((state) => state.products.isSearching);
   const searchQuery = useSelector((state) => state.products.searchQuery);
   const isHome = location.pathname === "/";
+  const isAdmin = location.pathname.includes('/admin');
   const isLoadingState = useSelector((state) => state.loader.isLoading);
   const cartId = useSelector((state) => state.products.cart?.id);
   const [openEditLoginModal, setOpenEditLoginModal] = useState(false);
@@ -635,7 +636,7 @@ function ProductCard({ productsList, horizontal = false }) {
                         </div>
                       </div>
                       {/* Delivery Badge */}
-                      {productId && (
+                      {productId && !isAdmin && (
                         <DeliveryBadge
                           isRefrigerated={locationStatus.isRefrigerated}
                           isLocationAllowed={locationStatus.allowed}
@@ -644,6 +645,7 @@ function ProductCard({ productsList, horizontal = false }) {
                           error={locationStatus.error}
                         />
                       )}
+                      {!isAdmin && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -659,6 +661,7 @@ function ProductCard({ productsList, horizontal = false }) {
                         <ShoppingCart className="w-4 h-4 font-bold relative z-10" />
                         <span className="relative z-10">Add to Cart</span>
                       </button>
+                      )}
                     </div>
                   );
                 })}
@@ -712,7 +715,11 @@ function ProductCard({ productsList, horizontal = false }) {
                     <ProductImageCarousel
                       product={product}
                       onClick={() => {
-                        navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`);
+                        if (isAdmin) {
+                          navigate(`${ROUTES.ADMIN_PRODUCT_DETAILS}/${product.id}`);
+                        } else {
+                          navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`);
+                        }
                         window.scrollTo(0, 0);
                       }}
                     />
@@ -720,7 +727,11 @@ function ProductCard({ productsList, horizontal = false }) {
                       <h2
                         className="text-base sm:text-lg lg:text-xl font-semibold cursor-pointer "
                         onClick={() => {
-                          navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`);
+                          if (isAdmin) {
+                            navigate(`${ROUTES.ADMIN_PRODUCT_DETAILS}/${product.id}`);
+                          } else {
+                            navigate(`${ROUTES.PRODUCT_DETAILS}/${product.id}`);
+                          }
                           window.scrollTo(0, 0);
                         }}
                       >
@@ -772,7 +783,7 @@ function ProductCard({ productsList, horizontal = false }) {
               </div>
 
                     {/* Delivery Badge */}
-                    {productId && (
+                    {productId && !isAdmin && (
                       <DeliveryBadge
                         isRefrigerated={locationStatus.isRefrigerated}
                         isLocationAllowed={locationStatus.allowed}
@@ -782,6 +793,7 @@ function ProductCard({ productsList, horizontal = false }) {
                       />
                     )}
 
+                    {!isAdmin && (
               <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -797,6 +809,7 @@ function ProductCard({ productsList, horizontal = false }) {
                 <ShoppingCart className="w-4 h-4 font-bold relative z-10" />
                 <span className="relative z-10">Add to Cart</span>
               </button>
+              )}
             </div>
           );
               })}

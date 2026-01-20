@@ -5,8 +5,9 @@ import { useDispatch } from "react-redux";
 import { setLoading } from "../../redux/loaderSlice";
 import ScrollableContent from "./EditCustomerModel/ScrollableContent";
 import Header from "./EditCustomerModel/Header";
+import { validateField } from "../../lib/validation";
 
-function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, tablePosition, title }) {
+function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, title }) {
     const dispatch = useDispatch();
     const modalRef = useRef(null);
     const [hasChanges, setHasChanges] = useState(false);
@@ -21,6 +22,14 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
       password_confirmation: "",
       accepts_marketing: false,
       send_email_welcome: true,
+    });
+    const [formErrors, setFormErrors] = useState({
+      email: "",
+      first_name: "",
+      last_name: "",
+      phone: "",
+      password: "",
+      password_confirmation: "",
     });
   
     const [addresses, setAddresses] = useState([
@@ -37,6 +46,7 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
         phone: "",
       },
     ]);
+    const [addressesErrors, setAddressesErrors] = useState({});
   
     const handleInputChange = useCallback((e) => {
       const { name, value, type, checked } = e.target;
@@ -44,16 +54,76 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
         ...prev,
         [name]: type === "checkbox" ? checked : value,
       }));
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: validateField(name, value, formData),
+      }));
       setHasChanges(true);
-    }, []);
+    }, [formData]);
   
     const handleAddressChange = useCallback((index, field, value) => {
       const updatedAddresses = [...addresses];
       updatedAddresses[index][field] = value;
       setAddresses(updatedAddresses);
+      setAddressesErrors((prev) => {
+        const newErrors = { ...prev };
+        if (!newErrors[index]) {
+          newErrors[index] = {};
+        }
+        newErrors[index] = {
+          ...newErrors[index],
+          [field]: validateField(field, value),
+        };
+        return newErrors;
+      });
       setHasChanges(true);
     }, [addresses]);
-  
+
+    // Validation functions
+    const validateForm = useCallback((email, firstName, lastName, phone) => {
+      const errors = {};
+      const emailError = validateField("email", email);
+      const firstNameError = validateField("first_name", firstName);
+      const lastNameError = validateField("last_name", lastName);
+      const phoneError = validateField("phone", phone);
+      
+      if (emailError) errors.email = emailError;
+      if (firstNameError) errors.first_name = firstNameError;
+      if (lastNameError) errors.last_name = lastNameError;
+      if (phoneError) errors.phone = phoneError;
+      
+      return errors;
+    }, []);
+
+    const validateAddresses = useCallback((addresses) => {
+      const errors = {};
+      addresses.forEach((address, index) => {
+        const addressErrors = {};
+        const firstNameError = validateField("first_name", address.first_name);
+        const lastNameError = validateField("last_name", address.last_name);
+        const phoneError = validateField("phone", address.phone);
+        const address1Error = validateField("address1", address.address1);
+        const cityError = validateField("city", address.city);
+        const provinceError = validateField("province", address.province);
+        const countryError = validateField("country", address.country);
+        const zipError = validateField("zip", address.zip);
+        
+        if (firstNameError) addressErrors.first_name = firstNameError;
+        if (lastNameError) addressErrors.last_name = lastNameError;
+        if (phoneError) addressErrors.phone = phoneError;
+        if (address1Error) addressErrors.address1 = address1Error;
+        if (cityError) addressErrors.city = cityError;
+        if (provinceError) addressErrors.province = provinceError;
+        if (countryError) addressErrors.country = countryError;
+        if (zipError) addressErrors.zip = zipError;
+        
+        if (Object.keys(addressErrors).length > 0) {
+          errors[index] = addressErrors;
+        }
+      });
+      return errors;
+    }, []);
+    
     useEffect(() => {
       if (formData.first_name) {
         setAddresses((prev) => 
@@ -174,6 +244,18 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
       async (e) => {
         e.preventDefault();
 
+        const errors = validateForm(formData.email, formData.first_name, formData.last_name, formData.phone);
+        if (Object.keys(errors).length > 0) {
+          setFormErrors(errors);
+          return;
+        }
+        
+        const addressesErrors = validateAddresses(addresses);
+        if (Object.keys(addressesErrors).length > 0) {
+          setAddressesErrors(addressesErrors);
+          return;
+        }
+
         if (!isFormValid()) {
           if (formData.password && formData.password !== formData.password_confirmation) {
             toast.error("Passwords do not match");
@@ -241,9 +323,16 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
           }
         } catch (error) {
           console.error("Error updating customer:", error);
-          const errorMessage =
+          const errorMessage = 
+           'Phone: ' + error.response?.data?.errors?.phone?.[0] ||
+            'First Name: ' + error.response?.data?.errors?.first_name?.[0] ||
+            'Last Name: ' + error.response?.data?.errors?.last_name?.[0] ||
+            'Email: ' + error.response?.data?.errors?.email?.[0] ||
+            'Password: ' + error.response?.data?.errors?.password?.[0] ||
+            'Password Confirmation: ' + error.response?.data?.errors?.password_confirmation?.[0] ||
+            'Accepts Marketing: ' + error.response?.data?.errors?.accepts_marketing?.[0] ||
+            'Send Email Welcome: ' + error.response?.data?.errors?.send_email_welcome?.[0] ||
             error.response?.data?.message ||
-            error.response?.data?.error ||
             error.message ||
             "Failed to update customer";
           toast.error(errorMessage);
@@ -251,13 +340,13 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
           dispatch(setLoading(false));
         }
       },
-      [formData, addresses, dispatch, isFormValid, customerId, onUpdate, onClose]
+      [formData, addresses, dispatch, isFormValid, customerId, onUpdate, onClose, validateForm, validateAddresses]
     );
 
  if (!isOpen) return null;
 
  // fallback for position if parent didn't pass tablePosition
- const safePosition = tablePosition || { top: 0, left: 0 };
+ const safePosition = { top: 0, left: 0 };
 
   return (
     <div
@@ -273,8 +362,8 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
         ref={modalRef}
         className="absolute bg-white rounded-lg shadow-xl overflow-hidden flex flex-col"
         style={{
-          width: tableWidth ? `${tableWidth}px` : "90%",
-          maxWidth: "1400px",
+          width: "90%",
+          maxWidth: "1000px",
           maxHeight: safePosition.top > 150 
             ? `${safePosition.top - 60}px` 
             : "calc(100vh - 2rem)",
@@ -287,10 +376,21 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, tableWidth, 
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <Header onClose={onClose} hasChanges={hasChanges} loading={loadingText} handleSubmit={handleSubmit} title={title} />
+        <Header onClose={onClose} hasChanges={hasChanges} loading={loadingText} handleSubmit={handleSubmit} title={title} formErrors={formErrors} addressesErrors={addressesErrors}/>
 
         {/* Scrollable Content */}
-        <ScrollableContent formData={formData} addresses={addresses} addAddress={addAddress} removeAddress={removeAddress} handleAddressChange={handleAddressChange} handleInputChange={handleInputChange} handleSubmit={handleSubmit} loading={loadingText} />
+        <ScrollableContent 
+          formData={formData} 
+          addresses={addresses} 
+          addAddress={addAddress} 
+          removeAddress={removeAddress} 
+          handleAddressChange={handleAddressChange} 
+          handleInputChange={handleInputChange} 
+          handleSubmit={handleSubmit} 
+          loading={loadingText}
+          formErrors={formErrors}
+          addressesErrors={addressesErrors}
+        />
       </div>
     </div>
   );

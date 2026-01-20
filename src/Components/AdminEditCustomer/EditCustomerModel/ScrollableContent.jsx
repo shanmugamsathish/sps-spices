@@ -1,10 +1,24 @@
-import React from 'react'
-
+import React, { useState, useEffect } from 'react'
 import theme from '../../../lib/theme';
 import BasicInformation from '../../AdminAddCustomerComponent/BasicInformation';
 import Address from '../../AdminAddCustomerComponent/Address';
+import { fetchStates } from '../../../apiCalls/fetchstates';
 
-function ScrollableContent({ formData, addresses, addAddress, removeAddress, handleAddressChange, handleInputChange, generateHandle, handleSubmit, loading }) {
+function ScrollableContent({ formData, addresses, addAddress, removeAddress, handleAddressChange, handleInputChange, generateHandle, handleSubmit, loading, formErrors = {}, addressesErrors = {} }) {
+  const [states, setStates] = useState([]);
+  useEffect(() => {
+    const fetchStatesData = async () => {
+      try {
+        const statesData = await fetchStates();
+        if (statesData.success && Array.isArray(statesData.states)) {
+          setStates(statesData.states);
+        }
+      } catch (error) {
+        console.error("Error fetching states:", error);
+      }
+    };
+    fetchStatesData();
+  }, []);
   return (
     <div className="overflow-y-auto flex-1 p-4 sm:p-6">
     {loading && !formData.title ? (
@@ -18,6 +32,7 @@ function ScrollableContent({ formData, addresses, addAddress, removeAddress, han
           formData={formData}
           handleInputChange={handleInputChange}
           generateHandle={generateHandle}
+          validationErrors={formErrors}
         />
 
         {/* Addresses */}
@@ -26,6 +41,8 @@ function ScrollableContent({ formData, addresses, addAddress, removeAddress, han
           addAddress={addAddress}
           removeAddress={removeAddress}
           handleAddressChange={handleAddressChange}
+          states={states}
+          validationErrors={addressesErrors}
         />
       </form>
     )}

@@ -27,7 +27,7 @@ const StarRating = ({ rating, size = "w-5 h-5" }) => {
   );
 };
 // Main Product Reviews Component
-function ProductReviews({ productId, customerId, customerName }) {
+function ProductReviews({ productId, customerId, customerName, isAdmin}) {
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -272,6 +272,7 @@ function ProductReviews({ productId, customerId, customerName }) {
           ))}
         </div>
       )}
+      {!isAdmin && (
       <h2
         className="text-2xl sm:text-3xl font-bold my-6 pb-3 border-b"
         style={{
@@ -281,7 +282,8 @@ function ProductReviews({ productId, customerId, customerName }) {
       >
         Submit a Review
       </h2>
-      {customerId && customerName && (
+      )}
+      {customerId && customerName && !isAdmin && (
         <>
           {isCheckingPurchase ? (
             <div
@@ -329,7 +331,7 @@ function ProductReviews({ productId, customerId, customerName }) {
           )}
         </>
       )}
-
+      
       {error && (
         <div
           className="mb-6 p-4 rounded-lg border"

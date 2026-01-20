@@ -9,7 +9,8 @@ import AdminAddProduct from '../Pages/Admin/AdminAddProduct';
 import Customers from '../Pages/Admin/Customers';
 import Orders from '../Pages/Admin/Orders';
 import Collections from '../Pages/Admin/Collections';
-import Products from '../Pages/Admin/Products';
+import AdminProducts from '../Pages/Admin/AdminProducts';
+import Products from '../Pages/User/Products';
 import AdminAddCollection from '../Pages/Admin/AdminAddCollection';
 import ProductDetails from '../Pages/User/ProductDetails';
 import AdminAddCustomer from '../Pages/Admin/AdminAddCustomer';
@@ -40,7 +41,8 @@ function Admin() {
               <Routes>
                 <Route element={<ProtectedRoutes />}>
                   <Route path={ROUTES.ADMIN_ADD_PRODUCT} element={<AdminAddProduct />} />
-                  <Route path={ROUTES.ADMIN_PRODUCTS} element={<Products />} />
+                  <Route path={ROUTES.ADMIN_PRODUCTS} element={<AdminProducts />} />
+                  <Route path={ROUTES.ADMIN_PRODUCT_LIST} element={<Products />} />
                   <Route path={ROUTES.ADMIN_CUSTOMERS} element={<Customers />} />
                   <Route path={ROUTES.ADMIN_ADD_CUSTOMER} element={<AdminAddCustomer />} />
                   <Route path={ROUTES.ADMIN_ORDERS} element={<Orders />} />
