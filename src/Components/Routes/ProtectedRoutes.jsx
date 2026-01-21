@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { getUserProfile, getAdminProfile } from '../../apiCalls/users';
 import toast from 'react-hot-toast';
@@ -50,26 +50,32 @@ function ProtectedRoutes() {
         return;
       }
 
-      // If it has token or shopifyAccessToken, then it must redirect to home page
-
-
       // Admin routes: require token and admin role only
       if (isAdmin) {
         if (!token) {
           toast.error("Unauthorized Access");
-          navigate("/admin/login");
+          navigate("/admin/login", { replace: true });
           setLoading(false);
           return;
         }
         const decoded = decodeToken(token);
         const userRole = decoded?.role;
-        if (userRole !== "admin") {
-          toast.error("Access Restricted — Admins Only");
-          navigate("/");
+        
+        // Check if token is expired
+        if (decoded?.exp && decoded.exp * 1000 < Date.now()) {
+          sessionStorage.removeItem("token");
+          toast.error("Session expired");
+          navigate("/admin/login", { replace: true });
           setLoading(false);
           return;
         }
-        setLoading(false);
+        
+        if (userRole !== "admin") {
+          toast.error("Access Restricted — Admins Only");
+          navigate("/", { replace: true });
+          setLoading(false);
+          return;
+        }
         return;
       }
 
@@ -93,7 +99,7 @@ function ProtectedRoutes() {
         dispatch(setUser(response));
       } catch (err) {
         toast.error(err.response?.data?.message || "Unauthorized");
-        navigate("/login");
+        navigate("/login", { replace: true });
         setLoading(false);
         return;
       }
@@ -102,22 +108,47 @@ function ProtectedRoutes() {
     };
 
     verifyAccess();
-  }, [location.pathname, navigate]);
+  }, [location.pathname, navigate, dispatch]);
 
-  const verifyAdminAccess = async () => {
-    const response = await getAdminProfile();
-    if (!response?.success) {
-      toast.error(response?.message || "Session expired");
-      navigate("/admin/login");
-      return;
+  const verifyAdminAccess = useCallback(async () => {
+    try {
+      const response = await getAdminProfile();
+      if (!response?.success) {
+        // Clear expired token
+        if (response?.expired) {
+          sessionStorage.removeItem("token");
+        }
+        toast.error(response?.message || "Session expired");
+        navigate("/admin/login", { replace: true });
+        return false;
+      }
+      // Token is valid, allow access
+      return true;
+    } catch (error) {
+      // Handle unexpected errors
+      console.error("Admin access verification error:", error);
+      if (error.response?.status === 401) {
+        sessionStorage.removeItem("token");
+        toast.error("Session expired");
+        navigate("/admin/login", { replace: true });
+        return false;
+      }
+      // For other errors, still allow access but log the error
+      return true;
     }
-  }
+  }, [navigate]);
 
   useEffect(() => {
     if (isAdminRoute(location.pathname)) {
-      verifyAdminAccess();
+  // Set the current pathname in session storage
+    sessionStorage.setItem("currentPath", location.pathname);
+      verifyAdminAccess().then((isValid) => {
+        if (isValid !== undefined) {
+          setLoading(false);
+        }
+      });
     }
-  }, [location.pathname, /* verifyAdminAccess intentionally omitted from deps */]);
+  }, [location.pathname, verifyAdminAccess]);
 
   if (loading) {
     return (

@@ -6,6 +6,7 @@ import { setLoading } from "../../redux/loaderSlice";
 import ScrollableContent from "./EditCustomerModel/ScrollableContent";
 import Header from "./EditCustomerModel/Header";
 import { validateField } from "../../lib/validation";
+import { updateCustomerAddress, deleteCustomerAddress } from "../../apiCalls/customers";
 
 function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, title }) {
     const dispatch = useDispatch();
@@ -46,6 +47,7 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, title }) {
         phone: "",
       },
     ]);
+    const [originalAddresses, setOriginalAddresses] = useState([]);
     const [addressesErrors, setAddressesErrors] = useState({});
   
     const handleInputChange = useCallback((e) => {
@@ -219,11 +221,12 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, title }) {
                   zip: "",
                   phone: customerObj?.phone || "",
                 };
-                setAddresses(
-                  Array.isArray(customerObj?.addresses) && customerObj.addresses.length
+                const fetchedAddresses = Array.isArray(customerObj?.addresses) && customerObj.addresses.length
                     ? customerObj.addresses
-                    : [defaultAddress]
-                );
+                    : [defaultAddress];
+                setAddresses(fetchedAddresses);
+                // Store original addresses for comparison
+                setOriginalAddresses(JSON.parse(JSON.stringify(fetchedAddresses)));
                 setHasChanges(false);
             }
         } catch (error) {
@@ -269,29 +272,104 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, title }) {
 
         dispatch(setLoading(true));
 
-        const customerPayload = {
-          customer: {
-            email: (formData.email || "").trim(),
-            first_name: (formData.first_name || "").trim() || "",
-            last_name: (formData.last_name || "").trim() || "",
-            phone: (formData.phone || "").trim() || "",
-            // Only include password fields if user provided them
-            ...(formData.password ? { password: formData.password, password_confirmation: formData.password_confirmation } : {}),
-            accepts_marketing: formData.accepts_marketing || false,
-            send_email_welcome: formData.send_email_welcome !== false,
-            addresses: addresses
-              .filter((addr) => addr.address1?.trim()) // Only include addresses with at least address1
-              .map((addr) => {
-                const addressObj = {
-                  first_name: (addr.first_name || "").trim() || (formData.first_name || "").trim() || "",
-                  last_name: (addr.last_name || "").trim() || (formData.last_name || "").trim() || "",
-                  address1: (addr.address1 || "").trim(),
-                  city: (addr.city || "").trim() || "",
-                  province: (addr.province || "").trim() || "",
-                  zip: (addr.zip || "").trim() || "",
-                  country: (addr.country || "").trim() || "India",
-                  phone: (addr.phone || "").trim() || (formData.phone || "").trim() || "",
-                };
+        try {
+          // Handle address updates and deletions separately
+          const addressPromises = [];
+          const addressesToDelete = originalAddresses.filter(origAddr => 
+            origAddr.id && !addresses.find(addr => addr.id === origAddr.id)
+          );
+          
+          // Delete removed addresses
+          for (const addrToDelete of addressesToDelete) {
+            addressPromises.push(
+              deleteCustomerAddress(customerId, addrToDelete.id)
+                .catch(err => {
+                  console.error(`Error deleting address ${addrToDelete.id}:`, err);
+                  throw err;
+                })
+            );
+          }
+          
+          // Find addresses to update
+          const addressesToUpdate = addresses.filter(addr => {
+            if (!addr.id) return false; 
+            const origAddr = originalAddresses.find(o => o.id === addr.id);
+            if (!origAddr) return false;
+            
+            // Check if address changed
+            return (
+              (addr.first_name || "") !== (origAddr.first_name || "") ||
+              (addr.last_name || "") !== (origAddr.last_name || "") ||
+              (addr.company || "") !== (origAddr.company || "") ||
+              (addr.address1 || "") !== (origAddr.address1 || "") ||
+              (addr.address2 || "") !== (origAddr.address2 || "") ||
+              (addr.city || "") !== (origAddr.city || "") ||
+              (addr.province || "") !== (origAddr.province || "") ||
+              (addr.country || "") !== (origAddr.country || "") ||
+              (addr.zip || "") !== (origAddr.zip || "") ||
+              (addr.phone || "") !== (origAddr.phone || "")
+            );
+          });
+          
+          // Update changed addresses
+          for (const addrToUpdate of addressesToUpdate) {
+            const addressPayload = {
+              first_name: (addrToUpdate.first_name || "").trim() || (formData.first_name || "").trim() || "",
+              last_name: (addrToUpdate.last_name || "").trim() || (formData.last_name || "").trim() || "",
+              address1: (addrToUpdate.address1 || "").trim(),
+              city: (addrToUpdate.city || "").trim() || "",
+              province: (addrToUpdate.province || "").trim() || "",
+              zip: (addrToUpdate.zip || "").trim() || "",
+              country: (addrToUpdate.country || "").trim() || "India",
+              phone: (addrToUpdate.phone || "").trim() || (formData.phone || "").trim() || "",
+            };
+            
+            // Include optional fields
+            if (addrToUpdate.company?.trim()) {
+              addressPayload.company = addrToUpdate.company.trim();
+            }
+            if (addrToUpdate.address2?.trim()) {
+              addressPayload.address2 = addrToUpdate.address2.trim();
+            }
+            
+            addressPromises.push(
+              updateCustomerAddress(customerId, addrToUpdate.id, addressPayload, false)
+                .catch(err => {
+                  console.error(`Error updating address ${addrToUpdate.id}:`, err);
+                  throw err;
+                })
+            );
+          }
+          
+          // Wait for all address operations to complete
+          await Promise.all(addressPromises);
+          
+          // Update customer info and create new addresses
+          const newAddresses = addresses.filter(addr => !addr.id && addr.address1?.trim());
+          
+          const customerPayload = {
+            customer: {
+              email: (formData.email || "").trim(),
+              first_name: (formData.first_name || "").trim() || "",
+              last_name: (formData.last_name || "").trim() || "",
+              phone: (formData.phone || "").trim() || "",
+              // Only include password fields if user provided them
+              ...(formData.password ? { password: formData.password, password_confirmation: formData.password_confirmation } : {}),
+              accepts_marketing: formData.accepts_marketing || false,
+              send_email_welcome: formData.send_email_welcome !== false,
+              // Only include new addresses (ones without IDs)
+              ...(newAddresses.length > 0 ? {
+                addresses: newAddresses.map((addr) => {
+                  const addressObj = {
+                    first_name: (addr.first_name || "").trim() || (formData.first_name || "").trim() || "",
+                    last_name: (addr.last_name || "").trim() || (formData.last_name || "").trim() || "",
+                    address1: (addr.address1 || "").trim(),
+                    city: (addr.city || "").trim() || "",
+                    province: (addr.province || "").trim() || "",
+                    zip: (addr.zip || "").trim() || "",
+                    country: (addr.country || "").trim() || "India",
+                    phone: (addr.phone || "").trim() || (formData.phone || "").trim() || "",
+                  };
 
                 // Include optional fields only if they have values
                 if (addr.company?.trim()) {
@@ -301,12 +379,12 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, title }) {
                   addressObj.address2 = addr.address2.trim();
                 }
 
-                return addressObj;
-              }),
-          },
-        };
+                  return addressObj;
+                })
+              } : {}),
+            },
+          };
 
-        try {
           const response = await updateCustomer(customerId, customerPayload);
           if (response) {
             toast.success(response.message || "Customer updated successfully");
@@ -340,7 +418,7 @@ function EditCustomerModal({ customerId, isOpen, onClose, onUpdate, title }) {
           dispatch(setLoading(false));
         }
       },
-      [formData, addresses, dispatch, isFormValid, customerId, onUpdate, onClose, validateForm, validateAddresses]
+      [formData, addresses, originalAddresses, dispatch, isFormValid, customerId, onUpdate, onClose, validateForm, validateAddresses]
     );
 
  if (!isOpen) return null;

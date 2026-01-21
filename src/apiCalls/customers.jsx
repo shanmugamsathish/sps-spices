@@ -53,6 +53,35 @@ export const updateCustomer = async (id, customer) => {
     }
 }
 
+// Update a customer address
+export const updateCustomerAddress = async (customerId, addressId, address, makeDefault = false) => {
+    try {
+        const response = await axiosInstance.put(`${API_URL}/customers/update/address`, { 
+            customerId, 
+            addressId, 
+            address, 
+            makeDefault 
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating customer address:', error);
+        throw error;
+    }
+}
+
+// Delete a customer address
+export const deleteCustomerAddress = async (customerId, addressId) => {
+    try {
+        const response = await axiosInstance.delete(`${API_URL}/customers/delete/address`, {
+            data: { customerId, addressId }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting customer address:', error);
+        throw error;
+    }
+}
+
 // Delete a customer
 export const deleteCustomer = async (id) => {
     try {

@@ -1,10 +1,11 @@
-import React, { useMemo, useState, useEffect } from "react";
-import { Mail, Phone, MapPin, User2, ShoppingBag, IndianRupee, Home } from "lucide-react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
+import { Mail, Phone, MapPin, User2, ShoppingBag, IndianRupee, Home, Pencil } from "lucide-react";
 import { getUserProfile } from "../../apiCalls/users";
 import { getCustomerById } from "../../apiCalls/customers";
 import theme from "../../lib/theme";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../../redux/loaderSlice";
+import EditCustomerModal from "../../Components/AdminEditCustomer/EditCustomerModel";
 
 function MyProfile() {
   const [customerId, setCustomerId] = useState(null);
@@ -12,40 +13,48 @@ function MyProfile() {
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.loader.loading);
   const [error, setError] = useState("");
+  const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        setError("");
-        const res = await getUserProfile();
-        setCustomerId(res?.customer?.id || null);
-      } catch (err) {
-        console.error("Error fetching user profile:", err);
-        setError("Unable to load your profile. Please try again.");
-      }
-    };
-    fetchUserProfile();
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      setError("");
+      const res = await getUserProfile();
+      setCustomerId(res?.customer?.id || null);
+    } catch (err) {
+      console.error("Error fetching user profile:", err);
+      setError("Unable to load your profile. Please try again.");
+    }
   }, []);
 
   useEffect(() => {
+    fetchUserProfile();
+  }, [fetchUserProfile]);
+
+  const fetchCustomer = useCallback(async () => {
     if (!customerId) return;
+    try {
+      dispatch(setLoading(true));
+      setError("");
+      const res = await getCustomerById(customerId);
+      setUserProfile(res);
+    } catch (err) {
+      console.error("Error fetching customer by id:", err);
+      setError("Unable to load customer details. Please try again.");
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }, [customerId, dispatch]);
 
-    const fetchCustomer = async () => {
-      try {
-        dispatch(setLoading(true));
-        setError("");
-        const res = await getCustomerById(customerId);
-        setUserProfile(res);
-      } catch (err) {
-        console.error("Error fetching customer by id:", err);
-        setError("Unable to load customer details. Please try again.");
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
-
+  useEffect(() => {
+    if (!customerId) return;
     fetchCustomer();
-  }, [customerId]);
+  }, [customerId, fetchCustomer]);
+
+  const handleCustomerUpdate = useCallback(() => {
+    setIsEditCustomerModalOpen(false);
+    fetchUserProfile();
+    fetchCustomer();
+  }, [fetchUserProfile, fetchCustomer]);
 
   const customer = userProfile;
   const defaultAddress = customer?.default_address;
@@ -88,7 +97,8 @@ function MyProfile() {
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Title */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-3">
           <div
             className="p-2.5 rounded-xl shadow-sm"
             style={{ backgroundColor: theme.colors.accent.primary, color: "#fff" }}
@@ -101,6 +111,10 @@ function MyProfile() {
           >
             My Profile
           </h1>
+          </div>
+          <div className="cursor-pointer p-2.5 rounded-xl shadow-sm hover:bg-gray-100 transition-all duration-300" style={{ backgroundColor: theme.colors.accent.primary, color: "#fff" }} onClick={() => setIsEditCustomerModalOpen(true)}>
+          <Pencil className="w-5 h-5" />
+          </div>
         </div>
 
         {loading && (
@@ -348,6 +362,13 @@ function MyProfile() {
           </div>
         )}
       </div>
+      <EditCustomerModal
+        customerId={customerId}
+        isOpen={isEditCustomerModalOpen}
+        onClose={() => setIsEditCustomerModalOpen(false)}
+        onUpdate={handleCustomerUpdate}
+        title="Edit Profile"
+      />
     </div>
   );
 }

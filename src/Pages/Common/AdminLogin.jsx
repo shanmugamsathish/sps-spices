@@ -21,6 +21,10 @@ const AdminLogin = () => {
     email: "",
     password: "",
   });
+
+  // Get the current pathname from session storage
+  const currentPath = sessionStorage.getItem("currentPath");
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError({
@@ -51,7 +55,7 @@ const AdminLogin = () => {
       dispatch(setLoading(true));
       const response = await loginAdmin(formData);
       if (response) {
-        navigate("/admin/products");
+        navigate(currentPath || "/admin/products");
         toast.success(response.message);
         sessionStorage.setItem("token", response.token);
       } else {

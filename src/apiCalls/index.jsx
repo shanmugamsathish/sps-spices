@@ -27,3 +27,34 @@ axiosInstance.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
+// Add a response interceptor to handle 401 errors for admin routes
+axiosInstance.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error.response?.status === 401) {
+            const requestUrl = error.config?.url || '';
+            if (requestUrl.includes('/admin/') || requestUrl.includes('/auth/admin/')) {
+                const token = sessionStorage.getItem("token");
+                if (token) {
+                    try {
+                        const payload = JSON.parse(atob(token.split('.')[1]));
+                        if (payload?.role === 'admin') {
+                            sessionStorage.removeItem("token");
+                            const currentPath = window.location.pathname;
+                            if (currentPath.startsWith('/admin')) {
+                                window.location.href = '/admin/login';
+                            }
+                        }
+                    } catch (e) {
+                        console.log(e);
+                        sessionStorage.removeItem("token");
+                    }
+                }
+            }
+        }
+        return Promise.reject(error);
+    }
+);

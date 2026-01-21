@@ -25,12 +25,18 @@ function HeroSection() {
 
   const handleShopSpices = () => {
     navigate(ROUTES.PRODUCTS);
-    window.scrollTo(0, 0);
+    const spicesSection = document.getElementById('whole-spices');
+    if (spicesSection) {
+      spicesSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleShopDryFruits = () => {
     navigate(ROUTES.PRODUCTS);
-    window.scrollTo(0, 0);
+    const dryFruitsSection = document.getElementById('dry-fruits');
+    if (dryFruitsSection) {
+      dryFruitsSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   useEffect(() => {
@@ -51,7 +57,7 @@ function HeroSection() {
       }
     };
     fetchBannerImages();
-  }, []);
+  }, [dispatch]);
 
   return (
     <section className="relative w-full h-[70vh] sm:h-[80vh] md:h-[80vh] overflow-hidden">

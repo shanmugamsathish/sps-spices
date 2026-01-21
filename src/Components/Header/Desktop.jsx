@@ -1,9 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import theme from "../../lib/theme";
-import dryFruits from "../../assets/login.png";
-import wholeSpices from "../../assets/adminLogin.png";
-import { ROUTES } from "../../lib/constant";
+import { ROUTES, PRODUCT_MENU_IMAGES } from "../../lib/constant";
 
 function Desktop({ isActive, isHeader, token, shopifyAccessToken }) {
   return (
@@ -122,7 +120,7 @@ function Desktop({ isActive, isHeader, token, shopifyAccessToken }) {
                   onClick={() => window.scrollTo(0, 0)}
                 >
                   <div className="flex items-center gap-2 ">
-                    <img src={dryFruits} alt="dry-fruits" className="w-8 h-8" />
+                    <img src={PRODUCT_MENU_IMAGES.DRY_FRUITS} alt="dry-fruits" className="w-8 h-8" />
                     <p className="text-md font-medium">Dry Fruits</p>
                   </div>
                 </Link>
@@ -135,7 +133,7 @@ function Desktop({ isActive, isHeader, token, shopifyAccessToken }) {
                 >
                   <div className="flex items-center gap-2">
                     <img
-                      src={wholeSpices}
+                      src={PRODUCT_MENU_IMAGES.SPICES}
                       alt="whole-spices"
                       className="w-8 h-8"
                     />
@@ -151,7 +149,7 @@ function Desktop({ isActive, isHeader, token, shopifyAccessToken }) {
                 >
                   <div className="flex items-center gap-2">
                     <img
-                      src={wholeSpices}
+                      src={PRODUCT_MENU_IMAGES.TOP_SELLER}
                       alt="top-selling-products"
                       className="w-8 h-8"
                     />
@@ -167,7 +165,7 @@ function Desktop({ isActive, isHeader, token, shopifyAccessToken }) {
                 >
                   <div className="flex items-center gap-2">
                     <img
-                      src={wholeSpices}
+                      src={PRODUCT_MENU_IMAGES.DAILY_DEALS}
                       alt="top-selling-products"
                       className="w-8 h-8"
                     />

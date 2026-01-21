@@ -13,8 +13,8 @@ export const firstNamePattern = /^[a-zA-Z][a-zA-Z\s.'-]{1,29}$/;
 // Last Name validation regex pattern- Example Jane
 export const lastNamePattern = /^[a-zA-Z][a-zA-Z\s.'-]{1,29}$/;
 
-// Phone Number validation regex pattern- Example 1234567890
-export const phoneNumberPattern = /^[0-9]{10}$/;
+// Phone Number validation regex pattern
+export const phoneNumberPattern = /^(\+91)?[0-9]{10}$/;
 
 // Postal Code validation regex pattern- Example 123456
 export const postalCodePattern = /^[0-9]{6}$/;

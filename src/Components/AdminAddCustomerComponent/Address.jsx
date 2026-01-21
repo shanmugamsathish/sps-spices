@@ -92,24 +92,24 @@ function Address({
             }}
           >
             {!isPaymentPage && (
-              <div className="flex items-center justify-between mb-4">
-                <h3
-                  className="text-md font-semibold"
-                  style={{ color: theme.colors.text.primary }}
-                >
+            <div className="flex items-center justify-between mb-4">
+              <h3
+                className="text-md font-semibold"
+                style={{ color: theme.colors.text.primary }}
+              >
                   Address {actualIndex + 1}
-                </h3>
-                {addresses.length > 1 && (
-                  <button
-                    type="button"
+              </h3>
+              {addresses.length > 1 && (
+                <button
+                  type="button"
                     onClick={() => removeAddress(actualIndex)}
-                    className="p-2 rounded-md text-red-500 hover:bg-red-50 transition-colors"
-                    title="Remove Address"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
+                  className="p-2 rounded-md text-red-500 hover:bg-red-50 transition-colors"
+                  title="Remove Address"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

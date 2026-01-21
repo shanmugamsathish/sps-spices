@@ -2,14 +2,6 @@
 // API URL
 export const API_URL = 'http://localhost:7777/api';
 
-// Hero Section Images
-import Image1 from '../assets/Image1.png';
-import Image2 from '../assets/Image2.png';
-import Image3 from '../assets/Image3.png';
-import Image4 from '../assets/Image4.png';
-import Image5 from '../assets/Image5.png';
-import Image6 from '../assets/Image6.png';
-
 // Logo Images
 import logo from '../assets/LOGO sps.jpg';
 import logoWhite from '../assets/LOGO sps bg.png';
@@ -28,6 +20,12 @@ import profilepic3 from "../assets/profilepic3.png";
 import profilepic4 from "../assets/profilepic4.png";
 import profilepic5 from "../assets/profilepic5.png";
 import profilepic6 from "../assets/profilepic6.png";
+
+// Product menu Images
+import Spices from '../assets/Spicess.jpg';
+import DryFruits from '../assets/DryFruits.jpg';
+import TopSeller from '../assets/TopSeller.jpg';
+import DailyDeals from '../assets/DailyDeals.jpg';
 
 // Routes
 export const ROUTES = {
@@ -70,23 +68,10 @@ export const ROUTES = {
   ADMIN_EDIT_BANNER_IMAGES: '/admin/edit-banner-images',
 }
 
-// Hero Section Images
-export const HERO_SECTION_IMAGES = [
-  Image1,
-  Image2,
-  Image3,
-  Image4,
-  Image5,
-  Image6,
-]
-
 // About Us Images
 export const ABOUT_US_IMAGES = {
   ABOUT_US_IMAGE: aboutUsImage,
 }
-
-// Hero Section Duration
-export const HERO_SECTION_DURATION = 60;
 
 // Logo Images
 export const LOGO = {
@@ -100,6 +85,14 @@ export const LOGO = {
 // Page Not Found Images
 export const PAGE_NOT_FOUND = {
   PAGE_NOT_FOUND: pageNotFound,
+}
+
+// Product menu Images
+export const PRODUCT_MENU_IMAGES = {
+  SPICES: Spices,
+  DRY_FRUITS: DryFruits,
+  TOP_SELLER: TopSeller,
+  DAILY_DEALS: DailyDeals,
 }
 
 // Terms and Conditions
@@ -290,3 +283,39 @@ export const REVIEWS = [
     text: "Bought Marayoor jaggery and cardamom. Natural taste and good flavour. Will buy again.",
   },
 ];
+
+export const PRIVACY_POLICY = {
+  TITLE: "Privacy Policy",
+  DESCRIPTION:
+    "Your privacy is important to us. This policy explains how we collect, use, and protect your data when you use our e-commerce platform.",
+
+  POLICIES: [
+    {
+      title: "Information We Collect",
+      text: "We collect personal details such as name, email, phone number, delivery address, and payment-related information to process your orders."
+    },
+    {
+      title: "How We Use Your Information",
+      text: "Your data is used for order processing, customer support, delivery updates, and improving your shopping experience."
+    },
+    {
+      title: "Data Security",
+      text: "We use secure servers and encryption methods to protect your personal information from unauthorized access."
+    },
+    {
+      title: "Sharing of Information",
+      text: "We do not sell your personal data. Information is only shared with delivery partners and payment gateways for order fulfillment."
+    },
+    {
+      title: "Cookies",
+      text: "We use cookies to enhance site performance, remember your preferences, and analyze user behavior."
+    },
+    {
+      title: "Your Rights",
+      text: "You can request access, correction, or deletion of your personal data by contacting our support team."
+    },
+  ],
+
+  FOOTER:
+    "By using our website, you agree to the terms of this Privacy Policy.",
+};

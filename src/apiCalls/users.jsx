@@ -43,8 +43,20 @@ export const getUserProfile = async () => {
 
 // Get admin profile /api/auth/admin/me
 export const getAdminProfile = async () => {
-    const response = await axiosInstance.get(`${API_URL}/auth/admin/me`);
-    return response.data;
+    try {
+        const response = await axiosInstance.get(`${API_URL}/auth/admin/me`);
+        return response.data;
+    } catch (error) {
+        // Handle 401 Unauthorized (token expired)
+        if (error.response?.status === 401) {
+            return {
+                success: false,
+                message: error.response?.data?.message || "Session expired",
+                expired: true
+            };
+        }
+        throw error;
+    }
 }
 
 // Get all ADMIN users
